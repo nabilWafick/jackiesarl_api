@@ -5,6 +5,7 @@ const SoldeCourantController = require('../../controllers/solde_courant/solde_co
 // Routes pour la table `solde_courant`
 router.post('/solde-courant', SoldeCourantController.create);
 router.get('/solde-courant/:id', SoldeCourantController.getById);
+router.get('/solde-courant/', SoldeCourantController.getAll);
 router.put('/solde-courant/:id', SoldeCourantController.update);
 router.delete('/solde-courant/:id', SoldeCourantController.delete);
 

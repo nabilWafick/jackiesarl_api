@@ -5,6 +5,7 @@ const StockCamionController = require('../../controllers/stock_camion/stock_cami
 // Routes pour la table `stock_camion`
 router.post('/stock-camion', StockCamionController.create);
 router.get('/stock-camion/:id', StockCamionController.getById);
+router.get('/stock-camion/', StockCamionController.getAll);
 router.put('/stock-camion/:id', StockCamionController.update);
 router.delete('/stock-camion/:id', StockCamionController.delete);
 

@@ -5,6 +5,7 @@ RapportsController
 // Routes pour la table `rapports`
 router.post('/rapports', RapportsController.create);
 router.get('/rapports/:id', RapportsController.getById);
+router.get('/rapports/', RapportsController.getAll);
 router.put('/rapports/:id', RapportsController.update);
 router.delete('/rapports/:id', RapportsController.delete);
 

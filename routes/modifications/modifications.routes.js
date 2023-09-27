@@ -5,6 +5,7 @@ const ModificationsController = require('../../controllers/modifications/modific
 // Routes pour la table `modifications`
 router.post('/modifications', ModificationsController.create);
 router.get('/modifications/:id', ModificationsController.getById);
+router.get('/modifications/', ModificationsController.getAll);
 router.put('/modifications/:id', ModificationsController.update);
 router.delete('/modifications/:id', ModificationsController.delete);
 

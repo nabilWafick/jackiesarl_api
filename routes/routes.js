@@ -21,26 +21,24 @@ const soldeCourantRoutes = require('./solde_courant/solde_courant.routes');
 const stockBonCommandeRoutes = require('./stock_bon_commande/stock_bon_commande.routes');
 const stockCamionRoutes = require('./stock_camion/stock_camion.routes');
 
-
-// Utiliser les routes pour chaque table
-router.use('/achat-client', achatClientRoutes);
-router.use('/achat-entreprise', achatEntrepriseRoutes);
-router.use('/activites-banque', activitesBanqueRoutes);
-router.use('/activites-depot', activitesDepotRoutes);
-router.use('/autorisations', autorisationsRoutes);
-router.use('/avance', avanceRoutes);
-router.use('/brouillard', brouillardRoutes);
-router.use('/clients', clientsRoutes);
-router.use('/commandes', commandesRoutes);
-router.use('/creances', creancesRoutes);
-router.use('/depenses', depensesRoutes);
-router.use('/employes', employesRoutes);
-router.use('/modifications', modificationsRoutes);
-router.use('/paiement-client', paiementClientRoutes);
-router.use('/rapports', rapportsRoutes);
-router.use('/remise-cheque-client', remiseChequeClientRoutes);
-router.use('/solde-courant', soldeCourantRoutes);
-router.use('/stock-bon-commande', stockBonCommandeRoutes);
-router.use('/stock-camion', stockCamionRoutes);
+router.use('/', achatClientRoutes);
+router.use('/', achatEntrepriseRoutes);
+router.use('/', activitesBanqueRoutes);
+router.use('/', activitesDepotRoutes);
+router.use('/', autorisationsRoutes);
+router.use('/', avanceRoutes);
+router.use('/', brouillardRoutes);
+router.use('/', clientsRoutes);
+router.use('/', commandesRoutes);
+router.use('/', creancesRoutes);
+router.use('/', depensesRoutes);
+router.use('/', employesRoutes);
+router.use('/', modificationsRoutes);
+router.use('/', paiementClientRoutes);
+router.use('/', rapportsRoutes);
+router.use('/', remiseChequeClientRoutes);
+router.use('/', soldeCourantRoutes);
+router.use('/', stockBonCommandeRoutes);
+router.use('/', stockCamionRoutes);
 
 module.exports = router;

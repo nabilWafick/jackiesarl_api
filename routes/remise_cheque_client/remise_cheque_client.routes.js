@@ -5,6 +5,7 @@ const RemiseChequeClientController = require('../../controllers/remise_cheque_cl
 // Routes pour la table `remise_cheque_client`
 router.post('/remise-cheque-client', RemiseChequeClientController.create);
 router.get('/remise-cheque-client/:id', RemiseChequeClientController.getById);
+router.get('/remise-cheque-client/', RemiseChequeClientController.getAll);
 router.put('/remise-cheque-client/:id', RemiseChequeClientController.update);
 router.delete('/remise-cheque-client/:id', RemiseChequeClientController.delete);
 
