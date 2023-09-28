@@ -51,7 +51,7 @@ static getAll(callback) {
       return callback(error, null);
     }
     const depenses = results.map((depenseData) => {
-      return new Depense(
+      return new Depenses(
         depenseData.id,
         depenseData.description,
         depenseData.montant,

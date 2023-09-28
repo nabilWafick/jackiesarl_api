@@ -48,6 +48,29 @@ class ActivitesBanque {
     });
   }
 
+  // Méthode pour récupérer toutes les entrées de la table activites_banque
+static getAll(callback) {
+  const query = 'SELECT * FROM activites_banque';
+  connection.query(query, (error, results) => {
+    if (error) {
+      return callback(error, null);
+    }
+    const activitesBanque = results.map((activiteBanqueData) => {
+      return new ActivitesBanque(
+        activiteBanqueData.id,
+        activiteBanqueData.id_banque,
+        activiteBanqueData.description,
+        activiteBanqueData.debit,
+        activiteBanqueData.credit,
+        activiteBanqueData.solde,
+        activiteBanqueData.date_activite
+      );
+    });
+    return callback(null, activitesBanque);
+  });
+}
+
+
   // Méthode pour mettre à jour une activité banque
   update(callback) {
     const query = 'UPDATE activites_banque SET ? WHERE id = ?';

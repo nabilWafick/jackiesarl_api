@@ -52,7 +52,7 @@ static getAll(callback) {
       return callback(error, null);
     }
     const employes = results.map((employeData) => {
-      return new Employe(
+      return new Employes(
         employeData.id,
         employeData.nom,
         employeData.prenoms,

@@ -51,7 +51,7 @@ static getAll(callback) {
       return callback(error, null);
     }
     const creances = results.map((creanceData) => {
-      return new Creance(
+      return new Creances(
         creanceData.id,
         creanceData.creance_cim_benin,
         creanceData.creance_nocibe,

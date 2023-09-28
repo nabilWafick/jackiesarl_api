@@ -49,7 +49,7 @@ static getAll(callback) {
       return callback(error, null);
     }
     const clients = results.map((clientData) => {
-      return new Client(
+      return new Clients(
         clientData.id,
         clientData.nom_complet,
         clientData.numero_ifu,

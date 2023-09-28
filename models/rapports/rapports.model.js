@@ -47,7 +47,7 @@ static getAll(callback) {
       return callback(error, null);
     }
     const rapports = results.map((rapportData) => {
-      return new Rapport(
+      return new Rapports(
         rapportData.id,
         rapportData.rapport,
         rapportData.date_envoi,

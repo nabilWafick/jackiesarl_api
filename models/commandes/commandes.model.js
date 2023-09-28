@@ -55,7 +55,7 @@ static getAll(callback) {
       return callback(error, null);
     }
     const commandes = results.map((commandeData) => {
-      return new Commande(
+      return new Commandes(
         commandeData.id,
         commandeData.categorie,
         commandeData.quantite_achetee,

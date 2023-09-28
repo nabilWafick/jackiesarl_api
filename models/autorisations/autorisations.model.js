@@ -48,7 +48,7 @@ static getAll(callback) {
       return callback(error, null);
     }
     const autorisations = results.map((autorisationData) => {
-      return new Autorisation(
+      return new Autorisations(
         autorisationData.id,
         autorisationData.role,
         autorisationData.autorisations,

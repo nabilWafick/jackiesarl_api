@@ -53,27 +53,27 @@ class AchatClient {
     });
   }
 
-  // Méthode pour récupérer toutes les entrées de la table achat_entreprise
-  static getAll(callback) {
-  const query = 'SELECT * FROM achat_entreprise';
+ // Méthode pour récupérer tous les achats clients
+static getAll(callback) {
+  const query = 'SELECT * FROM achat_client';
   connection.query(query, (error, results) => {
-     
     if (error) {
       return callback(error, null);
     }
-    getById
-    const achatsEntreprise = results.map((achatEntrepriseData) => {
-      return new AchatEntreprise(
-        achatEntrepriseData.bon_commande,
-        achatEntrepriseData.quantite_achetee,
-        achatEntrepriseData.montant,
-        achatEntrepriseData.banque,
-        achatEntrepriseData.cheque,
-        achatEntrepriseData.bordereau,
-        achatEntrepriseData.date_achat
+    const achatsClients = results.map((achatClientData) => {
+      return new AchatClient(
+        achatClientData.id,
+        achatClientData.quantite_achetee,
+        achatClientData.categorie,
+        achatClientData.montant,
+        achatClientData.numero_ctp,
+        achatClientData.bordereau,
+        achatClientData.numero_bc,
+        achatClientData.id_client,
+        achatClientData.date_achat
       );
     });
-    return callback(null, achatsEntreprise);
+    return callback(null, achatsClients);
   });
 }
 

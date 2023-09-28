@@ -47,7 +47,7 @@ static getAll(callback) {
       return callback(error, null);
     }
     const modifications = results.map((modificationData) => {
-      return new Modification(
+      return new Modifications(
         modificationData.id,
         modificationData.modification,
         modificationData.id_employe,

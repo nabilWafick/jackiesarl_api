@@ -48,28 +48,29 @@ class AchatEntreprise {
     });
   }
 
-  // Méthode pour récupérer toutes les entrées de la table activites_banque
-  static getAll(callback) {
-  const query = 'SELECT * FROM activites_banque';
+
+  
+ // Méthode pour récupérer toutes les entrées de la table achat_entreprise
+static getAll(callback) {
+  const query = 'SELECT * FROM achat_entreprise';
   connection.query(query, (error, results) => {
     if (error) {
       return callback(error, null);
     }
-    const activitesBanque = results.map((activiteBanqueData) => {
-      return new ActiviteBanque(
-        activiteBanqueData.id,
-        activiteBanqueData.id_banque,
-        activiteBanqueData.description,
-        activiteBanqueData.debit,
-        activiteBanqueData.credit,
-        activiteBanqueData.solde,
-        activiteBanqueData.date_activite
+    const achatsEntreprise = results.map((achatEntrepriseData) => {
+      return new AchatEntreprise(
+        achatEntrepriseData.bon_commande,
+        achatEntrepriseData.quantite_achetee,
+        achatEntrepriseData.montant,
+        achatEntrepriseData.banque,
+        achatEntrepriseData.cheque,
+        achatEntrepriseData.bordereau,
+        achatEntrepriseData.date_achat
       );
     });
-    return callback(null, activitesBanque);
+    return callback(null, achatsEntreprise);
   });
 }
-
 
   // Méthode pour mettre à jour un achat entreprise
   update(callback) {

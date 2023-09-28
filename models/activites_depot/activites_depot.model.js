@@ -60,7 +60,7 @@ static getAll(callback) {
       return callback(error, null);
     }
     const activitesDepot = results.map((activiteDepotData) => {
-      return new ActiviteDepot(
+      return new ActivitesDepot(
         activiteDepotData.id,
         activiteDepotData.id_depot,
         activiteDepotData.quantite_avant_vente,

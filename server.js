@@ -1,8 +1,9 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const app = express();
-const routes = require('./routes/routes');
-const port = process.env.PORT || 7000;
+const routes = require('./routes/routes')
+const config = require('./configurations/config');
+const port = process.env.PORT;
 
 // Middleware pour analyser le corps des requêtes au format JSON
 app.use(bodyParser.json());
