@@ -29,25 +29,39 @@ var connection = require('../_db/database');
 var Clients =
 /*#__PURE__*/
 function () {
-  function Clients(id, nomComplet, numeroIfu, numeroTelephone, email) {
+  function Clients(id, nom, prenoms, numero_ifu, numero_telephone, email, date_ajout) {
     _classCallCheck(this, Clients);
 
     this.id = id;
-    this.nomComplet = nomComplet;
-    this.numeroIfu = numeroIfu;
-    this.numeroTelephone = numeroTelephone;
+    this.nom = nom;
+    this.prenoms = prenoms;
+    this.numero_ifu = numero_ifu;
+    this.numero_telephone = numero_telephone;
     this.email = email;
+    this.date_ajout = date_ajout;
   }
 
   _createClass(Clients, [{
     key: "update",
     value: function update(callback) {
-      var query = 'UPDATE clients SET ? WHERE id = ?';
+      var query = 'UPDATE clients SET nom = ?, prenoms = ?, numero_ifu = ?, numero_telephone = ?, email = ?, date_ajout = ? WHERE clients.id = ?';
 
       var id = this.id,
           clientData = _objectWithoutProperties(this, ["id"]);
 
-      connection.query(query, [clientData, id], function (error, results) {
+      connection.query(query, [clientData.nom, clientData.prenoms, clientData.numero_ifu, clientData.numero_telephone, clientData.email, new Date(clientData.date_ajout), id], function (error, results) {
+        if (error) {
+          return callback(error);
+        }
+
+        return callback(null);
+      });
+    }
+  }, {
+    key: "delete",
+    value: function _delete(callback) {
+      var query = 'DELETE FROM clients WHERE id = ?';
+      connection.query(query, [this.id], function (error, results) {
         if (error) {
           return callback(error);
         }
@@ -58,13 +72,16 @@ function () {
   }], [{
     key: "create",
     value: function create(clientData, callback) {
-      var query = 'INSERT INTO clients SET ?';
-      connection.query(query, clientData, function (error, results) {
+      var query = 'INSERT INTO clients (id, nom, prenoms, numero_ifu, numero_telephone, email, date_ajout) VALUES (NULL,?,?,?,?,?,?)';
+      var currentDate = new Date();
+      console.log('Current date');
+      console.log(currentDate);
+      connection.query(query, [clientData.nom, clientData.prenoms, clientData.numero_ifu, clientData.numero_telephone, clientData.email, currentDate], function (error, results) {
         if (error) {
           return callback(error, null);
         }
 
-        var newClient = _construct(Clients, [results.insertId].concat(_toConsumableArray(Object.values(clientData))));
+        var newClient = _construct(Clients, [results.insertId].concat(_toConsumableArray(Object.values(clientData)), [currentDate]));
 
         return callback(null, newClient);
       });
@@ -83,7 +100,7 @@ function () {
         }
 
         var clientData = results[0];
-        var client = new Clients(clientData.id, clientData.nom_complet, clientData.numero_ifu, clientData.numero_telephone, clientData.email);
+        var client = new Clients(clientData.id, clientData.nom, clientData.prenoms, clientData.numero_ifu, clientData.numero_telephone, clientData.email, clientData.date_ajout);
         return callback(null, client);
       });
     } // Méthode pour récupérer toutes les entrées de la table clients
@@ -98,21 +115,9 @@ function () {
         }
 
         var clients = results.map(function (clientData) {
-          return new Clients(clientData.id, clientData.nom_complet, clientData.numero_ifu, clientData.numero_telephone, clientData.email);
+          return new Clients(clientData.id, clientData.nom, clientData.prenoms, clientData.numero_ifu, clientData.numero_telephone, clientData.email, clientData.date_ajout);
         });
         return callback(null, clients);
-      });
-    }
-  }, {
-    key: "deleteById",
-    value: function deleteById(id, callback) {
-      var query = 'DELETE FROM clients WHERE id = ?';
-      connection.query(query, [id], function (error, results) {
-        if (error) {
-          return callback(error);
-        }
-
-        return callback(null);
       });
     }
   }]);

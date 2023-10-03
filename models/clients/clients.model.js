@@ -1,21 +1,26 @@
 const connection = require('../_db/database');
 
 class Clients {
-  constructor(id, nomComplet, numeroIfu, numeroTelephone, email) {
+  constructor(id, nom,prenoms, numero_ifu, numero_telephone, email, date_ajout) {
     this.id = id;
-    this.nomComplet = nomComplet;
-    this.numeroIfu = numeroIfu;
-    this.numeroTelephone = numeroTelephone;
+    this.nom = nom;
+    this.prenoms = prenoms;
+    this.numero_ifu = numero_ifu;
+    this.numero_telephone = numero_telephone;
     this.email = email;
+    this.date_ajout = date_ajout;
   }
 
   static create(clientData, callback) {
-    const query = 'INSERT INTO clients SET ?';
-    connection.query(query, clientData, (error, results) => {
+    const query = 'INSERT INTO clients (id, nom, prenoms, numero_ifu, numero_telephone, email, date_ajout) VALUES (NULL,?,?,?,?,?,?)';
+   const currentDate = new Date()
+   console.log('Current date')
+    console.log(currentDate)
+    connection.query(query, [clientData.nom, clientData.prenoms,clientData.numero_ifu,clientData.numero_telephone,clientData.email,currentDate], (error, results) => {
       if (error) {
         return callback(error, null);
       }
-      const newClient = new Clients(results.insertId, ...Object.values(clientData));
+      const newClient = new Clients(results.insertId, ...Object.values(clientData),currentDate);
       return callback(null, newClient);
     });
   }
@@ -32,10 +37,12 @@ class Clients {
       const clientData = results[0];
       const client = new Clients(
         clientData.id,
-        clientData.nom_complet,
+        clientData.nom,
+        clientData.prenoms,
         clientData.numero_ifu,
         clientData.numero_telephone,
-        clientData.email
+        clientData.email,
+        clientData.date_ajout,
       );
       return callback(null, client);
     });
@@ -51,10 +58,12 @@ static getAll(callback) {
     const clients = results.map((clientData) => {
       return new Clients(
         clientData.id,
-        clientData.nom_complet,
+        clientData.nom,
+        clientData.prenoms,
         clientData.numero_ifu,
         clientData.numero_telephone,
-        clientData.email
+        clientData.email,
+        clientData.date_ajout,
       );
     });
     return callback(null, clients);
@@ -64,9 +73,9 @@ static getAll(callback) {
 
 
   update(callback) {
-    const query = 'UPDATE clients SET ? WHERE id = ?';
-    const { id, ...clientData } = this;
-    connection.query(query, [clientData, id], (error, results) => {
+    const query = 'UPDATE clients SET nom = ?, prenoms = ?, numero_ifu = ?, numero_telephone = ?, email = ?, date_ajout = ? WHERE clients.id = ?'
+    const {id, ...clientData} = this
+    connection.query(query, [clientData.nom, clientData.prenoms,clientData.numero_ifu,clientData.numero_telephone,clientData.email,new Date(clientData.date_ajout), id], (error, results) => {
       if (error) {
         return callback(error);
       }
@@ -74,9 +83,9 @@ static getAll(callback) {
     });
   }
 
-  static deleteById(id, callback) {
+   delete(callback) {
     const query = 'DELETE FROM clients WHERE id = ?';
-    connection.query(query, [id], (error, results) => {
+    connection.query(query, [this.id], (error, results) => {
       if (error) {
         return callback(error);
       }

@@ -24,8 +24,7 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
-var connection = require('../_db/database'); // Modèle de données pour la table achat_client
-
+var connection = require('../_db/database');
 
 var AchatClient =
 /*#__PURE__*/
@@ -42,27 +41,24 @@ function () {
     this.numeroBc = numeroBc;
     this.idClient = idClient;
     this.dateAchat = dateAchat;
-  } // Méthode pour créer un nouvel achat client
-
+  }
 
   _createClass(AchatClient, [{
     key: "update",
-    // Méthode pour mettre à jour un achat client
     value: function update(callback) {
-      var query = 'UPDATE achat_client SET ? WHERE id = ?';
+      var query = 'UPDATE achat_client SET quantite_achetee = ?, categorie = ?, montant = ?, numero_ctp = ?, bordereau = ?, numero_bc = ?, id_client = ?, date_achat = ? WHERE achat_client.id = ?';
 
       var id = this.id,
           achatClientData = _objectWithoutProperties(this, ["id"]);
 
-      connection.query(query, [achatClientData, id], function (error, results) {
+      connection.query(query, [achatClientData.quantiteAchetee, achatClientData.categorie, achatClientData.montant, achatClientData.numeroCtp, achatClientData.bordereau, achatClientData.numeroBc, achatClientData.idClient, new Date(achatClientData.dateAchat), id], function (error, results) {
         if (error) {
           return callback(error);
         }
 
         return callback(null);
       });
-    } // Méthode pour supprimer un achat client
-
+    }
   }, {
     key: "delete",
     value: function _delete(callback) {
@@ -74,23 +70,22 @@ function () {
 
         return callback(null);
       });
-    } // Autres méthodes pour effectuer des opérations CRUD sur la table achat_client
-
+    }
   }], [{
     key: "create",
     value: function create(achatClientData, callback) {
-      var query = 'INSERT INTO achat_client SET ?';
-      connection.query(query, achatClientData, function (error, results) {
+      var query = 'INSERT INTO achat_client (id, quantite_achetee, categorie, montant, numero_ctp, bordereau, numero_bc, id_client, date_achat) VALUES (NULL,?,?,?,?,?,?,?,?)';
+      var currentDate = new Date();
+      connection.query(query, [achatClientData.quantiteAchetee, achatClientData.categorie, achatClientData.montant, achatClientData.numeroCtp, achatClientData.bordereau, achatClientData.numeroBc, achatClientData.idClient, currentDate], function (error, results) {
         if (error) {
           return callback(error, null);
         }
 
-        var newAchatClient = _construct(AchatClient, [results.insertId].concat(_toConsumableArray(Object.values(achatClientData))));
+        var newAchatClient = _construct(AchatClient, [results.insertId].concat(_toConsumableArray(Object.values(achatClientData)), [currentDate]));
 
         return callback(null, newAchatClient);
       });
-    } // Méthode pour récupérer un achat client par ID
-
+    }
   }, {
     key: "getById",
     value: function getById(id, callback) {
@@ -105,11 +100,10 @@ function () {
         }
 
         var achatClientData = results[0];
-        var achatClient = new AchatClient(achatClientData.id, achatClientData.quantite_achetee, achatClientData.categorie, achatClientData.montant, achatClientData.numero_ctp, achatClientData.bordereau, achatClientData.numero_bc, achatClientData.id_client, achatClientData.date_achat);
+        var achatClient = new AchatClient(achatClientData.id, achatClientData.quantite_achetee, achatClientData.categorie, achatClientData.montant, achatClientData.numero_ctp, achatClientData.bordereau, achatClientData.numero_bc, achatClientData.id_client, new Date(achatClientData.date_achat));
         return callback(null, achatClient);
       });
-    } // Méthode pour récupérer tous les achats clients
-
+    }
   }, {
     key: "getAll",
     value: function getAll(callback) {
@@ -120,7 +114,7 @@ function () {
         }
 
         var achatsClients = results.map(function (achatClientData) {
-          return new AchatClient(achatClientData.id, achatClientData.quantite_achetee, achatClientData.categorie, achatClientData.montant, achatClientData.numero_ctp, achatClientData.bordereau, achatClientData.numero_bc, achatClientData.id_client, achatClientData.date_achat);
+          return new AchatClient(achatClientData.id, achatClientData.quantite_achetee, achatClientData.categorie, achatClientData.montant, achatClientData.numero_ctp, achatClientData.bordereau, achatClientData.numero_bc, achatClientData.id_client, new Date(achatClientData.date_achat));
         });
         return callback(null, achatsClients);
       });

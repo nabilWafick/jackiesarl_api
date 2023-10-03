@@ -1,28 +1,27 @@
 const connection = require('../_db/database');
 
-// Modèle de données pour la table brouillard
 class Brouillard {
-  constructor(id, depot, stockActuel, nomGerant, numeroGerant) {
+  constructor(id, depot, stock_actuel, nom_gerant, numero_gerant, date_ajout) {
     this.id = id;
     this.depot = depot;
-    this.stockActuel = stockActuel;
-    this.nomGerant = nomGerant;
-    this.numeroGerant = numeroGerant;
+    this.stock_actuel = stock_actuel;
+    this.nom_gerant = nom_gerant;
+    this.numero_gerant = numero_gerant;
+    this.date_ajout = date_ajout;
   }
 
-  // Méthode pour créer un nouveau brouillard
   static create(brouillardData, callback) {
-    const query = 'INSERT INTO brouillard SET ?';
-    connection.query(query, brouillardData, (error, results) => {
+    const query = 'INSERT INTO brouillard (depot, stock_actuel, nom_gerant, numero_gerant, date_ajout) VALUES (?, ?, ?, ?, ?)';
+    const currentDate = new Date();
+    connection.query(query, [brouillardData.depot, brouillardData.stock_actuel, brouillardData.nom_gerant, brouillardData.numero_gerant, currentDate], (error, results) => {
       if (error) {
         return callback(error, null);
       }
-      const newBrouillard = new Brouillard(results.insertId, ...Object.values(brouillardData));
+      const newBrouillard = new Brouillard(results.insertId, brouillardData.depot, brouillardData.stock_actuel, brouillardData.nom_gerant, brouillardData.numero_gerant, currentDate);
       return callback(null, newBrouillard);
     });
   }
 
-  // Méthode pour récupérer un brouillard par ID
   static getById(id, callback) {
     const query = 'SELECT * FROM brouillard WHERE id = ?';
     connection.query(query, [id], (error, results) => {
@@ -33,43 +32,28 @@ class Brouillard {
         return callback(null, null); // Brouillard non trouvé
       }
       const brouillardData = results[0];
-      const brouillard = new Brouillard(
-        brouillardData.id,
-        brouillardData.depot,
-        brouillardData.stock_actuel,
-        brouillardData.nom_gerant,
-        brouillardData.numero_gerant
-      );
+      const brouillard = new Brouillard(brouillardData.id, brouillardData.depot, brouillardData.stock_actuel, brouillardData.nom_gerant, brouillardData.numero_gerant, new Date(brouillardData.date_ajout));
       return callback(null, brouillard);
     });
   }
 
-  // Méthode pour récupérer toutes les entrées de la table brouillard
-static getAll(callback) {
-  const query = 'SELECT * FROM brouillard';
-  connection.query(query, (error, results) => {
-    if (error) {
-      return callback(error, null);
-    }
-    const brouillards = results.map((brouillardData) => {
-      return new Brouillard(
-        brouillardData.id,
-        brouillardData.depot,
-        brouillardData.stock_actuel,
-        brouillardData.nom_gerant,
-        brouillardData.numero_gerant
-      );
+  static getAll(callback) {
+    const query = 'SELECT * FROM brouillard';
+    connection.query(query, (error, results) => {
+      if (error) {
+        return callback(error, null);
+      }
+      const brouillardList = results.map((brouillardData) => {
+        return new Brouillard(brouillardData.id, brouillardData.depot, brouillardData.stock_actuel, brouillardData.nom_gerant, brouillardData.numero_gerant, new Date(brouillardData.date_ajout));
+      });
+      return callback(null, brouillardList);
     });
-    return callback(null, brouillards);
-  });
-}
+  }
 
-
-  // Méthode pour mettre à jour un brouillard
   update(callback) {
-    const query = 'UPDATE brouillard SET ? WHERE id = ?';
-    const { id, ...brouillardData } = this;
-    connection.query(query, [brouillardData, id], (error, results) => {
+    const query = 'UPDATE brouillard SET depot = ?, stock_actuel = ?, nom_gerant = ?, numero_gerant = ?, date_ajout = ? WHERE id = ?';
+    const { id, ...updatedData } = this;
+    connection.query(query, [updatedData.depot, updatedData.stock_actuel, updatedData.nom_gerant, updatedData.numero_gerant, updatedData.date_ajout, id], (error, results) => {
       if (error) {
         return callback(error);
       }
@@ -77,7 +61,6 @@ static getAll(callback) {
     });
   }
 
-  // Méthode pour supprimer un brouillard par ID
   static deleteById(id, callback) {
     const query = 'DELETE FROM brouillard WHERE id = ?';
     connection.query(query, [id], (error, results) => {
@@ -87,8 +70,6 @@ static getAll(callback) {
       return callback(null);
     });
   }
-
-  // Autres méthodes pour effectuer des opérations CRUD sur la table brouillard
 }
 
 module.exports = Brouillard;

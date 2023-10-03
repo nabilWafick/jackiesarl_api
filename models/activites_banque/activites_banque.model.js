@@ -1,9 +1,7 @@
 const connection = require('../_db/database');
 
-// Modèle de données pour la table activites_banque
 class ActivitesBanque {
-  constructor(id, idBanque, description, debit, credit, solde, dateActivite) {
-    this.id = id;
+  constructor(idBanque, description, debit, credit, solde, dateActivite) {
     this.idBanque = idBanque;
     this.description = description;
     this.debit = debit;
@@ -12,19 +10,18 @@ class ActivitesBanque {
     this.dateActivite = dateActivite;
   }
 
-  // Méthode pour créer une nouvelle activité banque
   static create(activitesBanqueData, callback) {
-    const query = 'INSERT INTO activites_banque SET ?';
-    connection.query(query, activitesBanqueData, (error, results) => {
+    const query = 'INSERT INTO activites_banque (id_banque, description, debit, credit, solde, date_activite) VALUES (?,?,?,?,?,?)';
+    const currentDate = new Date();
+    connection.query(query, [activitesBanqueData.idBanque, activitesBanqueData.description, activitesBanqueData.debit, activitesBanqueData.credit, activitesBanqueData.solde, currentDate], (error, results) => {
       if (error) {
         return callback(error, null);
       }
-      const newActivitesBanque = new ActivitesBanque(results.insertId, ...Object.values(activitesBanqueData));
+      const newActivitesBanque = new ActivitesBanque(...Object.values(activitesBanqueData), currentDate);
       return callback(null, newActivitesBanque);
     });
   }
 
-  // Méthode pour récupérer une activité banque par ID
   static getById(id, callback) {
     const query = 'SELECT * FROM activites_banque WHERE id = ?';
     connection.query(query, [id], (error, results) => {
@@ -36,46 +33,41 @@ class ActivitesBanque {
       }
       const activitesBanqueData = results[0];
       const activitesBanque = new ActivitesBanque(
-        activitesBanqueData.id,
         activitesBanqueData.id_banque,
         activitesBanqueData.description,
         activitesBanqueData.debit,
         activitesBanqueData.credit,
         activitesBanqueData.solde,
-        activitesBanqueData.date_activite
+        new Date(activitesBanqueData.date_activite)
       );
       return callback(null, activitesBanque);
     });
   }
 
-  // Méthode pour récupérer toutes les entrées de la table activites_banque
-static getAll(callback) {
-  const query = 'SELECT * FROM activites_banque';
-  connection.query(query, (error, results) => {
-    if (error) {
-      return callback(error, null);
-    }
-    const activitesBanque = results.map((activiteBanqueData) => {
-      return new ActivitesBanque(
-        activiteBanqueData.id,
-        activiteBanqueData.id_banque,
-        activiteBanqueData.description,
-        activiteBanqueData.debit,
-        activiteBanqueData.credit,
-        activiteBanqueData.solde,
-        activiteBanqueData.date_activite
-      );
+  static getAll(callback) {
+    const query = 'SELECT * FROM activites_banque';
+    connection.query(query, (error, results) => {
+      if (error) {
+        return callback(error, null);
+      }
+      const activitesBanqueList = results.map((activitesBanqueData) => {
+        return new ActivitesBanque(
+          activitesBanqueData.id_banque,
+          activitesBanqueData.description,
+          activitesBanqueData.debit,
+          activitesBanqueData.credit,
+          activitesBanqueData.solde,
+          new Date(activitesBanqueData.date_activite)
+        );
+      });
+      return callback(null, activitesBanqueList);
     });
-    return callback(null, activitesBanque);
-  });
-}
+  }
 
-
-  // Méthode pour mettre à jour une activité banque
   update(callback) {
-    const query = 'UPDATE activites_banque SET ? WHERE id = ?';
-    const { id, ...activitesBanqueData } = this;
-    connection.query(query, [activitesBanqueData, id], (error, results) => {
+    const query = 'UPDATE activites_banque SET description = ?, debit = ?, credit = ?, solde = ?, date_activite = ? WHERE id_banque = ?';
+    const { idBanque, ...updatedData } = this;
+    connection.query(query, [updatedData.description, updatedData.debit, updatedData.credit, updatedData.solde, updatedData.dateActivite, idBanque], (error, results) => {
       if (error) {
         return callback(error);
       }
@@ -83,9 +75,8 @@ static getAll(callback) {
     });
   }
 
-  // Méthode pour supprimer une activité banque par ID
   static deleteById(id, callback) {
-    const query = 'DELETE FROM activites_banque WHERE id = ?';
+    const query = 'DELETE FROM activites_banque WHERE id_banque = ?';
     connection.query(query, [id], (error, results) => {
       if (error) {
         return callback(error);
@@ -93,8 +84,6 @@ static getAll(callback) {
       return callback(null);
     });
   }
-
-  // Autres méthodes pour effectuer des opérations CRUD sur la table activites_banque
 }
 
 module.exports = ActivitesBanque;

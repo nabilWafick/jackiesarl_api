@@ -1,23 +1,23 @@
 const connection = require('../_db/database');
 
 class Creances {
-  constructor(id, creanceCimBenin, creanceNocibe, creanceAutres, dateCreance, idClient) {
+  constructor(id, creance_cim_benin, creance_nocibe, creance_autres, date_creance, id_client) {
     this.id = id;
-    this.creanceCimBenin = creanceCimBenin;
-    this.creanceNocibe = creanceNocibe;
-    this.creanceAutres = creanceAutres;
-    this.dateCreance = dateCreance;
-    this.idClient = idClient;
+    this.creance_cim_benin = creance_cim_benin;
+    this.creance_nocibe = creance_nocibe;
+    this.creance_autres = creance_autres;
+    this.date_creance = date_creance;
+    this.id_client = id_client;
   }
 
-  static create(creanceData, callback) {
-    const query = 'INSERT INTO creances SET ?';
-    connection.query(query, creanceData, (error, results) => {
+  static create(creancesData, callback) {
+    const query = 'INSERT INTO creances (id, creance_cim_benin, creance_nocibe, creance_autres, date_creance, id_client) VALUES (NULL, ?, ?, ?, ?, ?)';
+    connection.query(query, [creancesData.creance_cim_benin, creancesData.creance_nocibe, creancesData.creance_autres, creancesData.date_creance, creancesData.id_client], (error, results) => {
       if (error) {
         return callback(error, null);
       }
-      const newCreance = new Creances(results.insertId, ...Object.values(creanceData));
-      return callback(null, newCreance);
+      const newCreances = new Creances(results.insertId, ...Object.values(creancesData));
+      return callback(null, newCreances);
     });
   }
 
@@ -30,46 +30,43 @@ class Creances {
       if (results.length === 0) {
         return callback(null, null); // Créance non trouvée
       }
-      const creanceData = results[0];
-      const creance = new Creances(
-        creanceData.id,
-        creanceData.creance_cim_benin,
-        creanceData.creance_nocibe,
-        creanceData.creance_autres,
-        creanceData.date_creance,
-        creanceData.id_client
+      const creancesData = results[0];
+      const creances = new Creances(
+        creancesData.id,
+        creancesData.creance_cim_benin,
+        creancesData.creance_nocibe,
+        creancesData.creance_autres,
+        creancesData.date_creance,
+        creancesData.id_client,
       );
-      return callback(null, creance);
+      return callback(null, creances);
     });
   }
 
-  // Méthode pour récupérer toutes les entrées de la table creances
-static getAll(callback) {
-  const query = 'SELECT * FROM creances';
-  connection.query(query, (error, results) => {
-    if (error) {
-      return callback(error, null);
-    }
-    const creances = results.map((creanceData) => {
-      return new Creances(
-        creanceData.id,
-        creanceData.creance_cim_benin,
-        creanceData.creance_nocibe,
-        creanceData.creance_autres,
-        creanceData.date_creance,
-        creanceData.id_client
-      );
+  static getAll(callback) {
+    const query = 'SELECT * FROM creances';
+    connection.query(query, (error, results) => {
+      if (error) {
+        return callback(error, null);
+      }
+      const creancesList = results.map((creancesData) => {
+        return new Creances(
+          creancesData.id,
+          creancesData.creance_cim_benin,
+          creancesData.creance_nocibe,
+          creancesData.creance_autres,
+          creancesData.date_creance,
+          creancesData.id_client,
+        );
+      });
+      return callback(null, creancesList);
     });
-    return callback(null, creances);
-  });
-}
-
-
+  }
 
   update(callback) {
-    const query = 'UPDATE creances SET ? WHERE id = ?';
-    const { id, ...creanceData } = this;
-    connection.query(query, [creanceData, id], (error, results) => {
+    const query = 'UPDATE creances SET creance_cim_benin = ?, creance_nocibe = ?, creance_autres = ?, date_creance = ?, id_client = ? WHERE id = ?';
+    const { id, ...updatedData } = this;
+    connection.query(query, [...Object.values(updatedData), id], (error, results) => {
       if (error) {
         return callback(error);
       }

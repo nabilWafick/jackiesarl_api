@@ -1,30 +1,27 @@
 const connection = require('../_db/database');
 
-// Modèle de données pour la table stock_camion
 class StockCamion {
-  constructor(id, numeroCamion, categorie, numeroChauffeur, numeroBc, quantite, dateApprovisionnement) {
+  constructor(id, numero_camion, categorie, numero_chauffeur, numero_bc, quantite, date_approvisionnement) {
     this.id = id;
-    this.numeroCamion = numeroCamion;
+    this.numero_camion = numero_camion;
     this.categorie = categorie;
-    this.numeroChauffeur = numeroChauffeur;
-    this.numeroBc = numeroBc;
+    this.numero_chauffeur = numero_chauffeur;
+    this.numero_bc = numero_bc;
     this.quantite = quantite;
-    this.dateApprovisionnement = dateApprovisionnement;
+    this.date_approvisionnement = date_approvisionnement;
   }
 
-  // Méthode pour créer une nouvelle entrée de stock camion
-  static create(stockCamionData, callback) {
-    const query = 'INSERT INTO stock_camion SET ?';
-    connection.query(query, stockCamionData, (error, results) => {
+  static create(stockData, callback) {
+    const query = 'INSERT INTO stock_camion (id, numero_camion, categorie, numero_chauffeur, numero_bc, quantite, date_approvisionnement) VALUES (NULL, ?, ?, ?, ?, ?, ?)';
+    connection.query(query, [stockData.numero_camion, stockData.categorie, stockData.numero_chauffeur, stockData.numero_bc, stockData.quantite, stockData.date_approvisionnement], (error, results) => {
       if (error) {
         return callback(error, null);
       }
-      const newStockCamion = new StockCamion(results.insertId, ...Object.values(stockCamionData));
-      return callback(null, newStockCamion);
+      const newStock = new StockCamion(results.insertId, ...Object.values(stockData));
+      return callback(null, newStock);
     });
   }
 
-  // Méthode pour récupérer une entrée de stock camion par ID
   static getById(id, callback) {
     const query = 'SELECT * FROM stock_camion WHERE id = ?';
     connection.query(query, [id], (error, results) => {
@@ -32,49 +29,47 @@ class StockCamion {
         return callback(error, null);
       }
       if (results.length === 0) {
-        return callback(null, null); // Entrée de stock camion non trouvée
+        return callback(null, null); // Stock de camion non trouvé
       }
-      const stockCamionData = results[0];
-      const stockCamion = new StockCamion(
-        stockCamionData.id,
-        stockCamionData.numero_camion,
-        stockCamionData.categorie,
-        stockCamionData.numero_chauffeur,
-        stockCamionData.numero_bc,
-        stockCamionData.quantite,
-        stockCamionData.date_approvisionnement
-      );
-      return callback(null, stockCamion);
-    });
-  }
-
-  // Méthode pour récupérer toutes les entrées de la table stock_camion
- static getAll(callback) {
-  const query = 'SELECT * FROM stock_camion';
-  connection.query(query, (error, results) => {
-    if (error) {
-      return callback(error, null);
-    }
-    const stocksCamion = results.map((stockData) => {
-      return new StockCamion(
+      const stockData = results[0];
+      const stock = new StockCamion(
         stockData.id,
         stockData.numero_camion,
         stockData.categorie,
         stockData.numero_chauffeur,
         stockData.numero_bc,
         stockData.quantite,
-        stockData.date_approvisionnement
+        stockData.date_approvisionnement,
       );
+      return callback(null, stock);
     });
-    return callback(null, stocksCamion);
-  });
-}
+  }
 
-  // Méthode pour mettre à jour une entrée de stock camion
+  static getAll(callback) {
+    const query = 'SELECT * FROM stock_camion';
+    connection.query(query, (error, results) => {
+      if (error) {
+        return callback(error, null);
+      }
+      const stocksList = results.map((stockData) => {
+        return new StockCamion(
+          stockData.id,
+          stockData.numero_camion,
+          stockData.categorie,
+          stockData.numero_chauffeur,
+          stockData.numero_bc,
+          stockData.quantite,
+          stockData.date_approvisionnement,
+        );
+      });
+      return callback(null, stocksList);
+    });
+  }
+
   update(callback) {
-    const query = 'UPDATE stock_camion SET ? WHERE id = ?';
-    const { id, ...stockCamionData } = this;
-    connection.query(query, [stockCamionData, id], (error, results) => {
+    const query = 'UPDATE stock_camion SET numero_camion = ?, categorie = ?, numero_chauffeur = ?, numero_bc = ?, quantite = ?, date_approvisionnement = ? WHERE id = ?';
+    const { id, ...updatedData } = this;
+    connection.query(query, [...Object.values(updatedData), id], (error, results) => {
       if (error) {
         return callback(error);
       }
@@ -82,18 +77,15 @@ class StockCamion {
     });
   }
 
-  // Méthode pour supprimer une entrée de stock camion
-  delete(callback) {
+  static deleteById(id, callback) {
     const query = 'DELETE FROM stock_camion WHERE id = ?';
-    connection.query(query, [this.id], (error, results) => {
+    connection.query(query, [id], (error, results) => {
       if (error) {
         return callback(error);
       }
       return callback(null);
     });
   }
-
-  // Autres méthodes pour effectuer des opérations CRUD sur la table stock_camion
 }
 
 module.exports = StockCamion;

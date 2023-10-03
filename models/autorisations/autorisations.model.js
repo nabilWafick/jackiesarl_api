@@ -1,6 +1,5 @@
 const connection = require('../_db/database');
 
-// Modèle de données pour la table autorisations
 class Autorisations {
   constructor(id, role, autorisations) {
     this.id = id;
@@ -8,19 +7,17 @@ class Autorisations {
     this.autorisations = autorisations;
   }
 
-  // Méthode pour créer une nouvelle autorisation
   static create(autorisationsData, callback) {
-    const query = 'INSERT INTO autorisations SET ?';
-    connection.query(query, autorisationsData, (error, results) => {
+    const query = 'INSERT INTO autorisations (role, autorisations) VALUES (?, ?)';
+    connection.query(query, [autorisationsData.role, autorisationsData.autorisations], (error, results) => {
       if (error) {
         return callback(error, null);
       }
-      const newAutorisations = new Autorisations(results.insertId, ...Object.values(autorisationsData));
+      const newAutorisations = new Autorisations(results.insertId, autorisationsData.role, autorisationsData.autorisations);
       return callback(null, newAutorisations);
     });
   }
 
-  // Méthode pour récupérer une autorisation par ID
   static getById(id, callback) {
     const query = 'SELECT * FROM autorisations WHERE id = ?';
     connection.query(query, [id], (error, results) => {
@@ -28,43 +25,31 @@ class Autorisations {
         return callback(error, null);
       }
       if (results.length === 0) {
-        return callback(null, null); // Autorisation non trouvée
+        return callback(null, null); // Autorisations non trouvées
       }
       const autorisationsData = results[0];
-      const autorisations = new Autorisations(
-        autorisationsData.id,
-        autorisationsData.role,
-        autorisationsData.autorisations
-      );
+      const autorisations = new Autorisations(autorisationsData.id, autorisationsData.role, autorisationsData.autorisations);
       return callback(null, autorisations);
     });
   }
 
-  // Méthode pour récupérer toutes les entrées de la table autorisations
-static getAll(callback) {
-  const query = 'SELECT * FROM autorisations';
-  connection.query(query, (error, results) => {
-    if (error) {
-      return callback(error, null);
-    }
-    const autorisations = results.map((autorisationData) => {
-      return new Autorisations(
-        autorisationData.id,
-        autorisationData.role,
-        autorisationData.autorisations,
-       // JSON.parse(autorisationData.autorisations)
-      );
+  static getAll(callback) {
+    const query = 'SELECT * FROM autorisations';
+    connection.query(query, (error, results) => {
+      if (error) {
+        return callback(error, null);
+      }
+      const autorisationsList = results.map((autorisationsData) => {
+        return new Autorisations(autorisationsData.id, autorisationsData.role, autorisationsData.autorisations);
+      });
+      return callback(null, autorisationsList);
     });
-    return callback(null, autorisations);
-  });
-}
+  }
 
-
-  // Méthode pour mettre à jour une autorisation
   update(callback) {
-    const query = 'UPDATE autorisations SET ? WHERE id = ?';
-    const { id, ...autorisationsData } = this;
-    connection.query(query, [autorisationsData, id], (error, results) => {
+    const query = 'UPDATE autorisations SET role = ?, autorisations = ? WHERE id = ?';
+    const { id, ...updatedData } = this;
+    connection.query(query, [updatedData.role, updatedData.autorisations, id], (error, results) => {
       if (error) {
         return callback(error);
       }
@@ -72,7 +57,6 @@ static getAll(callback) {
     });
   }
 
-  // Méthode pour supprimer une autorisation par ID
   static deleteById(id, callback) {
     const query = 'DELETE FROM autorisations WHERE id = ?';
     connection.query(query, [id], (error, results) => {
@@ -82,8 +66,6 @@ static getAll(callback) {
       return callback(null);
     });
   }
-
-  // Autres méthodes pour effectuer des opérations CRUD sur la table autorisations
 }
 
 module.exports = Autorisations;

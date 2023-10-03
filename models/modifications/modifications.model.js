@@ -1,16 +1,16 @@
 const connection = require('../_db/database');
 
 class Modifications {
-  constructor(id, modification, idEmploye, dateModification) {
+  constructor(id, modification, id_employe, date_modification) {
     this.id = id;
     this.modification = modification;
-    this.idEmploye = idEmploye;
-    this.dateModification = dateModification;
+    this.id_employe = id_employe;
+    this.date_modification = date_modification;
   }
 
   static create(modificationData, callback) {
-    const query = 'INSERT INTO modifications SET ?';
-    connection.query(query, modificationData, (error, results) => {
+    const query = 'INSERT INTO modifications (id, modification, id_employe, date_modification) VALUES (NULL, ?, ?, ?)';
+    connection.query(query, [modificationData.modification, modificationData.id_employe, modificationData.date_modification], (error, results) => {
       if (error) {
         return callback(error, null);
       }
@@ -33,36 +33,34 @@ class Modifications {
         modificationData.id,
         modificationData.modification,
         modificationData.id_employe,
-        modificationData.date_modification
+        modificationData.date_modification,
       );
       return callback(null, modification);
     });
   }
 
-  // Méthode pour récupérer toutes les entrées de la table modifications
-static getAll(callback) {
-  const query = 'SELECT * FROM modifications';
-  connection.query(query, (error, results) => {
-    if (error) {
-      return callback(error, null);
-    }
-    const modifications = results.map((modificationData) => {
-      return new Modifications(
-        modificationData.id,
-        modificationData.modification,
-        modificationData.id_employe,
-        modificationData.date_modification
-      );
+  static getAll(callback) {
+    const query = 'SELECT * FROM modifications';
+    connection.query(query, (error, results) => {
+      if (error) {
+        return callback(error, null);
+      }
+      const modificationsList = results.map((modificationData) => {
+        return new Modifications(
+          modificationData.id,
+          modificationData.modification,
+          modificationData.id_employe,
+          modificationData.date_modification,
+        );
+      });
+      return callback(null, modificationsList);
     });
-    return callback(null, modifications);
-  });
-}
-
+  }
 
   update(callback) {
-    const query = 'UPDATE modifications SET ? WHERE id = ?';
-    const { id, ...modificationData } = this;
-    connection.query(query, [modificationData, id], (error, results) => {
+    const query = 'UPDATE modifications SET modification = ?, id_employe = ?, date_modification = ? WHERE id = ?';
+    const { id, ...updatedData } = this;
+    connection.query(query, [...Object.values(updatedData), id], (error, results) => {
       if (error) {
         return callback(error);
       }

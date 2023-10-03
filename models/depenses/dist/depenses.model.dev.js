@@ -29,26 +29,26 @@ var connection = require('../_db/database');
 var Depenses =
 /*#__PURE__*/
 function () {
-  function Depenses(id, description, montant, piece, estValide, dateDepense) {
+  function Depenses(id, description, montant, piece, est_validee, date_depense) {
     _classCallCheck(this, Depenses);
 
     this.id = id;
     this.description = description;
     this.montant = montant;
     this.piece = piece;
-    this.estValide = estValide;
-    this.dateDepense = dateDepense;
+    this.est_validee = est_validee;
+    this.date_depense = date_depense;
   }
 
   _createClass(Depenses, [{
     key: "update",
     value: function update(callback) {
-      var query = 'UPDATE depenses SET ? WHERE id = ?';
+      var query = 'UPDATE depenses SET description = ?, montant = ?, piece = ?, est_validee = ?, date_depense = ? WHERE id = ?';
 
       var id = this.id,
-          depenseData = _objectWithoutProperties(this, ["id"]);
+          updatedData = _objectWithoutProperties(this, ["id"]);
 
-      connection.query(query, [depenseData, id], function (error, results) {
+      connection.query(query, [].concat(_toConsumableArray(Object.values(updatedData)), [id]), function (error, results) {
         if (error) {
           return callback(error);
         }
@@ -59,8 +59,8 @@ function () {
   }], [{
     key: "create",
     value: function create(depenseData, callback) {
-      var query = 'INSERT INTO depenses SET ?';
-      connection.query(query, depenseData, function (error, results) {
+      var query = 'INSERT INTO depenses (id, description, montant, piece, est_validee, date_depense) VALUES (NULL, ?, ?, ?, ?, ?)';
+      connection.query(query, [depenseData.description, depenseData.montant, depenseData.piece, depenseData.est_validee, depenseData.date_depense], function (error, results) {
         if (error) {
           return callback(error, null);
         }
@@ -84,11 +84,10 @@ function () {
         }
 
         var depenseData = results[0];
-        var depense = new Depenses(depenseData.id, depenseData.description, depenseData.montant, depenseData.piece, depenseData.est_valide, depenseData.date_depense);
+        var depense = new Depenses(depenseData.id, depenseData.description, depenseData.montant, depenseData.piece, depenseData.est_validee, depenseData.date_depense);
         return callback(null, depense);
       });
-    } // Méthode pour récupérer toutes les entrées de la table depenses
-
+    }
   }, {
     key: "getAll",
     value: function getAll(callback) {
@@ -98,10 +97,10 @@ function () {
           return callback(error, null);
         }
 
-        var depenses = results.map(function (depenseData) {
-          return new Depenses(depenseData.id, depenseData.description, depenseData.montant, depenseData.piece, depenseData.est_valide, depenseData.date_depense);
+        var depensesList = results.map(function (depenseData) {
+          return new Depenses(depenseData.id, depenseData.description, depenseData.montant, depenseData.piece, depenseData.est_validee, depenseData.date_depense);
         });
-        return callback(null, depenses);
+        return callback(null, depensesList);
       });
     }
   }, {

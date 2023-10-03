@@ -1,18 +1,18 @@
 const connection = require('../_db/database');
 
 class Depenses {
-  constructor(id, description, montant, piece, estValide, dateDepense) {
+  constructor(id, description, montant, piece, est_validee, date_depense) {
     this.id = id;
     this.description = description;
     this.montant = montant;
     this.piece = piece;
-    this.estValide = estValide;
-    this.dateDepense = dateDepense;
+    this.est_validee = est_validee;
+    this.date_depense = date_depense;
   }
 
   static create(depenseData, callback) {
-    const query = 'INSERT INTO depenses SET ?';
-    connection.query(query, depenseData, (error, results) => {
+    const query = 'INSERT INTO depenses (id, description, montant, piece, est_validee, date_depense) VALUES (NULL, ?, ?, ?, ?, ?)';
+    connection.query(query, [depenseData.description, depenseData.montant, depenseData.piece, depenseData.est_validee, depenseData.date_depense], (error, results) => {
       if (error) {
         return callback(error, null);
       }
@@ -36,39 +36,37 @@ class Depenses {
         depenseData.description,
         depenseData.montant,
         depenseData.piece,
-        depenseData.est_valide,
-        depenseData.date_depense
+        depenseData.est_validee,
+        depenseData.date_depense,
       );
       return callback(null, depense);
     });
   }
 
-  // Méthode pour récupérer toutes les entrées de la table depenses
-static getAll(callback) {
-  const query = 'SELECT * FROM depenses';
-  connection.query(query, (error, results) => {
-    if (error) {
-      return callback(error, null);
-    }
-    const depenses = results.map((depenseData) => {
-      return new Depenses(
-        depenseData.id,
-        depenseData.description,
-        depenseData.montant,
-        depenseData.piece,
-        depenseData.est_valide,
-        depenseData.date_depense
-      );
+  static getAll(callback) {
+    const query = 'SELECT * FROM depenses';
+    connection.query(query, (error, results) => {
+      if (error) {
+        return callback(error, null);
+      }
+      const depensesList = results.map((depenseData) => {
+        return new Depenses(
+          depenseData.id,
+          depenseData.description,
+          depenseData.montant,
+          depenseData.piece,
+          depenseData.est_validee,
+          depenseData.date_depense,
+        );
+      });
+      return callback(null, depensesList);
     });
-    return callback(null, depenses);
-  });
-}
-
+  }
 
   update(callback) {
-    const query = 'UPDATE depenses SET ? WHERE id = ?';
-    const { id, ...depenseData } = this;
-    connection.query(query, [depenseData, id], (error, results) => {
+    const query = 'UPDATE depenses SET description = ?, montant = ?, piece = ?, est_validee = ?, date_depense = ? WHERE id = ?';
+    const { id, ...updatedData } = this;
+    connection.query(query, [...Object.values(updatedData), id], (error, results) => {
       if (error) {
         return callback(error);
       }

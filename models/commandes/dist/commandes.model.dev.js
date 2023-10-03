@@ -29,28 +29,29 @@ var connection = require('../_db/database');
 var Commandes =
 /*#__PURE__*/
 function () {
-  function Commandes(id, categorie, quantiteAchetee, destination, dateCommande, dateLivraison, estTraitee, idClient) {
+  function Commandes(id, categorie, quantite_achetee, destination, date_commande, date_livraison, est_traitee, id_client, date_ajout) {
     _classCallCheck(this, Commandes);
 
     this.id = id;
     this.categorie = categorie;
-    this.quantiteAchetee = quantiteAchetee;
+    this.quantite_achetee = quantite_achetee;
     this.destination = destination;
-    this.dateCommande = dateCommande;
-    this.dateLivraison = dateLivraison;
-    this.estTraitee = estTraitee;
-    this.idClient = idClient;
+    this.date_commande = date_commande;
+    this.date_livraison = date_livraison;
+    this.est_traitee = est_traitee;
+    this.id_client = id_client;
+    this.date_ajout = date_ajout;
   }
 
   _createClass(Commandes, [{
     key: "update",
     value: function update(callback) {
-      var query = 'UPDATE commandes SET ? WHERE id = ?';
+      var query = 'UPDATE commandes SET categorie = ?, quantite_achetee = ?, destination = ?, date_commande = ?, date_livraison = ?, est_traitee = ?, id_client = ?, date_ajout = ? WHERE id = ?';
 
       var id = this.id,
           commandeData = _objectWithoutProperties(this, ["id"]);
 
-      connection.query(query, [commandeData, id], function (error, results) {
+      connection.query(query, [].concat(_toConsumableArray(Object.values(commandeData)), [id]), function (error, results) {
         if (error) {
           return callback(error);
         }
@@ -61,13 +62,14 @@ function () {
   }], [{
     key: "create",
     value: function create(commandeData, callback) {
-      var query = 'INSERT INTO commandes SET ?';
-      connection.query(query, commandeData, function (error, results) {
+      var query = 'INSERT INTO commandes (id, categorie, quantite_achetee, destination, date_commande, date_livraison, est_traitee, id_client, date_ajout) VALUES (NULL, ?, ?, ?, ?, ?, ?, ?, ?)';
+      var currentDate = new Date();
+      connection.query(query, [commandeData.categorie, commandeData.quantite_achetee, commandeData.destination, commandeData.date_commande, commandeData.date_livraison, commandeData.est_traitee, commandeData.id_client, currentDate], function (error, results) {
         if (error) {
           return callback(error, null);
         }
 
-        var newCommande = _construct(Commandes, [results.insertId].concat(_toConsumableArray(Object.values(commandeData))));
+        var newCommande = _construct(Commandes, [results.insertId].concat(_toConsumableArray(Object.values(commandeData)), [currentDate]));
 
         return callback(null, newCommande);
       });
@@ -86,11 +88,10 @@ function () {
         }
 
         var commandeData = results[0];
-        var commande = new Commandes(commandeData.id, commandeData.categorie, commandeData.quantite_achetee, commandeData.destination, commandeData.date_commande, commandeData.date_livraison, commandeData.est_traitee, commandeData.id_client);
+        var commande = new Commandes(commandeData.id, commandeData.categorie, commandeData.quantite_achetee, commandeData.destination, commandeData.date_commande, commandeData.date_livraison, commandeData.est_traitee, commandeData.id_client, commandeData.date_ajout);
         return callback(null, commande);
       });
-    } // Méthode pour récupérer toutes les entrées de la table commandes
-
+    }
   }, {
     key: "getAll",
     value: function getAll(callback) {
@@ -101,7 +102,7 @@ function () {
         }
 
         var commandes = results.map(function (commandeData) {
-          return new Commandes(commandeData.id, commandeData.categorie, commandeData.quantite_achetee, commandeData.destination, commandeData.date_commande, commandeData.date_livraison, commandeData.est_traitee, commandeData.id_client);
+          return new Commandes(commandeData.id, commandeData.categorie, commandeData.quantite_achetee, commandeData.destination, commandeData.date_commande, commandeData.date_livraison, commandeData.est_traitee, commandeData.id_client, commandeData.date_ajout);
         });
         return callback(null, commandes);
       });

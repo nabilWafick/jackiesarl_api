@@ -29,7 +29,7 @@ var connection = require('../_db/database');
 var RemiseChequeClient =
 /*#__PURE__*/
 function () {
-  function RemiseChequeClient(id, description, banque, montant, reste, estValide, idClient, dateRemise) {
+  function RemiseChequeClient(id, description, banque, montant, reste, est_validee, id_client, date_remise) {
     _classCallCheck(this, RemiseChequeClient);
 
     this.id = id;
@@ -37,32 +37,20 @@ function () {
     this.banque = banque;
     this.montant = montant;
     this.reste = reste;
-    this.estValide = estValide;
-    this.idClient = idClient;
-    this.dateRemise = dateRemise;
+    this.est_validee = est_validee;
+    this.id_client = id_client;
+    this.date_remise = date_remise;
   }
 
   _createClass(RemiseChequeClient, [{
     key: "update",
     value: function update(callback) {
-      var query = 'UPDATE remise_cheque_client SET ? WHERE id = ?';
+      var query = 'UPDATE remise_cheque_client SET description = ?, banque = ?, montant = ?, reste = ?, est_validee = ?, id_client = ?, date_remise = ? WHERE id = ?';
 
       var id = this.id,
-          remiseChequeClientData = _objectWithoutProperties(this, ["id"]);
+          updatedData = _objectWithoutProperties(this, ["id"]);
 
-      connection.query(query, [remiseChequeClientData, id], function (error, results) {
-        if (error) {
-          return callback(error);
-        }
-
-        return callback(null);
-      });
-    }
-  }, {
-    key: "delete",
-    value: function _delete(callback) {
-      var query = 'DELETE FROM remise_cheque_client WHERE id = ?';
-      connection.query(query, [this.id], function (error, results) {
+      connection.query(query, [].concat(_toConsumableArray(Object.values(updatedData)), [id]), function (error, results) {
         if (error) {
           return callback(error);
         }
@@ -72,16 +60,16 @@ function () {
     }
   }], [{
     key: "create",
-    value: function create(remiseChequeClientData, callback) {
-      var query = 'INSERT INTO remise_cheque_client SET ?';
-      connection.query(query, remiseChequeClientData, function (error, results) {
+    value: function create(remiseData, callback) {
+      var query = 'INSERT INTO remise_cheque_client (id, description, banque, montant, reste, est_validee, id_client, date_remise) VALUES (NULL, ?, ?, ?, ?, ?, ?, ?)';
+      connection.query(query, [remiseData.description, remiseData.banque, remiseData.montant, remiseData.reste, remiseData.est_validee, remiseData.id_client, remiseData.date_remise], function (error, results) {
         if (error) {
           return callback(error, null);
         }
 
-        var newRemiseChequeClient = _construct(RemiseChequeClient, [results.insertId].concat(_toConsumableArray(Object.values(remiseChequeClientData))));
+        var newRemise = _construct(RemiseChequeClient, [results.insertId].concat(_toConsumableArray(Object.values(remiseData))));
 
-        return callback(null, newRemiseChequeClient);
+        return callback(null, newRemise);
       });
     }
   }, {
@@ -94,15 +82,14 @@ function () {
         }
 
         if (results.length === 0) {
-          return callback(null, null);
+          return callback(null, null); // Remise de chèque client non trouvée
         }
 
-        var remiseChequeClientData = results[0];
-        var remiseChequeClient = new RemiseChequeClient(remiseChequeClientData.id, remiseChequeClientData.description, remiseChequeClientData.banque, remiseChequeClientData.montant, remiseChequeClientData.reste, remiseChequeClientData.est_valide, remiseChequeClientData.id_client, remiseChequeClientData.date_remise);
-        return callback(null, remiseChequeClient);
+        var remiseData = results[0];
+        var remise = new RemiseChequeClient(remiseData.id, remiseData.description, remiseData.banque, remiseData.montant, remiseData.reste, remiseData.est_validee, remiseData.id_client, remiseData.date_remise);
+        return callback(null, remise);
       });
-    } // Méthode pour récupérer toutes les entrées de la table remise_cheque_client
-
+    }
   }, {
     key: "getAll",
     value: function getAll(callback) {
@@ -112,10 +99,22 @@ function () {
           return callback(error, null);
         }
 
-        var remisesChequeClient = results.map(function (remiseData) {
-          return new RemiseChequeClient(remiseData.id, remiseData.description, remiseData.banque, remiseData.montant, remiseData.reste, remiseData.est_valide, remiseData.id_client, remiseData.date_remise);
+        var remisesList = results.map(function (remiseData) {
+          return new RemiseChequeClient(remiseData.id, remiseData.description, remiseData.banque, remiseData.montant, remiseData.reste, remiseData.est_validee, remiseData.id_client, remiseData.date_remise);
         });
-        return callback(null, remisesChequeClient);
+        return callback(null, remisesList);
+      });
+    }
+  }, {
+    key: "deleteById",
+    value: function deleteById(id, callback) {
+      var query = 'DELETE FROM remise_cheque_client WHERE id = ?';
+      connection.query(query, [id], function (error, results) {
+        if (error) {
+          return callback(error);
+        }
+
+        return callback(null);
       });
     }
   }]);

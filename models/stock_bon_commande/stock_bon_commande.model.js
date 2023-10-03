@@ -1,25 +1,25 @@
 const connection = require('../_db/database');
 
 class StockBonCommande {
-  constructor(id, numeroBc, categorie, quantiteAchetee, stockAvantVente, vente, stockApresVente, dateRechargement) {
+  constructor(id, numero_bc, categorie, quantite_achetee, stock_avant_vente, vente, stock_apres_vente, date_rechargement) {
     this.id = id;
-    this.numeroBc = numeroBc;
+    this.numero_bc = numero_bc;
     this.categorie = categorie;
-    this.quantiteAchetee = quantiteAchetee;
-    this.stockAvantVente = stockAvantVente;
+    this.quantite_achetee = quantite_achetee;
+    this.stock_avant_vente = stock_avant_vente;
     this.vente = vente;
-    this.stockApresVente = stockApresVente;
-    this.dateRechargement = dateRechargement;
+    this.stock_apres_vente = stock_apres_vente;
+    this.date_rechargement = date_rechargement;
   }
 
-  static create(stockBonCommandeData, callback) {
-    const query = 'INSERT INTO stock_bon_commande SET ?';
-    connection.query(query, stockBonCommandeData, (error, results) => {
+  static create(stockData, callback) {
+    const query = 'INSERT INTO stock_bon_commande (id, numero_bc, categorie, quantite_achetee, stock_avant_vente, vente, stock_apres_vente, date_rechargement) VALUES (NULL, ?, ?, ?, ?, ?, ?, ?)';
+    connection.query(query, [stockData.numero_bc, stockData.categorie, stockData.quantite_achetee, stockData.stock_avant_vente, stockData.vente, stockData.stock_apres_vente, stockData.date_rechargement], (error, results) => {
       if (error) {
         return callback(error, null);
       }
-      const newStockBonCommande = new StockBonCommande(results.insertId, ...Object.values(stockBonCommandeData));
-      return callback(null, newStockBonCommande);
+      const newStock = new StockBonCommande(results.insertId, ...Object.values(stockData));
+      return callback(null, newStock);
     });
   }
 
@@ -30,32 +30,10 @@ class StockBonCommande {
         return callback(error, null);
       }
       if (results.length === 0) {
-        return callback(null, null);
+        return callback(null, null); // Stock de bon de commande non trouvé
       }
-      const stockBonCommandeData = results[0];
-      const stockBonCommande = new StockBonCommande(
-        stockBonCommandeData.id,
-        stockBonCommandeData.numero_bc,
-        stockBonCommandeData.categorie,
-        stockBonCommandeData.quantite_achetee,
-        stockBonCommandeData.stock_avant_vente,
-        stockBonCommandeData.vente,
-        stockBonCommandeData.stock_apres_vente,
-        stockBonCommandeData.date_rechargement
-      );
-      return callback(null, stockBonCommande);
-    });
-  }
-
-  // Méthode pour récupérer toutes les entrées de la table stock_bon_commande
-static getAll(callback) {
-  const query = 'SELECT * FROM stock_bon_commande';
-  connection.query(query, (error, results) => {
-    if (error) {
-      return callback(error, null);
-    }
-    const stocksBonCommande = results.map((stockData) => {
-      return new StockBonCommande(
+      const stockData = results[0];
+      const stock = new StockBonCommande(
         stockData.id,
         stockData.numero_bc,
         stockData.categorie,
@@ -63,18 +41,38 @@ static getAll(callback) {
         stockData.stock_avant_vente,
         stockData.vente,
         stockData.stock_apres_vente,
-        stockData.date_rechargement
+        stockData.date_rechargement,
       );
+      return callback(null, stock);
     });
-    return callback(null, stocksBonCommande);
-  });
-}
+  }
 
+  static getAll(callback) {
+    const query = 'SELECT * FROM stock_bon_commande';
+    connection.query(query, (error, results) => {
+      if (error) {
+        return callback(error, null);
+      }
+      const stocksList = results.map((stockData) => {
+        return new StockBonCommande(
+          stockData.id,
+          stockData.numero_bc,
+          stockData.categorie,
+          stockData.quantite_achetee,
+          stockData.stock_avant_vente,
+          stockData.vente,
+          stockData.stock_apres_vente,
+          stockData.date_rechargement,
+        );
+      });
+      return callback(null, stocksList);
+    });
+  }
 
   update(callback) {
-    const query = 'UPDATE stock_bon_commande SET ? WHERE id = ?';
-    const { id, ...stockBonCommandeData } = this;
-    connection.query(query, [stockBonCommandeData, id], (error, results) => {
+    const query = 'UPDATE stock_bon_commande SET numero_bc = ?, categorie = ?, quantite_achetee = ?, stock_avant_vente = ?, vente = ?, stock_apres_vente = ?, date_rechargement = ? WHERE id = ?';
+    const { id, ...updatedData } = this;
+    connection.query(query, [...Object.values(updatedData), id], (error, results) => {
       if (error) {
         return callback(error);
       }
@@ -82,9 +80,9 @@ static getAll(callback) {
     });
   }
 
-  delete(callback) {
+  static deleteById(id, callback) {
     const query = 'DELETE FROM stock_bon_commande WHERE id = ?';
-    connection.query(query, [this.id], (error, results) => {
+    connection.query(query, [id], (error, results) => {
       if (error) {
         return callback(error);
       }

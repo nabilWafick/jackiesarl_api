@@ -1,21 +1,21 @@
 const connection = require('../_db/database');
 
 class Rapports {
-  constructor(id, rapport, dateEnvoi, idEmploye) {
+  constructor(id, rapport, date_envoi, id_employe) {
     this.id = id;
     this.rapport = rapport;
-    this.dateEnvoi = dateEnvoi;
-    this.idEmploye = idEmploye;
+    this.date_envoi = date_envoi;
+    this.id_employe = id_employe;
   }
 
-  static create(rapportsData, callback) {
-    const query = 'INSERT INTO rapports SET ?';
-    connection.query(query, rapportsData, (error, results) => {
+  static create(rapportData, callback) {
+    const query = 'INSERT INTO rapports (id, rapport, date_envoi, id_employe) VALUES (NULL, ?, ?, ?)';
+    connection.query(query, [rapportData.rapport, rapportData.date_envoi, rapportData.id_employe], (error, results) => {
       if (error) {
         return callback(error, null);
       }
-      const newRapports = new Rapports(results.insertId, ...Object.values(rapportsData));
-      return callback(null, newRapports);
+      const newRapport = new Rapports(results.insertId, ...Object.values(rapportData));
+      return callback(null, newRapport);
     });
   }
 
@@ -26,43 +26,41 @@ class Rapports {
         return callback(error, null);
       }
       if (results.length === 0) {
-        return callback(null, null);
+        return callback(null, null); // Rapport non trouvé
       }
-      const rapportsData = results[0];
-      const rapports = new Rapports(
-        rapportsData.id,
-        rapportsData.rapport,
-        rapportsData.date_envoi,
-        rapportsData.id_employe
-      );
-      return callback(null, rapports);
-    });
-  }
-
-  // Méthode pour récupérer toutes les entrées de la table rapports
-static getAll(callback) {
-  const query = 'SELECT * FROM rapports';
-  connection.query(query, (error, results) => {
-    if (error) {
-      return callback(error, null);
-    }
-    const rapports = results.map((rapportData) => {
-      return new Rapports(
+      const rapportData = results[0];
+      const rapport = new Rapports(
         rapportData.id,
         rapportData.rapport,
         rapportData.date_envoi,
-        rapportData.id_employe
+        rapportData.id_employe,
       );
+      return callback(null, rapport);
     });
-    return callback(null, rapports);
-  });
-}
+  }
 
+  static getAll(callback) {
+    const query = 'SELECT * FROM rapports';
+    connection.query(query, (error, results) => {
+      if (error) {
+        return callback(error, null);
+      }
+      const rapportsList = results.map((rapportData) => {
+        return new Rapports(
+          rapportData.id,
+          rapportData.rapport,
+          rapportData.date_envoi,
+          rapportData.id_employe,
+        );
+      });
+      return callback(null, rapportsList);
+    });
+  }
 
   update(callback) {
-    const query = 'UPDATE rapports SET ? WHERE id = ?';
-    const { id, ...rapportsData } = this;
-    connection.query(query, [rapportsData, id], (error, results) => {
+    const query = 'UPDATE rapports SET rapport = ?, date_envoi = ?, id_employe = ? WHERE id = ?';
+    const { id, ...updatedData } = this;
+    connection.query(query, [...Object.values(updatedData), id], (error, results) => {
       if (error) {
         return callback(error);
       }
@@ -70,10 +68,9 @@ static getAll(callback) {
     });
   }
 
-
-  delete(callback) {
+  static deleteById(id, callback) {
     const query = 'DELETE FROM rapports WHERE id = ?';
-    connection.query(query, [this.id], (error, results) => {
+    connection.query(query, [id], (error, results) => {
       if (error) {
         return callback(error);
       }

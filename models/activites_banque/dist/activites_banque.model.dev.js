@@ -24,58 +24,53 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
-var connection = require('../_db/database'); // Modèle de données pour la table activites_banque
-
+var connection = require('../_db/database');
 
 var ActivitesBanque =
 /*#__PURE__*/
 function () {
-  function ActivitesBanque(id, idBanque, description, debit, credit, solde, dateActivite) {
+  function ActivitesBanque(idBanque, description, debit, credit, solde, dateActivite) {
     _classCallCheck(this, ActivitesBanque);
 
-    this.id = id;
     this.idBanque = idBanque;
     this.description = description;
     this.debit = debit;
     this.credit = credit;
     this.solde = solde;
     this.dateActivite = dateActivite;
-  } // Méthode pour créer une nouvelle activité banque
-
+  }
 
   _createClass(ActivitesBanque, [{
     key: "update",
-    // Méthode pour mettre à jour une activité banque
     value: function update(callback) {
-      var query = 'UPDATE activites_banque SET ? WHERE id = ?';
+      var query = 'UPDATE activites_banque SET description = ?, debit = ?, credit = ?, solde = ?, date_activite = ? WHERE id_banque = ?';
 
-      var id = this.id,
-          activitesBanqueData = _objectWithoutProperties(this, ["id"]);
+      var idBanque = this.idBanque,
+          updatedData = _objectWithoutProperties(this, ["idBanque"]);
 
-      connection.query(query, [activitesBanqueData, id], function (error, results) {
+      connection.query(query, [updatedData.description, updatedData.debit, updatedData.credit, updatedData.solde, updatedData.dateActivite, idBanque], function (error, results) {
         if (error) {
           return callback(error);
         }
 
         return callback(null);
       });
-    } // Méthode pour supprimer une activité banque par ID
-
+    }
   }], [{
     key: "create",
     value: function create(activitesBanqueData, callback) {
-      var query = 'INSERT INTO activites_banque SET ?';
-      connection.query(query, activitesBanqueData, function (error, results) {
+      var query = 'INSERT INTO activites_banque (id_banque, description, debit, credit, solde, date_activite) VALUES (?,?,?,?,?,?)';
+      var currentDate = new Date();
+      connection.query(query, [activitesBanqueData.idBanque, activitesBanqueData.description, activitesBanqueData.debit, activitesBanqueData.credit, activitesBanqueData.solde, currentDate], function (error, results) {
         if (error) {
           return callback(error, null);
         }
 
-        var newActivitesBanque = _construct(ActivitesBanque, [results.insertId].concat(_toConsumableArray(Object.values(activitesBanqueData))));
+        var newActivitesBanque = _construct(ActivitesBanque, _toConsumableArray(Object.values(activitesBanqueData)).concat([currentDate]));
 
         return callback(null, newActivitesBanque);
       });
-    } // Méthode pour récupérer une activité banque par ID
-
+    }
   }, {
     key: "getById",
     value: function getById(id, callback) {
@@ -90,11 +85,10 @@ function () {
         }
 
         var activitesBanqueData = results[0];
-        var activitesBanque = new ActivitesBanque(activitesBanqueData.id, activitesBanqueData.id_banque, activitesBanqueData.description, activitesBanqueData.debit, activitesBanqueData.credit, activitesBanqueData.solde, activitesBanqueData.date_activite);
+        var activitesBanque = new ActivitesBanque(activitesBanqueData.id_banque, activitesBanqueData.description, activitesBanqueData.debit, activitesBanqueData.credit, activitesBanqueData.solde, new Date(activitesBanqueData.date_activite));
         return callback(null, activitesBanque);
       });
-    } // Méthode pour récupérer toutes les entrées de la table activites_banque
-
+    }
   }, {
     key: "getAll",
     value: function getAll(callback) {
@@ -104,16 +98,16 @@ function () {
           return callback(error, null);
         }
 
-        var activitesBanque = results.map(function (activiteBanqueData) {
-          return new ActivitesBanque(activiteBanqueData.id, activiteBanqueData.id_banque, activiteBanqueData.description, activiteBanqueData.debit, activiteBanqueData.credit, activiteBanqueData.solde, activiteBanqueData.date_activite);
+        var activitesBanqueList = results.map(function (activitesBanqueData) {
+          return new ActivitesBanque(activitesBanqueData.id_banque, activitesBanqueData.description, activitesBanqueData.debit, activitesBanqueData.credit, activitesBanqueData.solde, new Date(activitesBanqueData.date_activite));
         });
-        return callback(null, activitesBanque);
+        return callback(null, activitesBanqueList);
       });
     }
   }, {
     key: "deleteById",
     value: function deleteById(id, callback) {
-      var query = 'DELETE FROM activites_banque WHERE id = ?';
+      var query = 'DELETE FROM activites_banque WHERE id_banque = ?';
       connection.query(query, [id], function (error, results) {
         if (error) {
           return callback(error);
@@ -121,8 +115,7 @@ function () {
 
         return callback(null);
       });
-    } // Autres méthodes pour effectuer des opérations CRUD sur la table activites_banque
-
+    }
   }]);
 
   return ActivitesBanque;

@@ -1,24 +1,26 @@
 const connection = require('../_db/database');
 
 class Commandes {
-  constructor(id, categorie, quantiteAchetee, destination, dateCommande, dateLivraison, estTraitee, idClient) {
+  constructor(id, categorie, quantite_achetee, destination, date_commande, date_livraison, est_traitee, id_client, date_ajout) {
     this.id = id;
     this.categorie = categorie;
-    this.quantiteAchetee = quantiteAchetee;
+    this.quantite_achetee = quantite_achetee;
     this.destination = destination;
-    this.dateCommande = dateCommande;
-    this.dateLivraison = dateLivraison;
-    this.estTraitee = estTraitee;
-    this.idClient = idClient;
+    this.date_commande = date_commande;
+    this.date_livraison = date_livraison;
+    this.est_traitee = est_traitee;
+    this.id_client = id_client;
+    this.date_ajout = date_ajout;
   }
 
   static create(commandeData, callback) {
-    const query = 'INSERT INTO commandes SET ?';
-    connection.query(query, commandeData, (error, results) => {
+    const query = 'INSERT INTO commandes (id, categorie, quantite_achetee, destination, date_commande, date_livraison, est_traitee, id_client, date_ajout) VALUES (NULL, ?, ?, ?, ?, ?, ?, ?, ?)';
+    const currentDate = new Date();
+    connection.query(query, [commandeData.categorie, commandeData.quantite_achetee, commandeData.destination, commandeData.date_commande, commandeData.date_livraison, commandeData.est_traitee, commandeData.id_client, currentDate], (error, results) => {
       if (error) {
         return callback(error, null);
       }
-      const newCommande = new Commandes(results.insertId, ...Object.values(commandeData));
+      const newCommande = new Commandes(results.insertId, ...Object.values(commandeData), currentDate);
       return callback(null, newCommande);
     });
   }
@@ -41,40 +43,40 @@ class Commandes {
         commandeData.date_commande,
         commandeData.date_livraison,
         commandeData.est_traitee,
-        commandeData.id_client
+        commandeData.id_client,
+        commandeData.date_ajout,
       );
       return callback(null, commande);
     });
   }
 
-  // Méthode pour récupérer toutes les entrées de la table commandes
-static getAll(callback) {
-  const query = 'SELECT * FROM commandes';
-  connection.query(query, (error, results) => {
-    if (error) {
-      return callback(error, null);
-    }
-    const commandes = results.map((commandeData) => {
-      return new Commandes(
-        commandeData.id,
-        commandeData.categorie,
-        commandeData.quantite_achetee,
-        commandeData.destination,
-        commandeData.date_commande,
-        commandeData.date_livraison,
-        commandeData.est_traitee,
-        commandeData.id_client
-      );
+  static getAll(callback) {
+    const query = 'SELECT * FROM commandes';
+    connection.query(query, (error, results) => {
+      if (error) {
+        return callback(error, null);
+      }
+      const commandes = results.map((commandeData) => {
+        return new Commandes(
+          commandeData.id,
+          commandeData.categorie,
+          commandeData.quantite_achetee,
+          commandeData.destination,
+          commandeData.date_commande,
+          commandeData.date_livraison,
+          commandeData.est_traitee,
+          commandeData.id_client,
+          commandeData.date_ajout,
+        );
+      });
+      return callback(null, commandes);
     });
-    return callback(null, commandes);
-  });
-}
-
+  }
 
   update(callback) {
-    const query = 'UPDATE commandes SET ? WHERE id = ?';
+    const query = 'UPDATE commandes SET categorie = ?, quantite_achetee = ?, destination = ?, date_commande = ?, date_livraison = ?, est_traitee = ?, id_client = ?, date_ajout = ? WHERE id = ?';
     const { id, ...commandeData } = this;
-    connection.query(query, [commandeData, id], (error, results) => {
+    connection.query(query, [...Object.values(commandeData), id], (error, results) => {
       if (error) {
         return callback(error);
       }

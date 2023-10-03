@@ -29,36 +29,24 @@ var connection = require('../_db/database');
 var Rapports =
 /*#__PURE__*/
 function () {
-  function Rapports(id, rapport, dateEnvoi, idEmploye) {
+  function Rapports(id, rapport, date_envoi, id_employe) {
     _classCallCheck(this, Rapports);
 
     this.id = id;
     this.rapport = rapport;
-    this.dateEnvoi = dateEnvoi;
-    this.idEmploye = idEmploye;
+    this.date_envoi = date_envoi;
+    this.id_employe = id_employe;
   }
 
   _createClass(Rapports, [{
     key: "update",
     value: function update(callback) {
-      var query = 'UPDATE rapports SET ? WHERE id = ?';
+      var query = 'UPDATE rapports SET rapport = ?, date_envoi = ?, id_employe = ? WHERE id = ?';
 
       var id = this.id,
-          rapportsData = _objectWithoutProperties(this, ["id"]);
+          updatedData = _objectWithoutProperties(this, ["id"]);
 
-      connection.query(query, [rapportsData, id], function (error, results) {
-        if (error) {
-          return callback(error);
-        }
-
-        return callback(null);
-      });
-    }
-  }, {
-    key: "delete",
-    value: function _delete(callback) {
-      var query = 'DELETE FROM rapports WHERE id = ?';
-      connection.query(query, [this.id], function (error, results) {
+      connection.query(query, [].concat(_toConsumableArray(Object.values(updatedData)), [id]), function (error, results) {
         if (error) {
           return callback(error);
         }
@@ -68,16 +56,16 @@ function () {
     }
   }], [{
     key: "create",
-    value: function create(rapportsData, callback) {
-      var query = 'INSERT INTO rapports SET ?';
-      connection.query(query, rapportsData, function (error, results) {
+    value: function create(rapportData, callback) {
+      var query = 'INSERT INTO rapports (id, rapport, date_envoi, id_employe) VALUES (NULL, ?, ?, ?)';
+      connection.query(query, [rapportData.rapport, rapportData.date_envoi, rapportData.id_employe], function (error, results) {
         if (error) {
           return callback(error, null);
         }
 
-        var newRapports = _construct(Rapports, [results.insertId].concat(_toConsumableArray(Object.values(rapportsData))));
+        var newRapport = _construct(Rapports, [results.insertId].concat(_toConsumableArray(Object.values(rapportData))));
 
-        return callback(null, newRapports);
+        return callback(null, newRapport);
       });
     }
   }, {
@@ -90,15 +78,14 @@ function () {
         }
 
         if (results.length === 0) {
-          return callback(null, null);
+          return callback(null, null); // Rapport non trouvé
         }
 
-        var rapportsData = results[0];
-        var rapports = new Rapports(rapportsData.id, rapportsData.rapport, rapportsData.date_envoi, rapportsData.id_employe);
-        return callback(null, rapports);
+        var rapportData = results[0];
+        var rapport = new Rapports(rapportData.id, rapportData.rapport, rapportData.date_envoi, rapportData.id_employe);
+        return callback(null, rapport);
       });
-    } // Méthode pour récupérer toutes les entrées de la table rapports
-
+    }
   }, {
     key: "getAll",
     value: function getAll(callback) {
@@ -108,10 +95,22 @@ function () {
           return callback(error, null);
         }
 
-        var rapports = results.map(function (rapportData) {
+        var rapportsList = results.map(function (rapportData) {
           return new Rapports(rapportData.id, rapportData.rapport, rapportData.date_envoi, rapportData.id_employe);
         });
-        return callback(null, rapports);
+        return callback(null, rapportsList);
+      });
+    }
+  }, {
+    key: "deleteById",
+    value: function deleteById(id, callback) {
+      var query = 'DELETE FROM rapports WHERE id = ?';
+      connection.query(query, [id], function (error, results) {
+        if (error) {
+          return callback(error);
+        }
+
+        return callback(null);
       });
     }
   }]);

@@ -1,6 +1,5 @@
-const connection = require('../_db/database')
+const connection = require('../_db/database');
 
-// Modèle de données pour la table achat_client
 class AchatClient {
   constructor(id, quantiteAchetee, categorie, montant, numeroCtp, bordereau, numeroBc, idClient, dateAchat) {
     this.id = id;
@@ -14,26 +13,24 @@ class AchatClient {
     this.dateAchat = dateAchat;
   }
 
-  // Méthode pour créer un nouvel achat client
   static create(achatClientData, callback) {
-    const query = 'INSERT INTO achat_client SET ?';
-    connection.query(query, achatClientData, (error, results) => {
+    const query = 'INSERT INTO achat_client (id, quantite_achetee, categorie, montant, numero_ctp, bordereau, numero_bc, id_client, date_achat) VALUES (NULL,?,?,?,?,?,?,?,?)';
+    const currentDate = new Date();
+    connection.query(query, [achatClientData.quantiteAchetee, achatClientData.categorie, achatClientData.montant, achatClientData.numeroCtp, achatClientData.bordereau, achatClientData.numeroBc, achatClientData.idClient, currentDate], (error, results) => {
       if (error) {
         return callback(error, null);
       }
-      const newAchatClient = new AchatClient(results.insertId, ...Object.values(achatClientData));
+      const newAchatClient = new AchatClient(results.insertId, ...Object.values(achatClientData), currentDate);
       return callback(null, newAchatClient);
     });
   }
 
-  // Méthode pour récupérer un achat client par ID
   static getById(id, callback) {
     const query = 'SELECT * FROM achat_client WHERE id = ?';
     connection.query(query, [id], (error, results) => {
       if (error) {
         return callback(error, null);
       }
-
       if (results.length === 0) {
         return callback(null, null); // Achat client non trouvé
       }
@@ -47,42 +44,39 @@ class AchatClient {
         achatClientData.bordereau,
         achatClientData.numero_bc,
         achatClientData.id_client,
-        achatClientData.date_achat
+        new Date(achatClientData.date_achat)
       );
       return callback(null, achatClient);
     });
   }
 
- // Méthode pour récupérer tous les achats clients
-static getAll(callback) {
-  const query = 'SELECT * FROM achat_client';
-  connection.query(query, (error, results) => {
-    if (error) {
-      return callback(error, null);
-    }
-    const achatsClients = results.map((achatClientData) => {
-      return new AchatClient(
-        achatClientData.id,
-        achatClientData.quantite_achetee,
-        achatClientData.categorie,
-        achatClientData.montant,
-        achatClientData.numero_ctp,
-        achatClientData.bordereau,
-        achatClientData.numero_bc,
-        achatClientData.id_client,
-        achatClientData.date_achat
-      );
+  static getAll(callback) {
+    const query = 'SELECT * FROM achat_client';
+    connection.query(query, (error, results) => {
+      if (error) {
+        return callback(error, null);
+      }
+      const achatsClients = results.map((achatClientData) => {
+        return new AchatClient(
+          achatClientData.id,
+          achatClientData.quantite_achetee,
+          achatClientData.categorie,
+          achatClientData.montant,
+          achatClientData.numero_ctp,
+          achatClientData.bordereau,
+          achatClientData.numero_bc,
+          achatClientData.id_client,
+          new Date(achatClientData.date_achat)
+        );
+      });
+      return callback(null, achatsClients);
     });
-    return callback(null, achatsClients);
-  });
-}
+  }
 
-
-  // Méthode pour mettre à jour un achat client
   update(callback) {
-    const query = 'UPDATE achat_client SET ? WHERE id = ?';
+    const query = 'UPDATE achat_client SET quantite_achetee = ?, categorie = ?, montant = ?, numero_ctp = ?, bordereau = ?, numero_bc = ?, id_client = ?, date_achat = ? WHERE achat_client.id = ?';
     const { id, ...achatClientData } = this;
-    connection.query(query, [achatClientData, id], (error, results) => {
+    connection.query(query, [achatClientData.quantiteAchetee, achatClientData.categorie, achatClientData.montant, achatClientData.numeroCtp, achatClientData.bordereau, achatClientData.numeroBc, achatClientData.idClient, new Date(achatClientData.dateAchat), id], (error, results) => {
       if (error) {
         return callback(error);
       }
@@ -90,7 +84,6 @@ static getAll(callback) {
     });
   }
 
-  // Méthode pour supprimer un achat client
   delete(callback) {
     const query = 'DELETE FROM achat_client WHERE id = ?';
     connection.query(query, [this.id], (error, results) => {
@@ -100,8 +93,6 @@ static getAll(callback) {
       return callback(null);
     });
   }
-
-  // Autres méthodes pour effectuer des opérations CRUD sur la table achat_client
 }
 
 module.exports = AchatClient;

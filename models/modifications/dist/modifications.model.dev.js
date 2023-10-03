@@ -29,24 +29,24 @@ var connection = require('../_db/database');
 var Modifications =
 /*#__PURE__*/
 function () {
-  function Modifications(id, modification, idEmploye, dateModification) {
+  function Modifications(id, modification, id_employe, date_modification) {
     _classCallCheck(this, Modifications);
 
     this.id = id;
     this.modification = modification;
-    this.idEmploye = idEmploye;
-    this.dateModification = dateModification;
+    this.id_employe = id_employe;
+    this.date_modification = date_modification;
   }
 
   _createClass(Modifications, [{
     key: "update",
     value: function update(callback) {
-      var query = 'UPDATE modifications SET ? WHERE id = ?';
+      var query = 'UPDATE modifications SET modification = ?, id_employe = ?, date_modification = ? WHERE id = ?';
 
       var id = this.id,
-          modificationData = _objectWithoutProperties(this, ["id"]);
+          updatedData = _objectWithoutProperties(this, ["id"]);
 
-      connection.query(query, [modificationData, id], function (error, results) {
+      connection.query(query, [].concat(_toConsumableArray(Object.values(updatedData)), [id]), function (error, results) {
         if (error) {
           return callback(error);
         }
@@ -57,8 +57,8 @@ function () {
   }], [{
     key: "create",
     value: function create(modificationData, callback) {
-      var query = 'INSERT INTO modifications SET ?';
-      connection.query(query, modificationData, function (error, results) {
+      var query = 'INSERT INTO modifications (id, modification, id_employe, date_modification) VALUES (NULL, ?, ?, ?)';
+      connection.query(query, [modificationData.modification, modificationData.id_employe, modificationData.date_modification], function (error, results) {
         if (error) {
           return callback(error, null);
         }
@@ -85,8 +85,7 @@ function () {
         var modification = new Modifications(modificationData.id, modificationData.modification, modificationData.id_employe, modificationData.date_modification);
         return callback(null, modification);
       });
-    } // Méthode pour récupérer toutes les entrées de la table modifications
-
+    }
   }, {
     key: "getAll",
     value: function getAll(callback) {
@@ -96,10 +95,10 @@ function () {
           return callback(error, null);
         }
 
-        var modifications = results.map(function (modificationData) {
+        var modificationsList = results.map(function (modificationData) {
           return new Modifications(modificationData.id, modificationData.modification, modificationData.id_employe, modificationData.date_modification);
         });
-        return callback(null, modifications);
+        return callback(null, modificationsList);
       });
     }
   }, {

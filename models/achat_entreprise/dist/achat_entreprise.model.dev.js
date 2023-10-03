@@ -24,8 +24,7 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
-var connection = require('../_db/database'); // Modèle de données pour la table achat_entreprise
-
+var connection = require('../_db/database');
 
 var AchatEntreprise =
 /*#__PURE__*/
@@ -40,42 +39,39 @@ function () {
     this.cheque = cheque;
     this.bordereau = bordereau;
     this.dateAchat = dateAchat;
-  } // Méthode pour créer un nouvel achat entreprise
-
+  }
 
   _createClass(AchatEntreprise, [{
     key: "update",
-    // Méthode pour mettre à jour un achat entreprise
     value: function update(callback) {
-      var query = 'UPDATE achat_entreprise SET ? WHERE bon_commande = ?';
+      var query = 'UPDATE achat_entreprise SET quantite_achetee = ?, montant = ?, banque = ?, cheque = ?, bordereau = ?, date_achat = ? WHERE bon_commande = ?';
 
       var bonCommande = this.bonCommande,
-          achatEntrepriseData = _objectWithoutProperties(this, ["bonCommande"]);
+          updatedData = _objectWithoutProperties(this, ["bonCommande"]);
 
-      connection.query(query, [achatEntrepriseData, bonCommande], function (error, results) {
+      connection.query(query, [updatedData.quantiteAchetee, updatedData.montant, updatedData.banque, updatedData.cheque, updatedData.bordereau, updatedData.dateAchat, bonCommande], function (error, results) {
         if (error) {
           return callback(error);
         }
 
         return callback(null);
       });
-    } // Méthode pour supprimer un achat entreprise par bon de commande
-
+    }
   }], [{
     key: "create",
     value: function create(achatEntrepriseData, callback) {
-      var query = 'INSERT INTO achat_entreprise SET ?';
-      connection.query(query, achatEntrepriseData, function (error, results) {
+      var query = 'INSERT INTO achat_entreprise (bon_commande, quantite_achetee, montant, banque, cheque, bordereau, date_achat) VALUES (?,?,?,?,?,?,?)';
+      var currentDate = new Date();
+      connection.query(query, [achatEntrepriseData.bonCommande, achatEntrepriseData.quantiteAchetee, achatEntrepriseData.montant, achatEntrepriseData.banque, achatEntrepriseData.cheque, achatEntrepriseData.bordereau, currentDate], function (error, results) {
         if (error) {
           return callback(error, null);
         }
 
-        var newAchatEntreprise = _construct(AchatEntreprise, [results.insertId].concat(_toConsumableArray(Object.values(achatEntrepriseData))));
+        var newAchatEntreprise = _construct(AchatEntreprise, _toConsumableArray(Object.values(achatEntrepriseData)).concat([currentDate]));
 
         return callback(null, newAchatEntreprise);
       });
-    } // Méthode pour récupérer un achat entreprise par bon de commande
-
+    }
   }, {
     key: "getByBonCommande",
     value: function getByBonCommande(bonCommande, callback) {
@@ -90,11 +86,10 @@ function () {
         }
 
         var achatEntrepriseData = results[0];
-        var achatEntreprise = new AchatEntreprise(achatEntrepriseData.bon_commande, achatEntrepriseData.quantite_achetee, achatEntrepriseData.montant, achatEntrepriseData.banque, achatEntrepriseData.cheque, achatEntrepriseData.bordereau, achatEntrepriseData.date_achat);
+        var achatEntreprise = new AchatEntreprise(achatEntrepriseData.bon_commande, achatEntrepriseData.quantite_achetee, achatEntrepriseData.montant, achatEntrepriseData.banque, achatEntrepriseData.cheque, achatEntrepriseData.bordereau, new Date(achatEntrepriseData.date_achat));
         return callback(null, achatEntreprise);
       });
-    } // Méthode pour récupérer toutes les entrées de la table achat_entreprise
-
+    }
   }, {
     key: "getAll",
     value: function getAll(callback) {
@@ -105,7 +100,7 @@ function () {
         }
 
         var achatsEntreprise = results.map(function (achatEntrepriseData) {
-          return new AchatEntreprise(achatEntrepriseData.bon_commande, achatEntrepriseData.quantite_achetee, achatEntrepriseData.montant, achatEntrepriseData.banque, achatEntrepriseData.cheque, achatEntrepriseData.bordereau, achatEntrepriseData.date_achat);
+          return new AchatEntreprise(achatEntrepriseData.bon_commande, achatEntrepriseData.quantite_achetee, achatEntrepriseData.montant, achatEntrepriseData.banque, achatEntrepriseData.cheque, achatEntrepriseData.bordereau, new Date(achatEntrepriseData.date_achat));
         });
         return callback(null, achatsEntreprise);
       });
@@ -121,8 +116,7 @@ function () {
 
         return callback(null);
       });
-    } // Autres méthodes pour effectuer des opérations CRUD sur la table achat_entreprise
-
+    }
   }]);
 
   return AchatEntreprise;

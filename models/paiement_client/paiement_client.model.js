@@ -1,27 +1,27 @@
 const connection = require('../_db/database');
 
 class PaiementClient {
-  constructor(id, montant, banque, reference, categorie, numeroBc, bordereau, estValide, idClient, datePaiement) {
+  constructor(id, montant, banque, reference, categorie, numero_bc, bordereau, est_valide, id_client, date_paiement) {
     this.id = id;
     this.montant = montant;
     this.banque = banque;
     this.reference = reference;
     this.categorie = categorie;
-    this.numeroBc = numeroBc;
+    this.numero_bc = numero_bc;
     this.bordereau = bordereau;
-    this.estValide = estValide;
-    this.idClient = idClient;
-    this.datePaiement = datePaiement;
+    this.est_valide = est_valide;
+    this.id_client = id_client;
+    this.date_paiement = date_paiement;
   }
 
-  static create(paiementClientData, callback) {
-    const query = 'INSERT INTO paiement_client SET ?';
-    connection.query(query, paiementClientData, (error, results) => {
+  static create(paiementData, callback) {
+    const query = 'INSERT INTO paiement_client (id, montant, banque, reference, categorie, numero_bc, bordereau, est_valide, id_client, date_paiement) VALUES (NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
+    connection.query(query, [paiementData.montant, paiementData.banque, paiementData.reference, paiementData.categorie, paiementData.numero_bc, paiementData.bordereau, paiementData.est_valide, paiementData.id_client, paiementData.date_paiement], (error, results) => {
       if (error) {
         return callback(error, null);
       }
-      const newPaiementClient = new PaiementClient(results.insertId, ...Object.values(paiementClientData));
-      return callback(null, newPaiementClient);
+      const newPaiement = new PaiementClient(results.insertId, ...Object.values(paiementData));
+      return callback(null, newPaiement);
     });
   }
 
@@ -32,34 +32,10 @@ class PaiementClient {
         return callback(error, null);
       }
       if (results.length === 0) {
-        return callback(null, null);
+        return callback(null, null); // Paiement client non trouvé
       }
-      const paiementClientData = results[0];
-      const paiementClient = new PaiementClient(
-        paiementClientData.id,
-        paiementClientData.montant,
-        paiementClientData.banque,
-        paiementClientData.reference,
-        paiementClientData.categorie,
-        paiementClientData.numero_bc,
-        paiementClientData.bordereau,
-        paiementClientData.est_valide,
-        paiementClientData.id_client,
-        paiementClientData.date_paiement
-      );
-      return callback(null, paiementClient);
-    });
-  }
-
-  // Méthode pour récupérer toutes les entrées de la table paiement_client
-static getAll(callback) {
-  const query = 'SELECT * FROM paiement_client';
-  connection.query(query, (error, results) => {
-    if (error) {
-      return callback(error, null);
-    }
-    const paiementsClient = results.map((paiementData) => {
-      return new PaiementClient(
+      const paiementData = results[0];
+      const paiement = new PaiementClient(
         paiementData.id,
         paiementData.montant,
         paiementData.banque,
@@ -69,18 +45,40 @@ static getAll(callback) {
         paiementData.bordereau,
         paiementData.est_valide,
         paiementData.id_client,
-        paiementData.date_paiement
+        paiementData.date_paiement,
       );
+      return callback(null, paiement);
     });
-    return callback(null, paiementsClient);
-  });
-}
+  }
 
+  static getAll(callback) {
+    const query = 'SELECT * FROM paiement_client';
+    connection.query(query, (error, results) => {
+      if (error) {
+        return callback(error, null);
+      }
+      const paiementsList = results.map((paiementData) => {
+        return new PaiementClient(
+          paiementData.id,
+          paiementData.montant,
+          paiementData.banque,
+          paiementData.reference,
+          paiementData.categorie,
+          paiementData.numero_bc,
+          paiementData.bordereau,
+          paiementData.est_valide,
+          paiementData.id_client,
+          paiementData.date_paiement,
+        );
+      });
+      return callback(null, paiementsList);
+    });
+  }
 
   update(callback) {
-    const query = 'UPDATE paiement_client SET ? WHERE id = ?';
-    const { id, ...paiementClientData } = this;
-    connection.query(query, [paiementClientData, id], (error, results) => {
+    const query = 'UPDATE paiement_client SET montant = ?, banque = ?, reference = ?, categorie = ?, numero_bc = ?, bordereau = ?, est_valide = ?, id_client = ?, date_paiement = ? WHERE id = ?';
+    const { id, ...updatedData } = this;
+    connection.query(query, [...Object.values(updatedData), id], (error, results) => {
       if (error) {
         return callback(error);
       }
@@ -88,9 +86,9 @@ static getAll(callback) {
     });
   }
 
-  delete(callback) {
+  static deleteById(id, callback) {
     const query = 'DELETE FROM paiement_client WHERE id = ?';
-    connection.query(query, [this.id], (error, results) => {
+    connection.query(query, [id], (error, results) => {
       if (error) {
         return callback(error);
       }

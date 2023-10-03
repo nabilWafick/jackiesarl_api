@@ -1,18 +1,19 @@
 const connection = require('../_db/database');
 
 class Employes {
-  constructor(id, nom, prenoms, email, password, role) {
+  constructor(id, nom, prenoms, email, password, role, token) {
     this.id = id;
     this.nom = nom;
     this.prenoms = prenoms;
     this.email = email;
     this.password = password;
     this.role = role;
+    this.token = token;
   }
 
   static create(employeData, callback) {
-    const query = 'INSERT INTO employes SET ?';
-    connection.query(query, employeData, (error, results) => {
+    const query = 'INSERT INTO employes (id, nom, prenoms, email, password, role, token) VALUES (NULL, ?, ?, ?, ?, ?, ?)';
+    connection.query(query, [employeData.nom, employeData.prenoms, employeData.email, employeData.password, employeData.role, employeData.token], (error, results) => {
       if (error) {
         return callback(error, null);
       }
@@ -37,40 +38,38 @@ class Employes {
         employeData.prenoms,
         employeData.email,
         employeData.password,
-        employeData.role
+        employeData.role,
+        employeData.token,
       );
       return callback(null, employe);
     });
   }
 
-
-  // Méthode pour récupérer toutes les entrées de la table employes
-static getAll(callback) {
-  const query = 'SELECT * FROM employes';
-  connection.query(query, (error, results) => {
-    if (error) {
-      return callback(error, null);
-    }
-    const employes = results.map((employeData) => {
-      return new Employes(
-        employeData.id,
-        employeData.nom,
-        employeData.prenoms,
-        employeData.email,
-        employeData.password,
-        employeData.role,
-        employeData.token
-      );
+  static getAll(callback) {
+    const query = 'SELECT * FROM employes';
+    connection.query(query, (error, results) => {
+      if (error) {
+        return callback(error, null);
+      }
+      const employesList = results.map((employeData) => {
+        return new Employes(
+          employeData.id,
+          employeData.nom,
+          employeData.prenoms,
+          employeData.email,
+          employeData.password,
+          employeData.role,
+          employeData.token,
+        );
+      });
+      return callback(null, employesList);
     });
-    return callback(null, employes);
-  });
-}
-
+  }
 
   update(callback) {
-    const query = 'UPDATE employes SET ? WHERE id = ?';
-    const { id, ...employeData } = this;
-    connection.query(query, [employeData, id], (error, results) => {
+    const query = 'UPDATE employes SET nom = ?, prenoms = ?, email = ?, password = ?, role = ?, token = ? WHERE id = ?';
+    const { id, ...updatedData } = this;
+    connection.query(query, [...Object.values(updatedData), id], (error, results) => {
       if (error) {
         return callback(error);
       }

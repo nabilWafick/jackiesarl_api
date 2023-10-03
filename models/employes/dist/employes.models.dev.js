@@ -29,7 +29,7 @@ var connection = require('../_db/database');
 var Employes =
 /*#__PURE__*/
 function () {
-  function Employes(id, nom, prenoms, email, password, role) {
+  function Employes(id, nom, prenoms, email, password, role, token) {
     _classCallCheck(this, Employes);
 
     this.id = id;
@@ -38,17 +38,18 @@ function () {
     this.email = email;
     this.password = password;
     this.role = role;
+    this.token = token;
   }
 
   _createClass(Employes, [{
     key: "update",
     value: function update(callback) {
-      var query = 'UPDATE employes SET ? WHERE id = ?';
+      var query = 'UPDATE employes SET nom = ?, prenoms = ?, email = ?, password = ?, role = ?, token = ? WHERE id = ?';
 
       var id = this.id,
-          employeData = _objectWithoutProperties(this, ["id"]);
+          updatedData = _objectWithoutProperties(this, ["id"]);
 
-      connection.query(query, [employeData, id], function (error, results) {
+      connection.query(query, [].concat(_toConsumableArray(Object.values(updatedData)), [id]), function (error, results) {
         if (error) {
           return callback(error);
         }
@@ -59,8 +60,8 @@ function () {
   }], [{
     key: "create",
     value: function create(employeData, callback) {
-      var query = 'INSERT INTO employes SET ?';
-      connection.query(query, employeData, function (error, results) {
+      var query = 'INSERT INTO employes (id, nom, prenoms, email, password, role, token) VALUES (NULL, ?, ?, ?, ?, ?, ?)';
+      connection.query(query, [employeData.nom, employeData.prenoms, employeData.email, employeData.password, employeData.role, employeData.token], function (error, results) {
         if (error) {
           return callback(error, null);
         }
@@ -84,11 +85,10 @@ function () {
         }
 
         var employeData = results[0];
-        var employe = new Employes(employeData.id, employeData.nom, employeData.prenoms, employeData.email, employeData.password, employeData.role);
+        var employe = new Employes(employeData.id, employeData.nom, employeData.prenoms, employeData.email, employeData.password, employeData.role, employeData.token);
         return callback(null, employe);
       });
-    } // Méthode pour récupérer toutes les entrées de la table employes
-
+    }
   }, {
     key: "getAll",
     value: function getAll(callback) {
@@ -98,10 +98,10 @@ function () {
           return callback(error, null);
         }
 
-        var employes = results.map(function (employeData) {
+        var employesList = results.map(function (employeData) {
           return new Employes(employeData.id, employeData.nom, employeData.prenoms, employeData.email, employeData.password, employeData.role, employeData.token);
         });
-        return callback(null, employes);
+        return callback(null, employesList);
       });
     }
   }, {

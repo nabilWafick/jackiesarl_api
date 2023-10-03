@@ -1,9 +1,7 @@
 const connection = require('../_db/database');
 
-// Modèle de données pour la table activites_depot
 class ActivitesDepot {
-  constructor(id, idDepot, quantiteAvantVente, vente, quantiteActuelle, versement, depense, observation, dateRemplissage) {
-    this.id = id;
+  constructor(idDepot, quantiteAvantVente, vente, quantiteActuelle, versement, depense, observation, dateRemplissage) {
     this.idDepot = idDepot;
     this.quantiteAvantVente = quantiteAvantVente;
     this.vente = vente;
@@ -14,31 +12,29 @@ class ActivitesDepot {
     this.dateRemplissage = dateRemplissage;
   }
 
-  // Méthode pour créer une nouvelle activité de dépôt
   static create(activitesDepotData, callback) {
-    const query = 'INSERT INTO activites_depot SET ?';
-    connection.query(query, activitesDepotData, (error, results) => {
+    const query = 'INSERT INTO activites_depot (id_depot, quantite_avant_vente, vente, quantite_actuelle, versement, depense, observation, date_remplissage) VALUES (?,?,?,?,?,?,?,?)';
+    const currentDate = new Date();
+    connection.query(query, [activitesDepotData.idDepot, activitesDepotData.quantiteAvantVente, activitesDepotData.vente, activitesDepotData.quantiteActuelle, activitesDepotData.versement, activitesDepotData.depense, activitesDepotData.observation, currentDate], (error, results) => {
       if (error) {
         return callback(error, null);
       }
-      const newActivitesDepot = new ActivitesDepot(results.insertId, ...Object.values(activitesDepotData));
+      const newActivitesDepot = new ActivitesDepot(...Object.values(activitesDepotData), currentDate);
       return callback(null, newActivitesDepot);
     });
   }
 
-  // Méthode pour récupérer une activité de dépôt par ID
   static getById(id, callback) {
-    const query = 'SELECT * FROM activites_depot WHERE id = ?';
+    const query = 'SELECT * FROM activites_depot WHERE id_depot = ?';
     connection.query(query, [id], (error, results) => {
       if (error) {
         return callback(error, null);
       }
       if (results.length === 0) {
-        return callback(null, null); // Activité de dépôt non trouvée
+        return callback(null, null); // Activité dépôt non trouvée
       }
       const activitesDepotData = results[0];
       const activitesDepot = new ActivitesDepot(
-        activitesDepotData.id,
         activitesDepotData.id_depot,
         activitesDepotData.quantite_avant_vente,
         activitesDepotData.vente,
@@ -46,42 +42,38 @@ class ActivitesDepot {
         activitesDepotData.versement,
         activitesDepotData.depense,
         activitesDepotData.observation,
-        activitesDepotData.date_remplissage
+        new Date(activitesDepotData.date_remplissage)
       );
       return callback(null, activitesDepot);
     });
   }
 
-  // Méthode pour récupérer toutes les entrées de la table activites_depot
-static getAll(callback) {
-  const query = 'SELECT * FROM activites_depot';
-  connection.query(query, (error, results) => {
-    if (error) {
-      return callback(error, null);
-    }
-    const activitesDepot = results.map((activiteDepotData) => {
-      return new ActivitesDepot(
-        activiteDepotData.id,
-        activiteDepotData.id_depot,
-        activiteDepotData.quantite_avant_vente,
-        activiteDepotData.vente,
-        activiteDepotData.quantite_actuelle,
-        activiteDepotData.versement,
-        activiteDepotData.depense,
-        activiteDepotData.observation,
-        activiteDepotData.date_remplissage
-      );
+  static getAll(callback) {
+    const query = 'SELECT * FROM activites_depot';
+    connection.query(query, (error, results) => {
+      if (error) {
+        return callback(error, null);
+      }
+      const activitesDepotList = results.map((activitesDepotData) => {
+        return new ActivitesDepot(
+          activitesDepotData.id_depot,
+          activitesDepotData.quantite_avant_vente,
+          activitesDepotData.vente,
+          activitesDepotData.quantite_actuelle,
+          activitesDepotData.versement,
+          activitesDepotData.depense,
+          activitesDepotData.observation,
+          new Date(activitesDepotData.date_remplissage)
+        );
+      });
+      return callback(null, activitesDepotList);
     });
-    return callback(null, activitesDepot);
-  });
-}
+  }
 
-
-  // Méthode pour mettre à jour une activité de dépôt
   update(callback) {
-    const query = 'UPDATE activites_depot SET ? WHERE id = ?';
-    const { id, ...activitesDepotData } = this;
-    connection.query(query, [activitesDepotData, id], (error, results) => {
+    const query = 'UPDATE activites_depot SET quantite_avant_vente = ?, vente = ?, quantite_actuelle = ?, versement = ?, depense = ?, observation = ?, date_remplissage = ? WHERE id_depot = ?';
+    const { idDepot, ...updatedData } = this;
+    connection.query(query, [updatedData.quantiteAvantVente, updatedData.vente, updatedData.quantiteActuelle, updatedData.versement, updatedData.depense, updatedData.observation, updatedData.dateRemplissage, idDepot], (error, results) => {
       if (error) {
         return callback(error);
       }
@@ -89,9 +81,8 @@ static getAll(callback) {
     });
   }
 
-  // Méthode pour supprimer une activité de dépôt par ID
   static deleteById(id, callback) {
-    const query = 'DELETE FROM activites_depot WHERE id = ?';
+    const query = 'DELETE FROM activites_depot WHERE id_depot = ?';
     connection.query(query, [id], (error, results) => {
       if (error) {
         return callback(error);
@@ -99,8 +90,6 @@ static getAll(callback) {
       return callback(null);
     });
   }
-
-  // Autres méthodes pour effectuer des opérations CRUD sur la table activites_depot
 }
 
 module.exports = ActivitesDepot;

@@ -29,26 +29,26 @@ var connection = require('../_db/database');
 var Creances =
 /*#__PURE__*/
 function () {
-  function Creances(id, creanceCimBenin, creanceNocibe, creanceAutres, dateCreance, idClient) {
+  function Creances(id, creance_cim_benin, creance_nocibe, creance_autres, date_creance, id_client) {
     _classCallCheck(this, Creances);
 
     this.id = id;
-    this.creanceCimBenin = creanceCimBenin;
-    this.creanceNocibe = creanceNocibe;
-    this.creanceAutres = creanceAutres;
-    this.dateCreance = dateCreance;
-    this.idClient = idClient;
+    this.creance_cim_benin = creance_cim_benin;
+    this.creance_nocibe = creance_nocibe;
+    this.creance_autres = creance_autres;
+    this.date_creance = date_creance;
+    this.id_client = id_client;
   }
 
   _createClass(Creances, [{
     key: "update",
     value: function update(callback) {
-      var query = 'UPDATE creances SET ? WHERE id = ?';
+      var query = 'UPDATE creances SET creance_cim_benin = ?, creance_nocibe = ?, creance_autres = ?, date_creance = ?, id_client = ? WHERE id = ?';
 
       var id = this.id,
-          creanceData = _objectWithoutProperties(this, ["id"]);
+          updatedData = _objectWithoutProperties(this, ["id"]);
 
-      connection.query(query, [creanceData, id], function (error, results) {
+      connection.query(query, [].concat(_toConsumableArray(Object.values(updatedData)), [id]), function (error, results) {
         if (error) {
           return callback(error);
         }
@@ -58,16 +58,16 @@ function () {
     }
   }], [{
     key: "create",
-    value: function create(creanceData, callback) {
-      var query = 'INSERT INTO creances SET ?';
-      connection.query(query, creanceData, function (error, results) {
+    value: function create(creancesData, callback) {
+      var query = 'INSERT INTO creances (id, creance_cim_benin, creance_nocibe, creance_autres, date_creance, id_client) VALUES (NULL, ?, ?, ?, ?, ?)';
+      connection.query(query, [creancesData.creance_cim_benin, creancesData.creance_nocibe, creancesData.creance_autres, creancesData.date_creance, creancesData.id_client], function (error, results) {
         if (error) {
           return callback(error, null);
         }
 
-        var newCreance = _construct(Creances, [results.insertId].concat(_toConsumableArray(Object.values(creanceData))));
+        var newCreances = _construct(Creances, [results.insertId].concat(_toConsumableArray(Object.values(creancesData))));
 
-        return callback(null, newCreance);
+        return callback(null, newCreances);
       });
     }
   }, {
@@ -83,12 +83,11 @@ function () {
           return callback(null, null); // Créance non trouvée
         }
 
-        var creanceData = results[0];
-        var creance = new Creances(creanceData.id, creanceData.creance_cim_benin, creanceData.creance_nocibe, creanceData.creance_autres, creanceData.date_creance, creanceData.id_client);
-        return callback(null, creance);
+        var creancesData = results[0];
+        var creances = new Creances(creancesData.id, creancesData.creance_cim_benin, creancesData.creance_nocibe, creancesData.creance_autres, creancesData.date_creance, creancesData.id_client);
+        return callback(null, creances);
       });
-    } // Méthode pour récupérer toutes les entrées de la table creances
-
+    }
   }, {
     key: "getAll",
     value: function getAll(callback) {
@@ -98,10 +97,10 @@ function () {
           return callback(error, null);
         }
 
-        var creances = results.map(function (creanceData) {
-          return new Creances(creanceData.id, creanceData.creance_cim_benin, creanceData.creance_nocibe, creanceData.creance_autres, creanceData.date_creance, creanceData.id_client);
+        var creancesList = results.map(function (creancesData) {
+          return new Creances(creancesData.id, creancesData.creance_cim_benin, creancesData.creance_nocibe, creancesData.creance_autres, creancesData.date_creance, creancesData.id_client);
         });
-        return callback(null, creances);
+        return callback(null, creancesList);
       });
     }
   }, {
