@@ -24,26 +24,26 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
-var connection = require('../_db/database');
+var connection = require("../_db/database");
 
 var Creances =
 /*#__PURE__*/
 function () {
-  function Creances(id, creance_cim_benin, creance_nocibe, creance_autres, date_creance, id_client) {
+  function Creances(id, creance_cim_benin, creance_nocibe, creance_autres, id_client, date_creance) {
     _classCallCheck(this, Creances);
 
     this.id = id;
     this.creance_cim_benin = creance_cim_benin;
     this.creance_nocibe = creance_nocibe;
     this.creance_autres = creance_autres;
-    this.date_creance = date_creance;
     this.id_client = id_client;
+    this.date_creance = date_creance;
   }
 
   _createClass(Creances, [{
     key: "update",
     value: function update(callback) {
-      var query = 'UPDATE creances SET creance_cim_benin = ?, creance_nocibe = ?, creance_autres = ?, date_creance = ?, id_client = ? WHERE id = ?';
+      var query = "UPDATE creances SET creance_cim_benin = ?, creance_nocibe = ?, creance_autres = ?, date_creance = ?, id_client = ? WHERE id = ?";
 
       var id = this.id,
           updatedData = _objectWithoutProperties(this, ["id"]);
@@ -59,13 +59,14 @@ function () {
   }], [{
     key: "create",
     value: function create(creancesData, callback) {
-      var query = 'INSERT INTO creances (id, creance_cim_benin, creance_nocibe, creance_autres, date_creance, id_client) VALUES (NULL, ?, ?, ?, ?, ?)';
-      connection.query(query, [creancesData.creance_cim_benin, creancesData.creance_nocibe, creancesData.creance_autres, creancesData.date_creance, creancesData.id_client], function (error, results) {
+      var query = "INSERT INTO creances (id, creance_cim_benin, creance_nocibe, creance_autres, id_client,date_creance) VALUES (NULL, ?, ?, ?, ?, ?)";
+      var currenDate = new Date();
+      connection.query(query, [creancesData.creance_cim_benin, creancesData.creance_nocibe, creancesData.creance_autres, creancesData.id_client, currenDate], function (error, results) {
         if (error) {
           return callback(error, null);
         }
 
-        var newCreances = _construct(Creances, [results.insertId].concat(_toConsumableArray(Object.values(creancesData))));
+        var newCreances = _construct(Creances, [results.insertId].concat(_toConsumableArray(Object.values(creancesData)), [currenDate]));
 
         return callback(null, newCreances);
       });
@@ -73,7 +74,7 @@ function () {
   }, {
     key: "getById",
     value: function getById(id, callback) {
-      var query = 'SELECT * FROM creances WHERE id = ?';
+      var query = "SELECT * FROM creances WHERE id = ?";
       connection.query(query, [id], function (error, results) {
         if (error) {
           return callback(error, null);
@@ -91,7 +92,7 @@ function () {
   }, {
     key: "getAll",
     value: function getAll(callback) {
-      var query = 'SELECT * FROM creances';
+      var query = "SELECT * FROM creances";
       connection.query(query, function (error, results) {
         if (error) {
           return callback(error, null);
@@ -104,9 +105,9 @@ function () {
       });
     }
   }, {
-    key: "deleteById",
-    value: function deleteById(id, callback) {
-      var query = 'DELETE FROM creances WHERE id = ?';
+    key: "delete",
+    value: function _delete(id, callback) {
+      var query = "DELETE FROM creances WHERE id = ?";
       connection.query(query, [id], function (error, results) {
         if (error) {
           return callback(error);

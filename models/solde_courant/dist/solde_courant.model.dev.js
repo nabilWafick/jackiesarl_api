@@ -59,12 +59,13 @@ function () {
     key: "create",
     value: function create(soldeData, callback) {
       var query = 'INSERT INTO solde_courant (id, banque, numero_compte, solde_actuel, date_ajout) VALUES (NULL, ?, ?, ?, ?)';
-      connection.query(query, [soldeData.banque, soldeData.numero_compte, soldeData.solde_actuel, soldeData.date_ajout], function (error, results) {
+      var currentDate = new Date();
+      connection.query(query, [soldeData.banque, soldeData.numero_compte, soldeData.solde_actuel, currentDate], function (error, results) {
         if (error) {
           return callback(error, null);
         }
 
-        var newSolde = _construct(SoldeCourant, [results.insertId].concat(_toConsumableArray(Object.values(soldeData))));
+        var newSolde = _construct(SoldeCourant, [results.insertId].concat(_toConsumableArray(Object.values(soldeData)), [currentDate]));
 
         return callback(null, newSolde);
       });
@@ -103,8 +104,8 @@ function () {
       });
     }
   }, {
-    key: "deleteById",
-    value: function deleteById(id, callback) {
+    key: "delete",
+    value: function _delete(id, callback) {
       var query = 'DELETE FROM solde_courant WHERE id = ?';
       connection.query(query, [id], function (error, results) {
         if (error) {

@@ -1,7 +1,16 @@
-const connection = require('../_db/database');
+const connection = require("../_db/database");
 
 class RemiseChequeClient {
-  constructor(id, description, banque, montant, reste, est_validee, id_client, date_remise) {
+  constructor(
+    id,
+    description,
+    banque,
+    montant,
+    reste,
+    est_validee,
+    id_client,
+    date_remise
+  ) {
     this.id = id;
     this.description = description;
     this.banque = banque;
@@ -13,18 +22,36 @@ class RemiseChequeClient {
   }
 
   static create(remiseData, callback) {
-    const query = 'INSERT INTO remise_cheque_client (id, description, banque, montant, reste, est_validee, id_client, date_remise) VALUES (NULL, ?, ?, ?, ?, ?, ?, ?)';
-    connection.query(query, [remiseData.description, remiseData.banque, remiseData.montant, remiseData.reste, remiseData.est_validee, remiseData.id_client, remiseData.date_remise], (error, results) => {
-      if (error) {
-        return callback(error, null);
+    const query =
+      "INSERT INTO remise_cheque_client (id, description, banque, montant, reste, est_validee, id_client, date_remise) VALUES (NULL, ?, ?, ?, ?, ?, ?, ?)";
+    const currentDate = new Date();
+    connection.query(
+      query,
+      [
+        remiseData.description,
+        remiseData.banque,
+        remiseData.montant,
+        remiseData.reste,
+        remiseData.est_validee,
+        remiseData.id_client,
+        currentDate,
+      ],
+      (error, results) => {
+        if (error) {
+          return callback(error, null);
+        }
+        const newRemise = new RemiseChequeClient(
+          results.insertId,
+          ...Object.values(remiseData),
+          currentDate
+        );
+        return callback(null, newRemise);
       }
-      const newRemise = new RemiseChequeClient(results.insertId, ...Object.values(remiseData));
-      return callback(null, newRemise);
-    });
+    );
   }
 
   static getById(id, callback) {
-    const query = 'SELECT * FROM remise_cheque_client WHERE id = ?';
+    const query = "SELECT * FROM remise_cheque_client WHERE id = ?";
     connection.query(query, [id], (error, results) => {
       if (error) {
         return callback(error, null);
@@ -41,14 +68,14 @@ class RemiseChequeClient {
         remiseData.reste,
         remiseData.est_validee,
         remiseData.id_client,
-        remiseData.date_remise,
+        remiseData.date_remise
       );
       return callback(null, remise);
     });
   }
 
   static getAll(callback) {
-    const query = 'SELECT * FROM remise_cheque_client';
+    const query = "SELECT * FROM remise_cheque_client";
     connection.query(query, (error, results) => {
       if (error) {
         return callback(error, null);
@@ -62,7 +89,29 @@ class RemiseChequeClient {
           remiseData.reste,
           remiseData.est_validee,
           remiseData.id_client,
-          remiseData.date_remise,
+          remiseData.date_remise
+        );
+      });
+      return callback(null, remisesList);
+    });
+  }
+
+  static getAllOfClient(id_client, callback) {
+    const query = "SELECT * FROM remise_cheque_client WHERE id_client = ?";
+    connection.query(query, [id_client], (error, results) => {
+      if (error) {
+        return callback(error, null);
+      }
+      const remisesList = results.map((remiseData) => {
+        return new RemiseChequeClient(
+          remiseData.id,
+          remiseData.description,
+          remiseData.banque,
+          remiseData.montant,
+          remiseData.reste,
+          remiseData.est_validee,
+          remiseData.id_client,
+          remiseData.date_remise
         );
       });
       return callback(null, remisesList);
@@ -70,18 +119,23 @@ class RemiseChequeClient {
   }
 
   update(callback) {
-    const query = 'UPDATE remise_cheque_client SET description = ?, banque = ?, montant = ?, reste = ?, est_validee = ?, id_client = ?, date_remise = ? WHERE id = ?';
+    const query =
+      "UPDATE remise_cheque_client SET description = ?, banque = ?, montant = ?, reste = ?, est_validee = ?, id_client = ?, date_remise = ? WHERE id = ?";
     const { id, ...updatedData } = this;
-    connection.query(query, [...Object.values(updatedData), id], (error, results) => {
-      if (error) {
-        return callback(error);
+    connection.query(
+      query,
+      [...Object.values(updatedData), id],
+      (error, results) => {
+        if (error) {
+          return callback(error);
+        }
+        return callback(null);
       }
-      return callback(null);
-    });
+    );
   }
 
-  static deleteById(id, callback) {
-    const query = 'DELETE FROM remise_cheque_client WHERE id = ?';
+  static delete(id, callback) {
+    const query = "DELETE FROM remise_cheque_client WHERE id = ?";
     connection.query(query, [id], (error, results) => {
       if (error) {
         return callback(error);

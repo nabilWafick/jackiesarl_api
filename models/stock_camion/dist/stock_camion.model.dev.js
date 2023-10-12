@@ -24,7 +24,7 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
-var connection = require('../_db/database');
+var connection = require("../_db/database");
 
 var StockCamion =
 /*#__PURE__*/
@@ -44,7 +44,7 @@ function () {
   _createClass(StockCamion, [{
     key: "update",
     value: function update(callback) {
-      var query = 'UPDATE stock_camion SET numero_camion = ?, categorie = ?, numero_chauffeur = ?, numero_bc = ?, quantite = ?, date_approvisionnement = ? WHERE id = ?';
+      var query = "UPDATE stock_camion SET numero_camion = ?, categorie = ?, numero_chauffeur = ?, numero_bc = ?, quantite = ?, date_approvisionnement = ? WHERE id = ?";
 
       var id = this.id,
           updatedData = _objectWithoutProperties(this, ["id"]);
@@ -60,13 +60,14 @@ function () {
   }], [{
     key: "create",
     value: function create(stockData, callback) {
-      var query = 'INSERT INTO stock_camion (id, numero_camion, categorie, numero_chauffeur, numero_bc, quantite, date_approvisionnement) VALUES (NULL, ?, ?, ?, ?, ?, ?)';
-      connection.query(query, [stockData.numero_camion, stockData.categorie, stockData.numero_chauffeur, stockData.numero_bc, stockData.quantite, stockData.date_approvisionnement], function (error, results) {
+      var query = "INSERT INTO stock_camion (id, numero_camion, categorie, numero_chauffeur, numero_bc, quantite, date_approvisionnement) VALUES (NULL, ?, ?, ?, ?, ?, ?)";
+      var currentDate = new Date();
+      connection.query(query, [stockData.numero_camion, stockData.categorie, stockData.numero_chauffeur, stockData.numero_bc, stockData.quantite, currentDate], function (error, results) {
         if (error) {
           return callback(error, null);
         }
 
-        var newStock = _construct(StockCamion, [results.insertId].concat(_toConsumableArray(Object.values(stockData))));
+        var newStock = _construct(StockCamion, [results.insertId].concat(_toConsumableArray(Object.values(stockData)), [currentDate]));
 
         return callback(null, newStock);
       });
@@ -74,7 +75,7 @@ function () {
   }, {
     key: "getById",
     value: function getById(id, callback) {
-      var query = 'SELECT * FROM stock_camion WHERE id = ?';
+      var query = "SELECT * FROM stock_camion WHERE id = ?";
       connection.query(query, [id], function (error, results) {
         if (error) {
           return callback(error, null);
@@ -92,7 +93,7 @@ function () {
   }, {
     key: "getAll",
     value: function getAll(callback) {
-      var query = 'SELECT * FROM stock_camion';
+      var query = "SELECT * FROM stock_camion";
       connection.query(query, function (error, results) {
         if (error) {
           return callback(error, null);
@@ -105,9 +106,9 @@ function () {
       });
     }
   }, {
-    key: "deleteById",
-    value: function deleteById(id, callback) {
-      var query = 'DELETE FROM stock_camion WHERE id = ?';
+    key: "delete",
+    value: function _delete(id, callback) {
+      var query = "DELETE FROM stock_camion WHERE id = ?";
       connection.query(query, [id], function (error, results) {
         if (error) {
           return callback(error);

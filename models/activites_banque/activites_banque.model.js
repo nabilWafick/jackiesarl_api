@@ -1,29 +1,45 @@
-const connection = require('../_db/database');
+const connection = require("../_db/database");
 
 class ActivitesBanque {
-  constructor(idBanque, description, debit, credit, solde, dateActivite) {
-    this.idBanque = idBanque;
+  constructor(id, id_banque, description, debit, credit, solde, date_activite) {
+    this.id = id;
+    this.id_banque = id_banque;
     this.description = description;
     this.debit = debit;
     this.credit = credit;
     this.solde = solde;
-    this.dateActivite = dateActivite;
+    this.date_activite = date_activite;
   }
 
   static create(activitesBanqueData, callback) {
-    const query = 'INSERT INTO activites_banque (id_banque, description, debit, credit, solde, date_activite) VALUES (?,?,?,?,?,?)';
+    const query =
+      "INSERT INTO activites_banque (id,id_banque, description, debit, credit, solde, date_activite) VALUES (NULL,?,?,?,?,?,?)";
     const currentDate = new Date();
-    connection.query(query, [activitesBanqueData.idBanque, activitesBanqueData.description, activitesBanqueData.debit, activitesBanqueData.credit, activitesBanqueData.solde, currentDate], (error, results) => {
-      if (error) {
-        return callback(error, null);
+    connection.query(
+      query,
+      [
+        activitesBanqueData.id_banque,
+        activitesBanqueData.description,
+        activitesBanqueData.debit,
+        activitesBanqueData.credit,
+        activitesBanqueData.solde,
+        currentDate,
+      ],
+      (error, results) => {
+        if (error) {
+          return callback(error, null);
+        }
+        const newActivitesBanque = new ActivitesBanque(
+          ...Object.values(activitesBanqueData),
+          currentDate
+        );
+        return callback(null, newActivitesBanque);
       }
-      const newActivitesBanque = new ActivitesBanque(...Object.values(activitesBanqueData), currentDate);
-      return callback(null, newActivitesBanque);
-    });
+    );
   }
 
   static getById(id, callback) {
-    const query = 'SELECT * FROM activites_banque WHERE id = ?';
+    const query = "SELECT * FROM activites_banque WHERE id = ?";
     connection.query(query, [id], (error, results) => {
       if (error) {
         return callback(error, null);
@@ -33,6 +49,7 @@ class ActivitesBanque {
       }
       const activitesBanqueData = results[0];
       const activitesBanque = new ActivitesBanque(
+        activitesBanqueData.id,
         activitesBanqueData.id_banque,
         activitesBanqueData.description,
         activitesBanqueData.debit,
@@ -45,13 +62,35 @@ class ActivitesBanque {
   }
 
   static getAll(callback) {
-    const query = 'SELECT * FROM activites_banque';
+    const query = "SELECT * FROM activites_banque";
     connection.query(query, (error, results) => {
       if (error) {
         return callback(error, null);
       }
       const activitesBanqueList = results.map((activitesBanqueData) => {
         return new ActivitesBanque(
+          activitesBanqueData.id,
+          activitesBanqueData.id_banque,
+          activitesBanqueData.description,
+          activitesBanqueData.debit,
+          activitesBanqueData.credit,
+          activitesBanqueData.solde,
+          new Date(activitesBanqueData.date_activite)
+        );
+      });
+      return callback(null, activitesBanqueList);
+    });
+  }
+
+  static getAllByBanqueID(id_banque, callback) {
+    const query = "SELECT * FROM activites_banque WHERE id_banque = ?";
+    connection.query(query, [id_banque], (error, results) => {
+      if (error) {
+        return callback(error, null);
+      }
+      const activitesBanqueList = results.map((activitesBanqueData) => {
+        return new ActivitesBanque(
+          activitesBanqueData.id,
           activitesBanqueData.id_banque,
           activitesBanqueData.description,
           activitesBanqueData.debit,
@@ -65,18 +104,31 @@ class ActivitesBanque {
   }
 
   update(callback) {
-    const query = 'UPDATE activites_banque SET description = ?, debit = ?, credit = ?, solde = ?, date_activite = ? WHERE id_banque = ?';
-    const { idBanque, ...updatedData } = this;
-    connection.query(query, [updatedData.description, updatedData.debit, updatedData.credit, updatedData.solde, updatedData.dateActivite, idBanque], (error, results) => {
-      if (error) {
-        return callback(error);
+    const query =
+      "UPDATE activites_banque SET id_banque = ?, description = ?, debit = ?, credit = ?, solde = ?, date_activite = ? WHERE id_banque = ?";
+    const { id_banque, ...updatedData } = this;
+    connection.query(
+      query,
+      [
+        updatedData.id_banque,
+        updatedData.description,
+        updatedData.debit,
+        updatedData.credit,
+        updatedData.solde,
+        updatedData.date_activite,
+        id,
+      ],
+      (error, results) => {
+        if (error) {
+          return callback(error);
+        }
+        return callback(null);
       }
-      return callback(null);
-    });
+    );
   }
 
-  static deleteById(id, callback) {
-    const query = 'DELETE FROM activites_banque WHERE id_banque = ?';
+  static delete(id, callback) {
+    const query = "DELETE FROM activites_banque WHERE id = ?";
     connection.query(query, [id], (error, results) => {
       if (error) {
         return callback(error);

@@ -13,11 +13,12 @@ class Employes {
 
   static create(employeData, callback) {
     const query = 'INSERT INTO employes (id, nom, prenoms, email, password, role, token) VALUES (NULL, ?, ?, ?, ?, ?, ?)';
-    connection.query(query, [employeData.nom, employeData.prenoms, employeData.email, employeData.password, employeData.role, employeData.token], (error, results) => {
+
+    connection.query(query, [employeData.nom, employeData.prenoms, employeData.email, employeData.password, employeData.role, 'test token'], (error, results) => {
       if (error) {
         return callback(error, null);
       }
-      const newEmploye = new Employes(results.insertId, ...Object.values(employeData));
+      const newEmploye = new Employes(results.insertId, ...Object.values(employeData), 'test token');
       return callback(null, newEmploye);
     });
   }
@@ -77,7 +78,7 @@ class Employes {
     });
   }
 
-  static deleteById(id, callback) {
+  static delete(id, callback) {
     const query = 'DELETE FROM employes WHERE id = ?';
     connection.query(query, [id], (error, results) => {
       if (error) {

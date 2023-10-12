@@ -24,32 +24,32 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
-var connection = require('../_db/database');
+var connection = require("../_db/database");
 
 var AchatEntreprise =
 /*#__PURE__*/
 function () {
-  function AchatEntreprise(bonCommande, quantiteAchetee, montant, banque, cheque, bordereau, dateAchat) {
+  function AchatEntreprise(bon_commande, quantite_achetee, montant, banque, cheque, bordereau, date_achat) {
     _classCallCheck(this, AchatEntreprise);
 
-    this.bonCommande = bonCommande;
-    this.quantiteAchetee = quantiteAchetee;
+    this.bon_commande = bon_commande;
+    this.quantite_achetee = quantite_achetee;
     this.montant = montant;
     this.banque = banque;
     this.cheque = cheque;
     this.bordereau = bordereau;
-    this.dateAchat = dateAchat;
+    this.date_achat = date_achat;
   }
 
   _createClass(AchatEntreprise, [{
     key: "update",
     value: function update(callback) {
-      var query = 'UPDATE achat_entreprise SET quantite_achetee = ?, montant = ?, banque = ?, cheque = ?, bordereau = ?, date_achat = ? WHERE bon_commande = ?';
+      var query = "UPDATE achat_entreprise SET quantite_achetee = ?, montant = ?, banque = ?, cheque = ?, bordereau = ?, date_achat = ? WHERE bon_commande = ?";
 
-      var bonCommande = this.bonCommande,
-          updatedData = _objectWithoutProperties(this, ["bonCommande"]);
+      var bon_commande = this.bon_commande,
+          updatedData = _objectWithoutProperties(this, ["bon_commande"]);
 
-      connection.query(query, [updatedData.quantiteAchetee, updatedData.montant, updatedData.banque, updatedData.cheque, updatedData.bordereau, updatedData.dateAchat, bonCommande], function (error, results) {
+      connection.query(query, [updatedData.quantite_achetee, updatedData.montant, updatedData.banque, updatedData.cheque, updatedData.bordereau, updatedData.date_achat, bon_commande], function (error, results) {
         if (error) {
           return callback(error);
         }
@@ -60,9 +60,9 @@ function () {
   }], [{
     key: "create",
     value: function create(achatEntrepriseData, callback) {
-      var query = 'INSERT INTO achat_entreprise (bon_commande, quantite_achetee, montant, banque, cheque, bordereau, date_achat) VALUES (?,?,?,?,?,?,?)';
+      var query = "INSERT INTO achat_entreprise (bon_commande, quantite_achetee, montant, banque, cheque, bordereau, date_achat) VALUES (?,?,?,?,?,?,?)";
       var currentDate = new Date();
-      connection.query(query, [achatEntrepriseData.bonCommande, achatEntrepriseData.quantiteAchetee, achatEntrepriseData.montant, achatEntrepriseData.banque, achatEntrepriseData.cheque, achatEntrepriseData.bordereau, currentDate], function (error, results) {
+      connection.query(query, [achatEntrepriseData.bon_commande, achatEntrepriseData.quantite_achetee, achatEntrepriseData.montant, achatEntrepriseData.banque, achatEntrepriseData.cheque, achatEntrepriseData.bordereau, currentDate], function (error, results) {
         if (error) {
           return callback(error, null);
         }
@@ -73,10 +73,10 @@ function () {
       });
     }
   }, {
-    key: "getByBonCommande",
-    value: function getByBonCommande(bonCommande, callback) {
-      var query = 'SELECT * FROM achat_entreprise WHERE bon_commande = ?';
-      connection.query(query, [bonCommande], function (error, results) {
+    key: "getByBon_commande",
+    value: function getByBon_commande(bon_commande, callback) {
+      var query = "SELECT * FROM achat_entreprise WHERE bon_commande = ?";
+      connection.query(query, [bon_commande], function (error, results) {
         if (error) {
           return callback(error, null);
         }
@@ -93,7 +93,7 @@ function () {
   }, {
     key: "getAll",
     value: function getAll(callback) {
-      var query = 'SELECT * FROM achat_entreprise';
+      var query = "SELECT * FROM achat_entreprise";
       connection.query(query, function (error, results) {
         if (error) {
           return callback(error, null);
@@ -106,10 +106,10 @@ function () {
       });
     }
   }, {
-    key: "deleteByBonCommande",
-    value: function deleteByBonCommande(bonCommande, callback) {
-      var query = 'DELETE FROM achat_entreprise WHERE bon_commande = ?';
-      connection.query(query, [bonCommande], function (error, results) {
+    key: "delete",
+    value: function _delete(bon_commande, callback) {
+      var query = "DELETE FROM achat_entreprise WHERE bon_commande = ?";
+      connection.query(query, [bon_commande], function (error, results) {
         if (error) {
           return callback(error);
         }

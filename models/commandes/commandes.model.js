@@ -1,7 +1,17 @@
-const connection = require('../_db/database');
+const connection = require("../_db/database");
 
 class Commandes {
-  constructor(id, categorie, quantite_achetee, destination, date_commande, date_livraison, est_traitee, id_client, date_ajout) {
+  constructor(
+    id,
+    categorie,
+    quantite_achetee,
+    destination,
+    date_commande,
+    date_livraison,
+    est_traitee,
+    id_client,
+    date_ajout
+  ) {
     this.id = id;
     this.categorie = categorie;
     this.quantite_achetee = quantite_achetee;
@@ -14,19 +24,37 @@ class Commandes {
   }
 
   static create(commandeData, callback) {
-    const query = 'INSERT INTO commandes (id, categorie, quantite_achetee, destination, date_commande, date_livraison, est_traitee, id_client, date_ajout) VALUES (NULL, ?, ?, ?, ?, ?, ?, ?, ?)';
+    const query =
+      "INSERT INTO commandes (id, categorie, quantite_achetee, destination, date_commande, date_livraison, est_traitee, id_client, date_ajout) VALUES (NULL, ?, ?, ?, ?, ?, ?, ?, ?)";
     const currentDate = new Date();
-    connection.query(query, [commandeData.categorie, commandeData.quantite_achetee, commandeData.destination, commandeData.date_commande, commandeData.date_livraison, commandeData.est_traitee, commandeData.id_client, currentDate], (error, results) => {
-      if (error) {
-        return callback(error, null);
+    connection.query(
+      query,
+      [
+        commandeData.categorie,
+        commandeData.quantite_achetee,
+        commandeData.destination,
+        new Date(commandeData.date_commande),
+        new Date(commandeData.date_livraison),
+        commandeData.est_traitee,
+        commandeData.id_client,
+        currentDate,
+      ],
+      (error, results) => {
+        if (error) {
+          return callback(error, null);
+        }
+        const newCommande = new Commandes(
+          results.insertId,
+          ...Object.values(commandeData),
+          currentDate
+        );
+        return callback(null, newCommande);
       }
-      const newCommande = new Commandes(results.insertId, ...Object.values(commandeData), currentDate);
-      return callback(null, newCommande);
-    });
+    );
   }
 
   static getById(id, callback) {
-    const query = 'SELECT * FROM commandes WHERE id = ?';
+    const query = "SELECT * FROM commandes WHERE id = ?";
     connection.query(query, [id], (error, results) => {
       if (error) {
         return callback(error, null);
@@ -44,14 +72,14 @@ class Commandes {
         commandeData.date_livraison,
         commandeData.est_traitee,
         commandeData.id_client,
-        commandeData.date_ajout,
+        commandeData.date_ajout
       );
       return callback(null, commande);
     });
   }
 
   static getAll(callback) {
-    const query = 'SELECT * FROM commandes';
+    const query = "SELECT * FROM commandes";
     connection.query(query, (error, results) => {
       if (error) {
         return callback(error, null);
@@ -66,7 +94,7 @@ class Commandes {
           commandeData.date_livraison,
           commandeData.est_traitee,
           commandeData.id_client,
-          commandeData.date_ajout,
+          commandeData.date_ajout
         );
       });
       return callback(null, commandes);
@@ -74,18 +102,23 @@ class Commandes {
   }
 
   update(callback) {
-    const query = 'UPDATE commandes SET categorie = ?, quantite_achetee = ?, destination = ?, date_commande = ?, date_livraison = ?, est_traitee = ?, id_client = ?, date_ajout = ? WHERE id = ?';
+    const query =
+      "UPDATE commandes SET categorie = ?, quantite_achetee = ?, destination = ?, date_commande = ?, date_livraison = ?, est_traitee = ?, id_client = ?, date_ajout = ? WHERE id = ?";
     const { id, ...commandeData } = this;
-    connection.query(query, [...Object.values(commandeData), id], (error, results) => {
-      if (error) {
-        return callback(error);
+    connection.query(
+      query,
+      [...Object.values(commandeData), id],
+      (error, results) => {
+        if (error) {
+          return callback(error);
+        }
+        return callback(null);
       }
-      return callback(null);
-    });
+    );
   }
 
-  static deleteById(id, callback) {
-    const query = 'DELETE FROM commandes WHERE id = ?';
+  static delete(id, callback) {
+    const query = "DELETE FROM commandes WHERE id = ?";
     connection.query(query, [id], (error, results) => {
       if (error) {
         return callback(error);

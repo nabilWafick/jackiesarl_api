@@ -24,7 +24,7 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
-var connection = require('../_db/database');
+var connection = require("../_db/database");
 
 var Commandes =
 /*#__PURE__*/
@@ -46,7 +46,7 @@ function () {
   _createClass(Commandes, [{
     key: "update",
     value: function update(callback) {
-      var query = 'UPDATE commandes SET categorie = ?, quantite_achetee = ?, destination = ?, date_commande = ?, date_livraison = ?, est_traitee = ?, id_client = ?, date_ajout = ? WHERE id = ?';
+      var query = "UPDATE commandes SET categorie = ?, quantite_achetee = ?, destination = ?, date_commande = ?, date_livraison = ?, est_traitee = ?, id_client = ?, date_ajout = ? WHERE id = ?";
 
       var id = this.id,
           commandeData = _objectWithoutProperties(this, ["id"]);
@@ -62,9 +62,9 @@ function () {
   }], [{
     key: "create",
     value: function create(commandeData, callback) {
-      var query = 'INSERT INTO commandes (id, categorie, quantite_achetee, destination, date_commande, date_livraison, est_traitee, id_client, date_ajout) VALUES (NULL, ?, ?, ?, ?, ?, ?, ?, ?)';
+      var query = "INSERT INTO commandes (id, categorie, quantite_achetee, destination, date_commande, date_livraison, est_traitee, id_client, date_ajout) VALUES (NULL, ?, ?, ?, ?, ?, ?, ?, ?)";
       var currentDate = new Date();
-      connection.query(query, [commandeData.categorie, commandeData.quantite_achetee, commandeData.destination, commandeData.date_commande, commandeData.date_livraison, commandeData.est_traitee, commandeData.id_client, currentDate], function (error, results) {
+      connection.query(query, [commandeData.categorie, commandeData.quantite_achetee, commandeData.destination, new Date(commandeData.date_commande), new Date(commandeData.date_livraison), commandeData.est_traitee, commandeData.id_client, currentDate], function (error, results) {
         if (error) {
           return callback(error, null);
         }
@@ -77,7 +77,7 @@ function () {
   }, {
     key: "getById",
     value: function getById(id, callback) {
-      var query = 'SELECT * FROM commandes WHERE id = ?';
+      var query = "SELECT * FROM commandes WHERE id = ?";
       connection.query(query, [id], function (error, results) {
         if (error) {
           return callback(error, null);
@@ -95,7 +95,7 @@ function () {
   }, {
     key: "getAll",
     value: function getAll(callback) {
-      var query = 'SELECT * FROM commandes';
+      var query = "SELECT * FROM commandes";
       connection.query(query, function (error, results) {
         if (error) {
           return callback(error, null);
@@ -108,9 +108,9 @@ function () {
       });
     }
   }, {
-    key: "deleteById",
-    value: function deleteById(id, callback) {
-      var query = 'DELETE FROM commandes WHERE id = ?';
+    key: "delete",
+    value: function _delete(id, callback) {
+      var query = "DELETE FROM commandes WHERE id = ?";
       connection.query(query, [id], function (error, results) {
         if (error) {
           return callback(error);

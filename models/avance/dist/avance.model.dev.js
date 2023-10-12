@@ -88,8 +88,8 @@ function () {
       });
     }
   }, {
-    key: "deleteById",
-    value: function deleteById(id, callback) {
+    key: "delete",
+    value: function _delete(id, callback) {
       var query = 'DELETE FROM avance WHERE id = ?';
       connection.query(query, [id], function (error, results) {
         if (error) {

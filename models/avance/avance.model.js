@@ -59,7 +59,7 @@ class Avance {
     });
   }
 
-  static deleteById(id, callback) {
+  static delete(id, callback) {
     const query = 'DELETE FROM avance WHERE id = ?';
     connection.query(query, [id], (error, results) => {
       if (error) {

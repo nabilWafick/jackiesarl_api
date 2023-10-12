@@ -1,4 +1,4 @@
-const connection = require('../_db/database');
+const connection = require("../_db/database");
 
 class Brouillard {
   constructor(id, depot, stock_actuel, nom_gerant, numero_gerant, date_ajout) {
@@ -11,19 +11,37 @@ class Brouillard {
   }
 
   static create(brouillardData, callback) {
-    const query = 'INSERT INTO brouillard (depot, stock_actuel, nom_gerant, numero_gerant, date_ajout) VALUES (?, ?, ?, ?, ?)';
+    const query =
+      "INSERT INTO brouillard (depot, stock_actuel, nom_gerant, numero_gerant, date_ajout) VALUES (?, ?, ?, ?, ?)";
     const currentDate = new Date();
-    connection.query(query, [brouillardData.depot, brouillardData.stock_actuel, brouillardData.nom_gerant, brouillardData.numero_gerant, currentDate], (error, results) => {
-      if (error) {
-        return callback(error, null);
+    connection.query(
+      query,
+      [
+        brouillardData.depot,
+        brouillardData.stock_actuel,
+        brouillardData.nom_gerant,
+        brouillardData.numero_gerant,
+        currentDate,
+      ],
+      (error, results) => {
+        if (error) {
+          return callback(error, null);
+        }
+        const newBrouillard = new Brouillard(
+          results.insertId,
+          brouillardData.depot,
+          brouillardData.stock_actuel,
+          brouillardData.nom_gerant,
+          brouillardData.numero_gerant,
+          currentDate
+        );
+        return callback(null, newBrouillard);
       }
-      const newBrouillard = new Brouillard(results.insertId, brouillardData.depot, brouillardData.stock_actuel, brouillardData.nom_gerant, brouillardData.numero_gerant, currentDate);
-      return callback(null, newBrouillard);
-    });
+    );
   }
 
   static getById(id, callback) {
-    const query = 'SELECT * FROM brouillard WHERE id = ?';
+    const query = "SELECT * FROM brouillard WHERE id = ?";
     connection.query(query, [id], (error, results) => {
       if (error) {
         return callback(error, null);
@@ -32,37 +50,63 @@ class Brouillard {
         return callback(null, null); // Brouillard non trouvé
       }
       const brouillardData = results[0];
-      const brouillard = new Brouillard(brouillardData.id, brouillardData.depot, brouillardData.stock_actuel, brouillardData.nom_gerant, brouillardData.numero_gerant, new Date(brouillardData.date_ajout));
+      const brouillard = new Brouillard(
+        brouillardData.id,
+        brouillardData.depot,
+        brouillardData.stock_actuel,
+        brouillardData.nom_gerant,
+        brouillardData.numero_gerant,
+        new Date(brouillardData.date_ajout)
+      );
       return callback(null, brouillard);
     });
   }
 
   static getAll(callback) {
-    const query = 'SELECT * FROM brouillard';
+    const query = "SELECT * FROM brouillard";
     connection.query(query, (error, results) => {
       if (error) {
         return callback(error, null);
       }
       const brouillardList = results.map((brouillardData) => {
-        return new Brouillard(brouillardData.id, brouillardData.depot, brouillardData.stock_actuel, brouillardData.nom_gerant, brouillardData.numero_gerant, new Date(brouillardData.date_ajout));
+        return new Brouillard(
+          brouillardData.id,
+          brouillardData.depot,
+          brouillardData.stock_actuel,
+          brouillardData.nom_gerant,
+          brouillardData.numero_gerant,
+          new Date(brouillardData.date_ajout)
+        );
       });
       return callback(null, brouillardList);
     });
   }
 
   update(callback) {
-    const query = 'UPDATE brouillard SET depot = ?, stock_actuel = ?, nom_gerant = ?, numero_gerant = ?, date_ajout = ? WHERE id = ?';
+    const query =
+      "UPDATE brouillard SET depot = ?, stock_actuel = ?, nom_gerant = ?, numero_gerant = ?, date_ajout = ? WHERE id = ?";
     const { id, ...updatedData } = this;
-    connection.query(query, [updatedData.depot, updatedData.stock_actuel, updatedData.nom_gerant, updatedData.numero_gerant, updatedData.date_ajout, id], (error, results) => {
-      if (error) {
-        return callback(error);
+    connection.query(
+      query,
+      [
+        updatedData.depot,
+        updatedData.stock_actuel,
+        updatedData.nom_gerant,
+        updatedData.numero_gerant,
+        updatedData.date_ajout,
+        id,
+      ],
+      (error, results) => {
+        if (error) {
+          return callback(error);
+        }
+        return callback(null);
       }
-      return callback(null);
-    });
+    );
   }
 
-  static deleteById(id, callback) {
-    const query = 'DELETE FROM brouillard WHERE id = ?';
+  static delete(id, callback) {
+    const query = "DELETE FROM brouillard WHERE id = ?";
     connection.query(query, [id], (error, results) => {
       if (error) {
         return callback(error);

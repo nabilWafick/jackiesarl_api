@@ -1,7 +1,15 @@
-const connection = require('../_db/database');
+const connection = require("../_db/database");
 
 class StockCamion {
-  constructor(id, numero_camion, categorie, numero_chauffeur, numero_bc, quantite, date_approvisionnement) {
+  constructor(
+    id,
+    numero_camion,
+    categorie,
+    numero_chauffeur,
+    numero_bc,
+    quantite,
+    date_approvisionnement
+  ) {
     this.id = id;
     this.numero_camion = numero_camion;
     this.categorie = categorie;
@@ -12,18 +20,37 @@ class StockCamion {
   }
 
   static create(stockData, callback) {
-    const query = 'INSERT INTO stock_camion (id, numero_camion, categorie, numero_chauffeur, numero_bc, quantite, date_approvisionnement) VALUES (NULL, ?, ?, ?, ?, ?, ?)';
-    connection.query(query, [stockData.numero_camion, stockData.categorie, stockData.numero_chauffeur, stockData.numero_bc, stockData.quantite, stockData.date_approvisionnement], (error, results) => {
-      if (error) {
-        return callback(error, null);
+    const query =
+      "INSERT INTO stock_camion (id, numero_camion, categorie, numero_chauffeur, numero_bc, quantite, date_approvisionnement) VALUES (NULL, ?, ?, ?, ?, ?, ?)";
+
+    const currentDate = new Date();
+
+    connection.query(
+      query,
+      [
+        stockData.numero_camion,
+        stockData.categorie,
+        stockData.numero_chauffeur,
+        stockData.numero_bc,
+        stockData.quantite,
+        currentDate,
+      ],
+      (error, results) => {
+        if (error) {
+          return callback(error, null);
+        }
+        const newStock = new StockCamion(
+          results.insertId,
+          ...Object.values(stockData),
+          currentDate
+        );
+        return callback(null, newStock);
       }
-      const newStock = new StockCamion(results.insertId, ...Object.values(stockData));
-      return callback(null, newStock);
-    });
+    );
   }
 
   static getById(id, callback) {
-    const query = 'SELECT * FROM stock_camion WHERE id = ?';
+    const query = "SELECT * FROM stock_camion WHERE id = ?";
     connection.query(query, [id], (error, results) => {
       if (error) {
         return callback(error, null);
@@ -39,14 +66,14 @@ class StockCamion {
         stockData.numero_chauffeur,
         stockData.numero_bc,
         stockData.quantite,
-        stockData.date_approvisionnement,
+        stockData.date_approvisionnement
       );
       return callback(null, stock);
     });
   }
 
   static getAll(callback) {
-    const query = 'SELECT * FROM stock_camion';
+    const query = "SELECT * FROM stock_camion";
     connection.query(query, (error, results) => {
       if (error) {
         return callback(error, null);
@@ -59,7 +86,7 @@ class StockCamion {
           stockData.numero_chauffeur,
           stockData.numero_bc,
           stockData.quantite,
-          stockData.date_approvisionnement,
+          stockData.date_approvisionnement
         );
       });
       return callback(null, stocksList);
@@ -67,18 +94,23 @@ class StockCamion {
   }
 
   update(callback) {
-    const query = 'UPDATE stock_camion SET numero_camion = ?, categorie = ?, numero_chauffeur = ?, numero_bc = ?, quantite = ?, date_approvisionnement = ? WHERE id = ?';
+    const query =
+      "UPDATE stock_camion SET numero_camion = ?, categorie = ?, numero_chauffeur = ?, numero_bc = ?, quantite = ?, date_approvisionnement = ? WHERE id = ?";
     const { id, ...updatedData } = this;
-    connection.query(query, [...Object.values(updatedData), id], (error, results) => {
-      if (error) {
-        return callback(error);
+    connection.query(
+      query,
+      [...Object.values(updatedData), id],
+      (error, results) => {
+        if (error) {
+          return callback(error);
+        }
+        return callback(null);
       }
-      return callback(null);
-    });
+    );
   }
 
-  static deleteById(id, callback) {
-    const query = 'DELETE FROM stock_camion WHERE id = ?';
+  static delete(id, callback) {
+    const query = "DELETE FROM stock_camion WHERE id = ?";
     connection.query(query, [id], (error, results) => {
       if (error) {
         return callback(error);

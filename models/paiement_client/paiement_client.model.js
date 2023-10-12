@@ -1,7 +1,18 @@
-const connection = require('../_db/database');
+const connection = require("../_db/database");
 
 class PaiementClient {
-  constructor(id, montant, banque, reference, categorie, numero_bc, bordereau, est_valide, id_client, date_paiement) {
+  constructor(
+    id,
+    montant,
+    banque,
+    reference,
+    categorie,
+    numero_bc,
+    bordereau,
+    est_valide,
+    id_client,
+    date_paiement
+  ) {
     this.id = id;
     this.montant = montant;
     this.banque = banque;
@@ -15,18 +26,38 @@ class PaiementClient {
   }
 
   static create(paiementData, callback) {
-    const query = 'INSERT INTO paiement_client (id, montant, banque, reference, categorie, numero_bc, bordereau, est_valide, id_client, date_paiement) VALUES (NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
-    connection.query(query, [paiementData.montant, paiementData.banque, paiementData.reference, paiementData.categorie, paiementData.numero_bc, paiementData.bordereau, paiementData.est_valide, paiementData.id_client, paiementData.date_paiement], (error, results) => {
-      if (error) {
-        return callback(error, null);
+    const query =
+      "INSERT INTO paiement_client (id, montant, banque, reference, categorie, numero_bc, bordereau, est_valide, id_client, date_paiement) VALUES (NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    const currentDate = new Date();
+    connection.query(
+      query,
+      [
+        paiementData.montant,
+        paiementData.banque,
+        paiementData.reference,
+        paiementData.categorie,
+        paiementData.numero_bc,
+        paiementData.bordereau,
+        paiementData.est_valide,
+        paiementData.id_client,
+        currentDate,
+      ],
+      (error, results) => {
+        if (error) {
+          return callback(error, null);
+        }
+        const newPaiement = new PaiementClient(
+          results.insertId,
+          ...Object.values(paiementData),
+          currentDate
+        );
+        return callback(null, newPaiement);
       }
-      const newPaiement = new PaiementClient(results.insertId, ...Object.values(paiementData));
-      return callback(null, newPaiement);
-    });
+    );
   }
 
   static getById(id, callback) {
-    const query = 'SELECT * FROM paiement_client WHERE id = ?';
+    const query = "SELECT * FROM paiement_client WHERE id = ?";
     connection.query(query, [id], (error, results) => {
       if (error) {
         return callback(error, null);
@@ -45,14 +76,14 @@ class PaiementClient {
         paiementData.bordereau,
         paiementData.est_valide,
         paiementData.id_client,
-        paiementData.date_paiement,
+        paiementData.date_paiement
       );
       return callback(null, paiement);
     });
   }
 
   static getAll(callback) {
-    const query = 'SELECT * FROM paiement_client';
+    const query = "SELECT * FROM paiement_client";
     connection.query(query, (error, results) => {
       if (error) {
         return callback(error, null);
@@ -68,7 +99,32 @@ class PaiementClient {
           paiementData.bordereau,
           paiementData.est_valide,
           paiementData.id_client,
-          paiementData.date_paiement,
+          paiementData.date_paiement
+        );
+      });
+      return callback(null, paiementsList);
+    });
+  }
+
+  static getAllOfClient(id_client, callback) {
+    const query = "SELECT * FROM paiement_client WHERE id_client = ?";
+    connection.query(query, [id_client], (error, results) => {
+      if (error) {
+        return callback(error, null);
+      }
+      const paiementsList = results.map((paiementData) => {
+        // console.log(typeof PaiementClientData.quantite_achetee);
+        return new PaiementClient(
+          paiementData.id,
+          paiementData.montant,
+          paiementData.banque,
+          paiementData.reference,
+          paiementData.categorie,
+          paiementData.numero_bc,
+          paiementData.bordereau,
+          paiementData.est_valide,
+          paiementData.id_client,
+          paiementData.date_paiement
         );
       });
       return callback(null, paiementsList);
@@ -76,18 +132,23 @@ class PaiementClient {
   }
 
   update(callback) {
-    const query = 'UPDATE paiement_client SET montant = ?, banque = ?, reference = ?, categorie = ?, numero_bc = ?, bordereau = ?, est_valide = ?, id_client = ?, date_paiement = ? WHERE id = ?';
+    const query =
+      "UPDATE paiement_client SET montant = ?, banque = ?, reference = ?, categorie = ?, numero_bc = ?, bordereau = ?, est_valide = ?, id_client = ?, date_paiement = ? WHERE id = ?";
     const { id, ...updatedData } = this;
-    connection.query(query, [...Object.values(updatedData), id], (error, results) => {
-      if (error) {
-        return callback(error);
+    connection.query(
+      query,
+      [...Object.values(updatedData), id],
+      (error, results) => {
+        if (error) {
+          return callback(error);
+        }
+        return callback(null);
       }
-      return callback(null);
-    });
+    );
   }
 
-  static deleteById(id, callback) {
-    const query = 'DELETE FROM paiement_client WHERE id = ?';
+  static delete(id, callback) {
+    const query = "DELETE FROM paiement_client WHERE id = ?";
     connection.query(query, [id], (error, results) => {
       if (error) {
         return callback(error);

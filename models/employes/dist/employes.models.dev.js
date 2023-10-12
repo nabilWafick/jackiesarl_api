@@ -61,12 +61,12 @@ function () {
     key: "create",
     value: function create(employeData, callback) {
       var query = 'INSERT INTO employes (id, nom, prenoms, email, password, role, token) VALUES (NULL, ?, ?, ?, ?, ?, ?)';
-      connection.query(query, [employeData.nom, employeData.prenoms, employeData.email, employeData.password, employeData.role, employeData.token], function (error, results) {
+      connection.query(query, [employeData.nom, employeData.prenoms, employeData.email, employeData.password, employeData.role, 'test token'], function (error, results) {
         if (error) {
           return callback(error, null);
         }
 
-        var newEmploye = _construct(Employes, [results.insertId].concat(_toConsumableArray(Object.values(employeData))));
+        var newEmploye = _construct(Employes, [results.insertId].concat(_toConsumableArray(Object.values(employeData)), ['test token']));
 
         return callback(null, newEmploye);
       });
@@ -105,8 +105,8 @@ function () {
       });
     }
   }, {
-    key: "deleteById",
-    value: function deleteById(id, callback) {
+    key: "delete",
+    value: function _delete(id, callback) {
       var query = 'DELETE FROM employes WHERE id = ?';
       connection.query(query, [id], function (error, results) {
         if (error) {

@@ -58,12 +58,13 @@ function () {
     key: "create",
     value: function create(modificationData, callback) {
       var query = 'INSERT INTO modifications (id, modification, id_employe, date_modification) VALUES (NULL, ?, ?, ?)';
-      connection.query(query, [modificationData.modification, modificationData.id_employe, modificationData.date_modification], function (error, results) {
+      var currentDate = new Date();
+      connection.query(query, [modificationData.modification, modificationData.id_employe, currentDate], function (error, results) {
         if (error) {
           return callback(error, null);
         }
 
-        var newModification = _construct(Modifications, [results.insertId].concat(_toConsumableArray(Object.values(modificationData))));
+        var newModification = _construct(Modifications, [results.insertId].concat(_toConsumableArray(Object.values(modificationData)), [currentDate]));
 
         return callback(null, newModification);
       });
@@ -102,8 +103,8 @@ function () {
       });
     }
   }, {
-    key: "deleteById",
-    value: function deleteById(id, callback) {
+    key: "delete",
+    value: function _delete(id, callback) {
       var query = 'DELETE FROM modifications WHERE id = ?';
       connection.query(query, [id], function (error, results) {
         if (error) {

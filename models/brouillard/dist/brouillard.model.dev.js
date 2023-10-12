@@ -10,7 +10,7 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
-var connection = require('../_db/database');
+var connection = require("../_db/database");
 
 var Brouillard =
 /*#__PURE__*/
@@ -29,7 +29,7 @@ function () {
   _createClass(Brouillard, [{
     key: "update",
     value: function update(callback) {
-      var query = 'UPDATE brouillard SET depot = ?, stock_actuel = ?, nom_gerant = ?, numero_gerant = ?, date_ajout = ? WHERE id = ?';
+      var query = "UPDATE brouillard SET depot = ?, stock_actuel = ?, nom_gerant = ?, numero_gerant = ?, date_ajout = ? WHERE id = ?";
 
       var id = this.id,
           updatedData = _objectWithoutProperties(this, ["id"]);
@@ -45,7 +45,7 @@ function () {
   }], [{
     key: "create",
     value: function create(brouillardData, callback) {
-      var query = 'INSERT INTO brouillard (depot, stock_actuel, nom_gerant, numero_gerant, date_ajout) VALUES (?, ?, ?, ?, ?)';
+      var query = "INSERT INTO brouillard (depot, stock_actuel, nom_gerant, numero_gerant, date_ajout) VALUES (?, ?, ?, ?, ?)";
       var currentDate = new Date();
       connection.query(query, [brouillardData.depot, brouillardData.stock_actuel, brouillardData.nom_gerant, brouillardData.numero_gerant, currentDate], function (error, results) {
         if (error) {
@@ -59,7 +59,7 @@ function () {
   }, {
     key: "getById",
     value: function getById(id, callback) {
-      var query = 'SELECT * FROM brouillard WHERE id = ?';
+      var query = "SELECT * FROM brouillard WHERE id = ?";
       connection.query(query, [id], function (error, results) {
         if (error) {
           return callback(error, null);
@@ -77,7 +77,7 @@ function () {
   }, {
     key: "getAll",
     value: function getAll(callback) {
-      var query = 'SELECT * FROM brouillard';
+      var query = "SELECT * FROM brouillard";
       connection.query(query, function (error, results) {
         if (error) {
           return callback(error, null);
@@ -90,9 +90,9 @@ function () {
       });
     }
   }, {
-    key: "deleteById",
-    value: function deleteById(id, callback) {
-      var query = 'DELETE FROM brouillard WHERE id = ?';
+    key: "delete",
+    value: function _delete(id, callback) {
+      var query = "DELETE FROM brouillard WHERE id = ?";
       connection.query(query, [id], function (error, results) {
         if (error) {
           return callback(error);

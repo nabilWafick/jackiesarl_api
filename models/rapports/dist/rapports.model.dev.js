@@ -24,24 +24,24 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
-var connection = require('../_db/database');
+var connection = require("../_db/database");
 
 var Rapports =
 /*#__PURE__*/
 function () {
-  function Rapports(id, rapport, date_envoi, id_employe) {
+  function Rapports(id, rapport, id_employe, date_envoi) {
     _classCallCheck(this, Rapports);
 
     this.id = id;
     this.rapport = rapport;
-    this.date_envoi = date_envoi;
     this.id_employe = id_employe;
+    this.date_envoi = date_envoi;
   }
 
   _createClass(Rapports, [{
     key: "update",
     value: function update(callback) {
-      var query = 'UPDATE rapports SET rapport = ?, date_envoi = ?, id_employe = ? WHERE id = ?';
+      var query = "UPDATE rapports SET rapport = ?, date_envoi = ?, id_employe = ? WHERE id = ?";
 
       var id = this.id,
           updatedData = _objectWithoutProperties(this, ["id"]);
@@ -57,13 +57,14 @@ function () {
   }], [{
     key: "create",
     value: function create(rapportData, callback) {
-      var query = 'INSERT INTO rapports (id, rapport, date_envoi, id_employe) VALUES (NULL, ?, ?, ?)';
-      connection.query(query, [rapportData.rapport, rapportData.date_envoi, rapportData.id_employe], function (error, results) {
+      var query = "INSERT INTO rapports (id, rapport,id_employe, date_envoi, ) VALUES (NULL, ?, ?, ?)";
+      var currentDate = new Date();
+      connection.query(query, [rapportData.rapport, rapportData.id_employe, currentDate], function (error, results) {
         if (error) {
           return callback(error, null);
         }
 
-        var newRapport = _construct(Rapports, [results.insertId].concat(_toConsumableArray(Object.values(rapportData))));
+        var newRapport = _construct(Rapports, [results.insertId].concat(_toConsumableArray(Object.values(rapportData)), [currentDate]));
 
         return callback(null, newRapport);
       });
@@ -71,7 +72,7 @@ function () {
   }, {
     key: "getById",
     value: function getById(id, callback) {
-      var query = 'SELECT * FROM rapports WHERE id = ?';
+      var query = "SELECT * FROM rapports WHERE id = ?";
       connection.query(query, [id], function (error, results) {
         if (error) {
           return callback(error, null);
@@ -89,7 +90,7 @@ function () {
   }, {
     key: "getAll",
     value: function getAll(callback) {
-      var query = 'SELECT * FROM rapports';
+      var query = "SELECT * FROM rapports";
       connection.query(query, function (error, results) {
         if (error) {
           return callback(error, null);
@@ -102,9 +103,9 @@ function () {
       });
     }
   }, {
-    key: "deleteById",
-    value: function deleteById(id, callback) {
-      var query = 'DELETE FROM rapports WHERE id = ?';
+    key: "delete",
+    value: function _delete(id, callback) {
+      var query = "DELETE FROM rapports WHERE id = ?";
       connection.query(query, [id], function (error, results) {
         if (error) {
           return callback(error);

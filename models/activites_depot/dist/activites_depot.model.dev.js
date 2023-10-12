@@ -24,33 +24,34 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
-var connection = require('../_db/database');
+var connection = require("../_db/database");
 
 var ActivitesDepot =
 /*#__PURE__*/
 function () {
-  function ActivitesDepot(idDepot, quantiteAvantVente, vente, quantiteActuelle, versement, depense, observation, dateRemplissage) {
+  function ActivitesDepot(id, id_depot, quantite_avant_vente, vente, quantite_apres_vente, versement, depense, observation, date_remplissage) {
     _classCallCheck(this, ActivitesDepot);
 
-    this.idDepot = idDepot;
-    this.quantiteAvantVente = quantiteAvantVente;
+    this.id = id;
+    this.id_depot = id_depot;
+    this.quantite_avant_vente = quantite_avant_vente;
     this.vente = vente;
-    this.quantiteActuelle = quantiteActuelle;
+    this.quantite_apres_vente = quantite_apres_vente;
     this.versement = versement;
     this.depense = depense;
     this.observation = observation;
-    this.dateRemplissage = dateRemplissage;
+    this.date_remplissage = date_remplissage;
   }
 
   _createClass(ActivitesDepot, [{
     key: "update",
     value: function update(callback) {
-      var query = 'UPDATE activites_depot SET quantite_avant_vente = ?, vente = ?, quantite_actuelle = ?, versement = ?, depense = ?, observation = ?, date_remplissage = ? WHERE id_depot = ?';
+      var query = "UPDATE activites_depot SET id_depot = ?, quantite_avant_vente = ?, vente = ?, quantite_apres_vente = ?, versement = ?, depense = ?, observation = ?, date_remplissage = ? WHERE id = ?";
 
-      var idDepot = this.idDepot,
-          updatedData = _objectWithoutProperties(this, ["idDepot"]);
+      var id = this.id,
+          updatedData = _objectWithoutProperties(this, ["id"]);
 
-      connection.query(query, [updatedData.quantiteAvantVente, updatedData.vente, updatedData.quantiteActuelle, updatedData.versement, updatedData.depense, updatedData.observation, updatedData.dateRemplissage, idDepot], function (error, results) {
+      connection.query(query, [updatedData.id_depot, updatedData.quantite_avant_vente, updatedData.vente, updatedData.quantite_apres_vente, updatedData.versement, updatedData.depense, updatedData.observation, updatedData.date_remplissage, id], function (error, results) {
         if (error) {
           return callback(error);
         }
@@ -61,9 +62,9 @@ function () {
   }], [{
     key: "create",
     value: function create(activitesDepotData, callback) {
-      var query = 'INSERT INTO activites_depot (id_depot, quantite_avant_vente, vente, quantite_actuelle, versement, depense, observation, date_remplissage) VALUES (?,?,?,?,?,?,?,?)';
+      var query = "INSERT INTO activites_depot (id,id_depot, quantite_avant_vente, vente, quantite_apres_vente, versement, depense, observation, date_remplissage) VALUES (NULL,?,?,?,?,?,?,?,?)";
       var currentDate = new Date();
-      connection.query(query, [activitesDepotData.idDepot, activitesDepotData.quantiteAvantVente, activitesDepotData.vente, activitesDepotData.quantiteActuelle, activitesDepotData.versement, activitesDepotData.depense, activitesDepotData.observation, currentDate], function (error, results) {
+      connection.query(query, [activitesDepotData.id_depot, activitesDepotData.quantite_avant_vente, activitesDepotData.vente, activitesDepotData.quantite_apres_vente, activitesDepotData.versement, activitesDepotData.depense, activitesDepotData.observation, currentDate], function (error, results) {
         if (error) {
           return callback(error, null);
         }
@@ -76,7 +77,7 @@ function () {
   }, {
     key: "getById",
     value: function getById(id, callback) {
-      var query = 'SELECT * FROM activites_depot WHERE id_depot = ?';
+      var query = "SELECT * FROM activites_depot WHERE id = ?";
       connection.query(query, [id], function (error, results) {
         if (error) {
           return callback(error, null);
@@ -87,29 +88,45 @@ function () {
         }
 
         var activitesDepotData = results[0];
-        var activitesDepot = new ActivitesDepot(activitesDepotData.id_depot, activitesDepotData.quantite_avant_vente, activitesDepotData.vente, activitesDepotData.quantite_actuelle, activitesDepotData.versement, activitesDepotData.depense, activitesDepotData.observation, new Date(activitesDepotData.date_remplissage));
+        var activitesDepot = new ActivitesDepot(activitesDepotData.id, activitesDepotData.id_depot, activitesDepotData.quantite_avant_vente, activitesDepotData.vente, activitesDepotData.quantite_apres_vente, activitesDepotData.versement, activitesDepotData.depense, activitesDepotData.observation, new Date(activitesDepotData.date_remplissage));
         return callback(null, activitesDepot);
       });
     }
   }, {
     key: "getAll",
     value: function getAll(callback) {
-      var query = 'SELECT * FROM activites_depot';
+      var query = "SELECT * FROM activites_depot";
       connection.query(query, function (error, results) {
         if (error) {
           return callback(error, null);
         }
 
         var activitesDepotList = results.map(function (activitesDepotData) {
-          return new ActivitesDepot(activitesDepotData.id_depot, activitesDepotData.quantite_avant_vente, activitesDepotData.vente, activitesDepotData.quantite_actuelle, activitesDepotData.versement, activitesDepotData.depense, activitesDepotData.observation, new Date(activitesDepotData.date_remplissage));
+          return new ActivitesDepot(activitesDepotData.id, activitesDepotData.id_depot, activitesDepotData.quantite_avant_vente, activitesDepotData.vente, activitesDepotData.quantite_apres_vente, activitesDepotData.versement, activitesDepotData.depense, activitesDepotData.observation, new Date(activitesDepotData.date_remplissage));
         });
         return callback(null, activitesDepotList);
       });
     }
   }, {
-    key: "deleteById",
-    value: function deleteById(id, callback) {
-      var query = 'DELETE FROM activites_depot WHERE id_depot = ?';
+    key: "getAllByDepotID",
+    value: function getAllByDepotID(id_depot, callback) {
+      var query = "SELECT * FROM activites_depot WHERE id_depot = ? ";
+      connection.query(query, [id_depot], function (error, results) {
+        if (error) {
+          return callback(error, null);
+        }
+
+        var activitesDepotList = results.map(function (activitesDepotData) {
+          return new ActivitesDepot(activitesDepotData.id, activitesDepotData.id_depot, activitesDepotData.quantite_avant_vente, activitesDepotData.vente, activitesDepotData.quantite_apres_vente, activitesDepotData.versement, activitesDepotData.depense, activitesDepotData.observation, new Date(activitesDepotData.date_remplissage));
+        }); //console.log(activitesDepotList.length);
+
+        return callback(null, activitesDepotList);
+      });
+    }
+  }, {
+    key: "delete",
+    value: function _delete(id, callback) {
+      var query = "DELETE FROM activites_depot WHERE id = ?";
       connection.query(query, [id], function (error, results) {
         if (error) {
           return callback(error);

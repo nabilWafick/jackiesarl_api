@@ -12,11 +12,14 @@ class Depenses {
 
   static create(depenseData, callback) {
     const query = 'INSERT INTO depenses (id, description, montant, piece, est_validee, date_depense) VALUES (NULL, ?, ?, ?, ?, ?)';
-    connection.query(query, [depenseData.description, depenseData.montant, depenseData.piece, depenseData.est_validee, depenseData.date_depense], (error, results) => {
+
+    const currentDate = new Date();
+
+    connection.query(query, [depenseData.description, depenseData.montant, depenseData.piece, depenseData.est_validee, currentDate], (error, results) => {
       if (error) {
         return callback(error, null);
       }
-      const newDepense = new Depenses(results.insertId, ...Object.values(depenseData));
+      const newDepense = new Depenses(results.insertId, ...Object.values(depenseData),currentDate);
       return callback(null, newDepense);
     });
   }
@@ -74,7 +77,7 @@ class Depenses {
     });
   }
 
-  static deleteById(id, callback) {
+  static delete(id, callback) {
     const query = 'DELETE FROM depenses WHERE id = ?';
     connection.query(query, [id], (error, results) => {
       if (error) {

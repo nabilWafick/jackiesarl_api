@@ -57,7 +57,7 @@ class Autorisations {
     });
   }
 
-  static deleteById(id, callback) {
+  static delete(id, callback) {
     const query = 'DELETE FROM autorisations WHERE id = ?';
     connection.query(query, [id], (error, results) => {
       if (error) {

@@ -11,11 +11,12 @@ class SoldeCourant {
 
   static create(soldeData, callback) {
     const query = 'INSERT INTO solde_courant (id, banque, numero_compte, solde_actuel, date_ajout) VALUES (NULL, ?, ?, ?, ?)';
-    connection.query(query, [soldeData.banque, soldeData.numero_compte, soldeData.solde_actuel, soldeData.date_ajout], (error, results) => {
+    const currentDate = new Date();
+    connection.query(query, [soldeData.banque, soldeData.numero_compte, soldeData.solde_actuel, currentDate], (error, results) => {
       if (error) {
         return callback(error, null);
       }
-      const newSolde = new SoldeCourant(results.insertId, ...Object.values(soldeData));
+      const newSolde = new SoldeCourant(results.insertId, ...Object.values(soldeData),currentDate);
       return callback(null, newSolde);
     });
   }
@@ -71,7 +72,7 @@ class SoldeCourant {
     });
   }
 
-  static deleteById(id, callback) {
+  static delete(id, callback) {
     const query = 'DELETE FROM solde_courant WHERE id = ?';
     connection.query(query, [id], (error, results) => {
       if (error) {

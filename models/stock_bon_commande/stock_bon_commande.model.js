@@ -14,11 +14,12 @@ class StockBonCommande {
 
   static create(stockData, callback) {
     const query = 'INSERT INTO stock_bon_commande (id, numero_bc, categorie, quantite_achetee, stock_avant_vente, vente, stock_apres_vente, date_rechargement) VALUES (NULL, ?, ?, ?, ?, ?, ?, ?)';
-    connection.query(query, [stockData.numero_bc, stockData.categorie, stockData.quantite_achetee, stockData.stock_avant_vente, stockData.vente, stockData.stock_apres_vente, stockData.date_rechargement], (error, results) => {
+    const currentDate = new Date();
+    connection.query(query, [stockData.numero_bc, stockData.categorie, stockData.quantite_achetee, stockData.stock_avant_vente, stockData.vente, stockData.stock_apres_vente, currentDate], (error, results) => {
       if (error) {
         return callback(error, null);
       }
-      const newStock = new StockBonCommande(results.insertId, ...Object.values(stockData));
+      const newStock = new StockBonCommande(results.insertId, ...Object.values(stockData), currentDate);
       return callback(null, newStock);
     });
   }
@@ -80,7 +81,7 @@ class StockBonCommande {
     });
   }
 
-  static deleteById(id, callback) {
+  static delete(id, callback) {
     const query = 'DELETE FROM stock_bon_commande WHERE id = ?';
     connection.query(query, [id], (error, results) => {
       if (error) {

@@ -60,12 +60,13 @@ function () {
     key: "create",
     value: function create(depenseData, callback) {
       var query = 'INSERT INTO depenses (id, description, montant, piece, est_validee, date_depense) VALUES (NULL, ?, ?, ?, ?, ?)';
-      connection.query(query, [depenseData.description, depenseData.montant, depenseData.piece, depenseData.est_validee, depenseData.date_depense], function (error, results) {
+      var currentDate = new Date();
+      connection.query(query, [depenseData.description, depenseData.montant, depenseData.piece, depenseData.est_validee, currentDate], function (error, results) {
         if (error) {
           return callback(error, null);
         }
 
-        var newDepense = _construct(Depenses, [results.insertId].concat(_toConsumableArray(Object.values(depenseData))));
+        var newDepense = _construct(Depenses, [results.insertId].concat(_toConsumableArray(Object.values(depenseData)), [currentDate]));
 
         return callback(null, newDepense);
       });
@@ -104,8 +105,8 @@ function () {
       });
     }
   }, {
-    key: "deleteById",
-    value: function deleteById(id, callback) {
+    key: "delete",
+    value: function _delete(id, callback) {
       var query = 'DELETE FROM depenses WHERE id = ?';
       connection.query(query, [id], function (error, results) {
         if (error) {

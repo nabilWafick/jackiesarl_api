@@ -24,7 +24,7 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
-var connection = require('../_db/database');
+var connection = require("../_db/database");
 
 var PaiementClient =
 /*#__PURE__*/
@@ -47,7 +47,7 @@ function () {
   _createClass(PaiementClient, [{
     key: "update",
     value: function update(callback) {
-      var query = 'UPDATE paiement_client SET montant = ?, banque = ?, reference = ?, categorie = ?, numero_bc = ?, bordereau = ?, est_valide = ?, id_client = ?, date_paiement = ? WHERE id = ?';
+      var query = "UPDATE paiement_client SET montant = ?, banque = ?, reference = ?, categorie = ?, numero_bc = ?, bordereau = ?, est_valide = ?, id_client = ?, date_paiement = ? WHERE id = ?";
 
       var id = this.id,
           updatedData = _objectWithoutProperties(this, ["id"]);
@@ -63,13 +63,14 @@ function () {
   }], [{
     key: "create",
     value: function create(paiementData, callback) {
-      var query = 'INSERT INTO paiement_client (id, montant, banque, reference, categorie, numero_bc, bordereau, est_valide, id_client, date_paiement) VALUES (NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
-      connection.query(query, [paiementData.montant, paiementData.banque, paiementData.reference, paiementData.categorie, paiementData.numero_bc, paiementData.bordereau, paiementData.est_valide, paiementData.id_client, paiementData.date_paiement], function (error, results) {
+      var query = "INSERT INTO paiement_client (id, montant, banque, reference, categorie, numero_bc, bordereau, est_valide, id_client, date_paiement) VALUES (NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+      var currentDate = new Date();
+      connection.query(query, [paiementData.montant, paiementData.banque, paiementData.reference, paiementData.categorie, paiementData.numero_bc, paiementData.bordereau, paiementData.est_valide, paiementData.id_client, currentDate], function (error, results) {
         if (error) {
           return callback(error, null);
         }
 
-        var newPaiement = _construct(PaiementClient, [results.insertId].concat(_toConsumableArray(Object.values(paiementData))));
+        var newPaiement = _construct(PaiementClient, [results.insertId].concat(_toConsumableArray(Object.values(paiementData)), [currentDate]));
 
         return callback(null, newPaiement);
       });
@@ -77,7 +78,7 @@ function () {
   }, {
     key: "getById",
     value: function getById(id, callback) {
-      var query = 'SELECT * FROM paiement_client WHERE id = ?';
+      var query = "SELECT * FROM paiement_client WHERE id = ?";
       connection.query(query, [id], function (error, results) {
         if (error) {
           return callback(error, null);
@@ -95,7 +96,7 @@ function () {
   }, {
     key: "getAll",
     value: function getAll(callback) {
-      var query = 'SELECT * FROM paiement_client';
+      var query = "SELECT * FROM paiement_client";
       connection.query(query, function (error, results) {
         if (error) {
           return callback(error, null);
@@ -108,9 +109,25 @@ function () {
       });
     }
   }, {
-    key: "deleteById",
-    value: function deleteById(id, callback) {
-      var query = 'DELETE FROM paiement_client WHERE id = ?';
+    key: "getAllOfClient",
+    value: function getAllOfClient(id_client, callback) {
+      var query = "SELECT * FROM paiement_client WHERE id_client = ?";
+      connection.query(query, [id_client], function (error, results) {
+        if (error) {
+          return callback(error, null);
+        }
+
+        var paiementsList = results.map(function (paiementData) {
+          // console.log(typeof PaiementClientData.quantite_achetee);
+          return new PaiementClient(paiementData.id, paiementData.montant, paiementData.banque, paiementData.reference, paiementData.categorie, paiementData.numero_bc, paiementData.bordereau, paiementData.est_valide, paiementData.id_client, paiementData.date_paiement);
+        });
+        return callback(null, paiementsList);
+      });
+    }
+  }, {
+    key: "delete",
+    value: function _delete(id, callback) {
+      var query = "DELETE FROM paiement_client WHERE id = ?";
       connection.query(query, [id], function (error, results) {
         if (error) {
           return callback(error);

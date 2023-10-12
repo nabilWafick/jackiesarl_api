@@ -24,7 +24,7 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
-var connection = require('../_db/database');
+var connection = require("../_db/database");
 
 var RemiseChequeClient =
 /*#__PURE__*/
@@ -45,7 +45,7 @@ function () {
   _createClass(RemiseChequeClient, [{
     key: "update",
     value: function update(callback) {
-      var query = 'UPDATE remise_cheque_client SET description = ?, banque = ?, montant = ?, reste = ?, est_validee = ?, id_client = ?, date_remise = ? WHERE id = ?';
+      var query = "UPDATE remise_cheque_client SET description = ?, banque = ?, montant = ?, reste = ?, est_validee = ?, id_client = ?, date_remise = ? WHERE id = ?";
 
       var id = this.id,
           updatedData = _objectWithoutProperties(this, ["id"]);
@@ -61,13 +61,14 @@ function () {
   }], [{
     key: "create",
     value: function create(remiseData, callback) {
-      var query = 'INSERT INTO remise_cheque_client (id, description, banque, montant, reste, est_validee, id_client, date_remise) VALUES (NULL, ?, ?, ?, ?, ?, ?, ?)';
-      connection.query(query, [remiseData.description, remiseData.banque, remiseData.montant, remiseData.reste, remiseData.est_validee, remiseData.id_client, remiseData.date_remise], function (error, results) {
+      var query = "INSERT INTO remise_cheque_client (id, description, banque, montant, reste, est_validee, id_client, date_remise) VALUES (NULL, ?, ?, ?, ?, ?, ?, ?)";
+      var currentDate = new Date();
+      connection.query(query, [remiseData.description, remiseData.banque, remiseData.montant, remiseData.reste, remiseData.est_validee, remiseData.id_client, currentDate], function (error, results) {
         if (error) {
           return callback(error, null);
         }
 
-        var newRemise = _construct(RemiseChequeClient, [results.insertId].concat(_toConsumableArray(Object.values(remiseData))));
+        var newRemise = _construct(RemiseChequeClient, [results.insertId].concat(_toConsumableArray(Object.values(remiseData)), [currentDate]));
 
         return callback(null, newRemise);
       });
@@ -75,7 +76,7 @@ function () {
   }, {
     key: "getById",
     value: function getById(id, callback) {
-      var query = 'SELECT * FROM remise_cheque_client WHERE id = ?';
+      var query = "SELECT * FROM remise_cheque_client WHERE id = ?";
       connection.query(query, [id], function (error, results) {
         if (error) {
           return callback(error, null);
@@ -93,7 +94,7 @@ function () {
   }, {
     key: "getAll",
     value: function getAll(callback) {
-      var query = 'SELECT * FROM remise_cheque_client';
+      var query = "SELECT * FROM remise_cheque_client";
       connection.query(query, function (error, results) {
         if (error) {
           return callback(error, null);
@@ -106,9 +107,24 @@ function () {
       });
     }
   }, {
-    key: "deleteById",
-    value: function deleteById(id, callback) {
-      var query = 'DELETE FROM remise_cheque_client WHERE id = ?';
+    key: "getAllOfClient",
+    value: function getAllOfClient(id_client, callback) {
+      var query = "SELECT * FROM remise_cheque_client WHERE id_client = ?";
+      connection.query(query, [id_client], function (error, results) {
+        if (error) {
+          return callback(error, null);
+        }
+
+        var remisesList = results.map(function (remiseData) {
+          return new RemiseChequeClient(remiseData.id, remiseData.description, remiseData.banque, remiseData.montant, remiseData.reste, remiseData.est_validee, remiseData.id_client, remiseData.date_remise);
+        });
+        return callback(null, remisesList);
+      });
+    }
+  }, {
+    key: "delete",
+    value: function _delete(id, callback) {
+      var query = "DELETE FROM remise_cheque_client WHERE id = ?";
       connection.query(query, [id], function (error, results) {
         if (error) {
           return callback(error);

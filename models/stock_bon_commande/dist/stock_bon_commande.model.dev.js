@@ -62,12 +62,13 @@ function () {
     key: "create",
     value: function create(stockData, callback) {
       var query = 'INSERT INTO stock_bon_commande (id, numero_bc, categorie, quantite_achetee, stock_avant_vente, vente, stock_apres_vente, date_rechargement) VALUES (NULL, ?, ?, ?, ?, ?, ?, ?)';
-      connection.query(query, [stockData.numero_bc, stockData.categorie, stockData.quantite_achetee, stockData.stock_avant_vente, stockData.vente, stockData.stock_apres_vente, stockData.date_rechargement], function (error, results) {
+      var currentDate = new Date();
+      connection.query(query, [stockData.numero_bc, stockData.categorie, stockData.quantite_achetee, stockData.stock_avant_vente, stockData.vente, stockData.stock_apres_vente, currentDate], function (error, results) {
         if (error) {
           return callback(error, null);
         }
 
-        var newStock = _construct(StockBonCommande, [results.insertId].concat(_toConsumableArray(Object.values(stockData))));
+        var newStock = _construct(StockBonCommande, [results.insertId].concat(_toConsumableArray(Object.values(stockData)), [currentDate]));
 
         return callback(null, newStock);
       });
@@ -106,8 +107,8 @@ function () {
       });
     }
   }, {
-    key: "deleteById",
-    value: function deleteById(id, callback) {
+    key: "delete",
+    value: function _delete(id, callback) {
       var query = 'DELETE FROM stock_bon_commande WHERE id = ?';
       connection.query(query, [id], function (error, results) {
         if (error) {

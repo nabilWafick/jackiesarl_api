@@ -24,34 +24,34 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
-var connection = require('../_db/database');
+var connection = require("../_db/database");
 
 var AchatClient =
 /*#__PURE__*/
 function () {
-  function AchatClient(id, quantiteAchetee, categorie, montant, numeroCtp, bordereau, numeroBc, idClient, dateAchat) {
+  function AchatClient(id, quantite_achetee, categorie, montant, numero_ctp, bordereau, numero_bc, id_client, date_achat) {
     _classCallCheck(this, AchatClient);
 
     this.id = id;
-    this.quantiteAchetee = quantiteAchetee;
+    this.quantite_achetee = quantite_achetee;
     this.categorie = categorie;
     this.montant = montant;
-    this.numeroCtp = numeroCtp;
+    this.numero_ctp = numero_ctp;
     this.bordereau = bordereau;
-    this.numeroBc = numeroBc;
-    this.idClient = idClient;
-    this.dateAchat = dateAchat;
+    this.numero_bc = numero_bc;
+    this.id_client = id_client;
+    this.date_achat = date_achat;
   }
 
   _createClass(AchatClient, [{
     key: "update",
     value: function update(callback) {
-      var query = 'UPDATE achat_client SET quantite_achetee = ?, categorie = ?, montant = ?, numero_ctp = ?, bordereau = ?, numero_bc = ?, id_client = ?, date_achat = ? WHERE achat_client.id = ?';
+      var query = "UPDATE achat_client SET quantite_achetee = ?, categorie = ?, montant = ?, numero_ctp = ?, bordereau = ?, numero_bc = ?, id_client = ?, date_achat = ? WHERE achat_client.id = ?";
 
       var id = this.id,
           achatClientData = _objectWithoutProperties(this, ["id"]);
 
-      connection.query(query, [achatClientData.quantiteAchetee, achatClientData.categorie, achatClientData.montant, achatClientData.numeroCtp, achatClientData.bordereau, achatClientData.numeroBc, achatClientData.idClient, new Date(achatClientData.dateAchat), id], function (error, results) {
+      connection.query(query, [achatClientData.quantite_achetee, achatClientData.categorie, achatClientData.montant, achatClientData.numero_ctp, achatClientData.bordereau, achatClientData.numero_bc, achatClientData.id_client, new Date(achatClientData.date_achat), id], function (error, results) {
         if (error) {
           return callback(error);
         }
@@ -62,7 +62,7 @@ function () {
   }, {
     key: "delete",
     value: function _delete(callback) {
-      var query = 'DELETE FROM achat_client WHERE id = ?';
+      var query = "DELETE FROM achat_client WHERE id = ?";
       connection.query(query, [this.id], function (error, results) {
         if (error) {
           return callback(error);
@@ -74,9 +74,9 @@ function () {
   }], [{
     key: "create",
     value: function create(achatClientData, callback) {
-      var query = 'INSERT INTO achat_client (id, quantite_achetee, categorie, montant, numero_ctp, bordereau, numero_bc, id_client, date_achat) VALUES (NULL,?,?,?,?,?,?,?,?)';
+      var query = "INSERT INTO achat_client (id, quantite_achetee, categorie, montant, numero_ctp, bordereau, numero_bc, id_client, date_achat) VALUES (NULL,?,?,?,?,?,?,?,?)";
       var currentDate = new Date();
-      connection.query(query, [achatClientData.quantiteAchetee, achatClientData.categorie, achatClientData.montant, achatClientData.numeroCtp, achatClientData.bordereau, achatClientData.numeroBc, achatClientData.idClient, currentDate], function (error, results) {
+      connection.query(query, [achatClientData.quantite_achetee, achatClientData.categorie, achatClientData.montant, achatClientData.numero_ctp, achatClientData.bordereau, achatClientData.numero_bc, achatClientData.id_client, currentDate], function (error, results) {
         if (error) {
           return callback(error, null);
         }
@@ -89,7 +89,7 @@ function () {
   }, {
     key: "getById",
     value: function getById(id, callback) {
-      var query = 'SELECT * FROM achat_client WHERE id = ?';
+      var query = "SELECT * FROM achat_client WHERE id = ?";
       connection.query(query, [id], function (error, results) {
         if (error) {
           return callback(error, null);
@@ -107,13 +107,29 @@ function () {
   }, {
     key: "getAll",
     value: function getAll(callback) {
-      var query = 'SELECT * FROM achat_client';
+      var query = "SELECT * FROM achat_client";
       connection.query(query, function (error, results) {
         if (error) {
           return callback(error, null);
         }
 
         var achatsClients = results.map(function (achatClientData) {
+          return new AchatClient(achatClientData.id, achatClientData.quantite_achetee, achatClientData.categorie, achatClientData.montant, achatClientData.numero_ctp, achatClientData.bordereau, achatClientData.numero_bc, achatClientData.id_client, new Date(achatClientData.date_achat));
+        });
+        return callback(null, achatsClients);
+      });
+    }
+  }, {
+    key: "getAllOfClient",
+    value: function getAllOfClient(id_client, callback) {
+      var query = "SELECT * FROM achat_client WHERE id_client = ?";
+      connection.query(query, [id_client], function (error, results) {
+        if (error) {
+          return callback(error, null);
+        }
+
+        var achatsClients = results.map(function (achatClientData) {
+          // console.log(typeof achatClientData.quantite_achetee);
           return new AchatClient(achatClientData.id, achatClientData.quantite_achetee, achatClientData.categorie, achatClientData.montant, achatClientData.numero_ctp, achatClientData.bordereau, achatClientData.numero_bc, achatClientData.id_client, new Date(achatClientData.date_achat));
         });
         return callback(null, achatsClients);

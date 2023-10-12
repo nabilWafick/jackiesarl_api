@@ -1,26 +1,36 @@
-const connection = require('../_db/database');
+const connection = require("../_db/database");
 
 class Rapports {
-  constructor(id, rapport, date_envoi, id_employe) {
+  constructor(id, rapport, id_employe, date_envoi) {
     this.id = id;
     this.rapport = rapport;
-    this.date_envoi = date_envoi;
     this.id_employe = id_employe;
+    this.date_envoi = date_envoi;
   }
 
   static create(rapportData, callback) {
-    const query = 'INSERT INTO rapports (id, rapport, date_envoi, id_employe) VALUES (NULL, ?, ?, ?)';
-    connection.query(query, [rapportData.rapport, rapportData.date_envoi, rapportData.id_employe], (error, results) => {
-      if (error) {
-        return callback(error, null);
+    const query =
+      "INSERT INTO rapports (id, rapport,id_employe, date_envoi, ) VALUES (NULL, ?, ?, ?)";
+    const currentDate = new Date();
+    connection.query(
+      query,
+      [rapportData.rapport, rapportData.id_employe, currentDate],
+      (error, results) => {
+        if (error) {
+          return callback(error, null);
+        }
+        const newRapport = new Rapports(
+          results.insertId,
+          ...Object.values(rapportData),
+          currentDate
+        );
+        return callback(null, newRapport);
       }
-      const newRapport = new Rapports(results.insertId, ...Object.values(rapportData));
-      return callback(null, newRapport);
-    });
+    );
   }
 
   static getById(id, callback) {
-    const query = 'SELECT * FROM rapports WHERE id = ?';
+    const query = "SELECT * FROM rapports WHERE id = ?";
     connection.query(query, [id], (error, results) => {
       if (error) {
         return callback(error, null);
@@ -33,14 +43,14 @@ class Rapports {
         rapportData.id,
         rapportData.rapport,
         rapportData.date_envoi,
-        rapportData.id_employe,
+        rapportData.id_employe
       );
       return callback(null, rapport);
     });
   }
 
   static getAll(callback) {
-    const query = 'SELECT * FROM rapports';
+    const query = "SELECT * FROM rapports";
     connection.query(query, (error, results) => {
       if (error) {
         return callback(error, null);
@@ -50,7 +60,7 @@ class Rapports {
           rapportData.id,
           rapportData.rapport,
           rapportData.date_envoi,
-          rapportData.id_employe,
+          rapportData.id_employe
         );
       });
       return callback(null, rapportsList);
@@ -58,18 +68,23 @@ class Rapports {
   }
 
   update(callback) {
-    const query = 'UPDATE rapports SET rapport = ?, date_envoi = ?, id_employe = ? WHERE id = ?';
+    const query =
+      "UPDATE rapports SET rapport = ?, date_envoi = ?, id_employe = ? WHERE id = ?";
     const { id, ...updatedData } = this;
-    connection.query(query, [...Object.values(updatedData), id], (error, results) => {
-      if (error) {
-        return callback(error);
+    connection.query(
+      query,
+      [...Object.values(updatedData), id],
+      (error, results) => {
+        if (error) {
+          return callback(error);
+        }
+        return callback(null);
       }
-      return callback(null);
-    });
+    );
   }
 
-  static deleteById(id, callback) {
-    const query = 'DELETE FROM rapports WHERE id = ?';
+  static delete(id, callback) {
+    const query = "DELETE FROM rapports WHERE id = ?";
     connection.query(query, [id], (error, results) => {
       if (error) {
         return callback(error);

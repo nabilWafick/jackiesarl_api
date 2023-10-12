@@ -10,11 +10,12 @@ class Modifications {
 
   static create(modificationData, callback) {
     const query = 'INSERT INTO modifications (id, modification, id_employe, date_modification) VALUES (NULL, ?, ?, ?)';
-    connection.query(query, [modificationData.modification, modificationData.id_employe, modificationData.date_modification], (error, results) => {
+    const currentDate = new Date();
+    connection.query(query, [modificationData.modification, modificationData.id_employe, currentDate], (error, results) => {
       if (error) {
         return callback(error, null);
       }
-      const newModification = new Modifications(results.insertId, ...Object.values(modificationData));
+      const newModification = new Modifications(results.insertId, ...Object.values(modificationData), currentDate);
       return callback(null, newModification);
     });
   }
@@ -68,7 +69,7 @@ class Modifications {
     });
   }
 
-  static deleteById(id, callback) {
+  static delete(id, callback) {
     const query = 'DELETE FROM modifications WHERE id = ?';
     connection.query(query, [id], (error, results) => {
       if (error) {
