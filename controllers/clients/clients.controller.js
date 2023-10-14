@@ -22,6 +22,7 @@ class ClientsController {
         ifuNumber: null,
         email: null,
       };
+
       // console.log("Founded Clients", clients);
       let exist = false;
       clients.forEach((client) => {
@@ -55,12 +56,10 @@ class ClientsController {
       }
       Clients.create(clientData, (error, client) => {
         if (error) {
-          return res
-            .status(500)
-            .json({
-              status: 500,
-              error: "Erreur lors de la création du client",
-            });
+          return res.status(500).json({
+            status: 500,
+            error: "Erreur lors de la création du client",
+          });
         }
         return res.status(201).json({ status: 201, client: client });
       });

@@ -1,16 +1,26 @@
 const AchatClient = require("../../models/achat_client/achat_client.model");
+//const multer = require("multer");
 
 class AchatClientController {
   // Créer un nouvel achat client
   static create = (req, res) => {
-    const achatClientData = req.body;
+    const achatClientDataf = req.body;
+    const file = req.file;
+    console.log("achatClientDataf", achatClientDataf);
+    console.log("file", file);
+    const achatClientData = {
+      ...achatClientDataf,
+      bordereau: file ? file.path : "",
+    };
+    console.log("achatClientData", achatClientData);
     AchatClient.create(achatClientData, (error, achatClient) => {
       if (error) {
-        return res
-          .status(500)
-          .json({ error: "Erreur lors de la création de l'achat client" });
+        return res.status(500).json({
+          status: 500,
+          error: "Erreur lors de la création de l'achat client",
+        });
       }
-      return res.status(201).json(achatClient);
+      return res.status(201).json({ status: 201, achatClient: achatClient });
     });
   };
 
@@ -34,11 +44,9 @@ class AchatClientController {
   static getAll = (req, res) => {
     AchatClient.getAll((error, achatsClients) => {
       if (error) {
-        return res
-          .status(500)
-          .json({
-            error: "Erreur lors de la récupération des achats des clients",
-          });
+        return res.status(500).json({
+          error: "Erreur lors de la récupération des achats des clients",
+        });
       }
       return res.status(200).json(achatsClients);
     });
@@ -48,11 +56,9 @@ class AchatClientController {
     const id_client = req.params.id_client;
     AchatClient.getAllOfClient(id_client, (error, achatsClient) => {
       if (error) {
-        return res
-          .status(500)
-          .json({
-            error: "Erreur lors de la récupération des achats du client",
-          });
+        return res.status(500).json({
+          error: "Erreur lors de la récupération des achats du client",
+        });
       }
       return res.status(200).json(achatsClient);
     });
