@@ -8,13 +8,14 @@ class RemiseChequeClientController {
       remiseChequeClientData,
       (error, remiseChequeClient) => {
         if (error) {
-          return res
-            .status(500)
-            .json({
-              error: "Erreur lors de la création de la remise de chèque client",
-            });
+          return res.status(500).json({
+            status: 500,
+            error: "Erreur lors de la création de la remise de chèque client",
+          });
         }
-        return res.status(201).json(remiseChequeClient);
+        return res
+          .status(201)
+          .json({ status: 201, remiseChequeClient: remiseChequeClient });
       }
     );
   };
@@ -24,12 +25,9 @@ class RemiseChequeClientController {
     const id = req.params.id;
     RemiseChequeClient.getById(id, (error, remiseChequeClient) => {
       if (error) {
-        return res
-          .status(500)
-          .json({
-            error:
-              "Erreur lors de la récupération de la remise de chèque client",
-          });
+        return res.status(500).json({
+          error: "Erreur lors de la récupération de la remise de chèque client",
+        });
       }
       if (!remiseChequeClient) {
         return res
@@ -43,12 +41,10 @@ class RemiseChequeClientController {
   static getAll = (req, res) => {
     RemiseChequeClient.getAll((error, remisesChequeClient) => {
       if (error) {
-        return res
-          .status(500)
-          .json({
-            error:
-              "Erreur lors de la récupération des remises de chèques clients",
-          });
+        return res.status(500).json({
+          error:
+            "Erreur lors de la récupération des remises de chèques clients",
+        });
       }
       return res.status(200).json(remisesChequeClient);
     });
@@ -76,32 +72,41 @@ class RemiseChequeClientController {
     const updatedData = req.body;
     RemiseChequeClient.getById(id, (getError, existingRemiseChequeClient) => {
       if (getError) {
-        return res
-          .status(500)
-          .json({
-            error:
-              "Erreur lors de la récupération de la remise de chèque client",
-          });
+        return res.status(500).json({
+          status: 500,
+          error: "Erreur lors de la récupération de la remise de chèque client",
+        });
       }
       if (!existingRemiseChequeClient) {
         return res
           .status(404)
-          .json({ error: "Remise de chèque client non trouvée" });
+          .json({ status: 404, error: "Remise de chèque client non trouvée" });
       }
       existingRemiseChequeClient = {
         ...existingRemiseChequeClient,
         ...updatedData,
       };
+      existingRemiseChequeClient = new RemiseChequeClient(
+        existingRemiseChequeClient.id,
+        existingRemiseChequeClient.description,
+        existingRemiseChequeClient.banque,
+        existingRemiseChequeClient.montant,
+        existingRemiseChequeClient.reste,
+        existingRemiseChequeClient.est_validee,
+        existingRemiseChequeClient.id_client,
+        existingRemiseChequeClient.date_remise
+      );
       existingRemiseChequeClient.update((updateError) => {
         if (updateError) {
-          return res
-            .status(500)
-            .json({
-              error:
-                "Erreur lors de la mise à jour de la remise de chèque client",
-            });
+          return res.status(500).json({
+            status: 500,
+            error:
+              "Erreur lors de la mise à jour de la remise de chèque client",
+          });
         }
-        return res.status(200).json(existingRemiseChequeClient);
+        return res
+          .status(200)
+          .json({ status: 200, existingRemiseChequeClient });
       });
     });
   };
@@ -111,28 +116,24 @@ class RemiseChequeClientController {
     const id = req.params.id;
     RemiseChequeClient.getById(id, (getError, existingRemiseChequeClient) => {
       if (getError) {
-        return res
-          .status(500)
-          .json({
-            error:
-              "Erreur lors de la récupération de la remise de chèque client",
-          });
+        return res.status(500).json({
+          error: "Erreur lors de la récupération de la remise de chèque client",
+        });
       }
       if (!existingRemiseChequeClient) {
         return res
           .status(404)
-          .json({ error: "Remise de chèque client non trouvée" });
+          .json({ status: 404, error: "Remise de chèque client non trouvée" });
       }
-      existingRemiseChequeClient.delete((deleteError) => {
-        if (deleteError) {
-          return res
-            .status(500)
-            .json({
-              error:
-                "Erreur lors de la suppression de la remise de chèque client",
-            });
+      existingRemiseChequeClient.delete((deleteError, id) => {
+        if (!id) {
+          return res.status(500).json({
+            status: 500,
+            error:
+              "Erreur lors de la suppression de la remise de chèque client",
+          });
         }
-        return res.status(204).end();
+        return res.status(204).json({ status: 204, id });
       });
     });
   };

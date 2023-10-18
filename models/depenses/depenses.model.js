@@ -1,4 +1,4 @@
-const connection = require('../_db/database');
+const connection = require("../_db/database");
 
 class Depenses {
   constructor(id, description, montant, piece, est_validee, date_depense) {
@@ -11,21 +11,36 @@ class Depenses {
   }
 
   static create(depenseData, callback) {
-    const query = 'INSERT INTO depenses (id, description, montant, piece, est_validee, date_depense) VALUES (NULL, ?, ?, ?, ?, ?)';
+    const query =
+      "INSERT INTO depenses (id, description, montant, piece, est_validee, date_depense) VALUES (NULL, ?, ?, ?, ?, ?)";
 
     const currentDate = new Date();
 
-    connection.query(query, [depenseData.description, depenseData.montant, depenseData.piece, depenseData.est_validee, currentDate], (error, results) => {
-      if (error) {
-        return callback(error, null);
+    connection.query(
+      query,
+      [
+        depenseData.description,
+        depenseData.montant,
+        depenseData.piece,
+        depenseData.est_validee,
+        currentDate,
+      ],
+      (error, results) => {
+        if (error) {
+          return callback(error, null);
+        }
+        const newDepense = new Depenses(
+          results.insertId,
+          ...Object.values(depenseData),
+          currentDate
+        );
+        return callback(null, newDepense);
       }
-      const newDepense = new Depenses(results.insertId, ...Object.values(depenseData),currentDate);
-      return callback(null, newDepense);
-    });
+    );
   }
 
   static getById(id, callback) {
-    const query = 'SELECT * FROM depenses WHERE id = ?';
+    const query = "SELECT * FROM depenses WHERE id = ?";
     connection.query(query, [id], (error, results) => {
       if (error) {
         return callback(error, null);
@@ -40,14 +55,14 @@ class Depenses {
         depenseData.montant,
         depenseData.piece,
         depenseData.est_validee,
-        depenseData.date_depense,
+        depenseData.date_depense
       );
       return callback(null, depense);
     });
   }
 
   static getAll(callback) {
-    const query = 'SELECT * FROM depenses';
+    const query = "SELECT * FROM depenses";
     connection.query(query, (error, results) => {
       if (error) {
         return callback(error, null);
@@ -59,7 +74,7 @@ class Depenses {
           depenseData.montant,
           depenseData.piece,
           depenseData.est_validee,
-          depenseData.date_depense,
+          depenseData.date_depense
         );
       });
       return callback(null, depensesList);
@@ -67,23 +82,28 @@ class Depenses {
   }
 
   update(callback) {
-    const query = 'UPDATE depenses SET description = ?, montant = ?, piece = ?, est_validee = ?, date_depense = ? WHERE id = ?';
+    const query =
+      "UPDATE depenses SET description = ?, montant = ?, piece = ?, est_validee = ?, date_depense = ? WHERE id = ?";
     const { id, ...updatedData } = this;
-    connection.query(query, [...Object.values(updatedData), id], (error, results) => {
-      if (error) {
-        return callback(error);
+    connection.query(
+      query,
+      [...Object.values(updatedData), id],
+      (error, results) => {
+        if (error) {
+          return callback(error);
+        }
+        return callback(null);
       }
-      return callback(null);
-    });
+    );
   }
 
-  static delete(id, callback) {
-    const query = 'DELETE FROM depenses WHERE id = ?';
-    connection.query(query, [id], (error, results) => {
+  delete(callback) {
+    const query = "DELETE FROM depenses WHERE id = ?";
+    connection.query(query, [this.id], (error, results) => {
       if (error) {
-        return callback(error);
+        return callback(error, null);
       }
-      return callback(null);
+      return callback(null, this.id);
     });
   }
 }

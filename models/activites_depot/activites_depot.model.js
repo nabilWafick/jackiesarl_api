@@ -138,7 +138,7 @@ class ActivitesDepot {
         updatedData.versement,
         updatedData.depense,
         updatedData.observation,
-        updatedData.date_remplissage,
+        new Date(updatedData.date_remplissage),
         id,
       ],
       (error, results) => {
@@ -150,13 +150,13 @@ class ActivitesDepot {
     );
   }
 
-  static delete(id, callback) {
+  delete(callback) {
     const query = "DELETE FROM activites_depot WHERE id = ?";
-    connection.query(query, [id], (error, results) => {
+    connection.query(query, [this.id], (error, results) => {
       if (error) {
-        return callback(error);
+        return callback(error, null);
       }
-      return callback(null);
+      return callback(null, this.id);
     });
   }
 }

@@ -62,13 +62,15 @@ function () {
   }, {
     key: "delete",
     value: function _delete(callback) {
+      var _this = this;
+
       var query = "DELETE FROM achat_client WHERE id = ?";
       connection.query(query, [this.id], function (error, results) {
         if (error) {
-          return callback(error);
+          return callback(error, null);
         }
 
-        return callback(null);
+        return callback(null, _this.id);
       });
     }
   }], [{

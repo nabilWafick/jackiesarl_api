@@ -57,6 +57,20 @@ function () {
         return callback(null);
       });
     }
+  }, {
+    key: "delete",
+    value: function _delete(callback) {
+      var _this = this;
+
+      var query = "DELETE FROM stock_camion WHERE id = ?";
+      connection.query(query, [this.id], function (error, results) {
+        if (error) {
+          return callback(error, null);
+        }
+
+        return callback(null, _this.id);
+      });
+    }
   }], [{
     key: "create",
     value: function create(stockData, callback) {
@@ -103,18 +117,6 @@ function () {
           return new StockCamion(stockData.id, stockData.numero_camion, stockData.categorie, stockData.numero_chauffeur, stockData.numero_bc, stockData.quantite, stockData.date_approvisionnement);
         });
         return callback(null, stocksList);
-      });
-    }
-  }, {
-    key: "delete",
-    value: function _delete(id, callback) {
-      var query = "DELETE FROM stock_camion WHERE id = ?";
-      connection.query(query, [id], function (error, results) {
-        if (error) {
-          return callback(error);
-        }
-
-        return callback(null);
       });
     }
   }]);

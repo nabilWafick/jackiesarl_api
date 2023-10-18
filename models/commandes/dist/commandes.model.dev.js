@@ -51,12 +51,26 @@ function () {
       var id = this.id,
           commandeData = _objectWithoutProperties(this, ["id"]);
 
-      connection.query(query, [].concat(_toConsumableArray(Object.values(commandeData)), [id]), function (error, results) {
+      connection.query(query, [commandeData.categorie, commandeData.quantite_achetee, commandeData.destination, new Date(commandeData.date_commande), new Date(commandeData.date_livraison), commandeData.est_traitee, commandeData.id_client, new Date(commandeData.date_ajout), id], function (error, results) {
         if (error) {
           return callback(error);
         }
 
         return callback(null);
+      });
+    }
+  }, {
+    key: "delete",
+    value: function _delete(callback) {
+      var _this = this;
+
+      var query = "DELETE FROM commandes WHERE id = ?";
+      connection.query(query, [this.id], function (error, results) {
+        if (error) {
+          return callback(error, null);
+        }
+
+        return callback(null, _this.id);
       });
     }
   }], [{
@@ -105,18 +119,6 @@ function () {
           return new Commandes(commandeData.id, commandeData.categorie, commandeData.quantite_achetee, commandeData.destination, commandeData.date_commande, commandeData.date_livraison, commandeData.est_traitee, commandeData.id_client, commandeData.date_ajout);
         });
         return callback(null, commandes);
-      });
-    }
-  }, {
-    key: "delete",
-    value: function _delete(id, callback) {
-      var query = "DELETE FROM commandes WHERE id = ?";
-      connection.query(query, [id], function (error, results) {
-        if (error) {
-          return callback(error);
-        }
-
-        return callback(null);
       });
     }
   }]);

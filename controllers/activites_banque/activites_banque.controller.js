@@ -6,11 +6,12 @@ class ActivitesBanqueController {
     const activiteBanqueData = req.body;
     ActivitesBanque.create(activiteBanqueData, (error, activiteBanque) => {
       if (error) {
-        return res
-          .status(500)
-          .json({ error: "Erreur lors de la création de l'activité banque" });
+        return res.status(500).json({
+          status: 500,
+          error: "Erreur lors de la création de l'activité banque",
+        });
       }
-      return res.status(201).json(activiteBanque);
+      return res.status(201).json({ status: 201, activiteBanque });
     });
   };
 
@@ -60,20 +61,36 @@ class ActivitesBanqueController {
     ActivitesBanque.getById(id, (getError, existingActiviteBanque) => {
       if (getError) {
         return res.status(500).json({
+          status: 500,
           error: "Erreur lors de la récupération de l'activité banque",
         });
       }
       if (!existingActiviteBanque) {
-        return res.status(404).json({ error: "Activité banque non trouvée" });
+        return res
+          .status(404)
+          .json({ status: 404, error: "Activité banque non trouvée" });
       }
       existingActiviteBanque = { ...existingActiviteBanque, ...updatedData };
+
+      existingActiviteBanque = new ActivitesBanque(
+        existingActiviteBanque.id,
+        existingActiviteBanque.id_banque,
+        existingActiviteBanque.description,
+        existingActiviteBanque.debit,
+        existingActiviteBanque.credit,
+        existingActiviteBanque.solde_actuel,
+        existingActiviteBanque.date_activite
+      );
+
       existingActiviteBanque.update((updateError) => {
         if (updateError) {
+          console.log("SQL Error");
           return res.status(500).json({
+            status: 500,
             error: "Erreur lors de la mise à jour de l'activité banque",
           });
         }
-        return res.status(200).json(existingActiviteBanque);
+        return res.status(200).json({ status: 200, existingActiviteBanque });
       });
     });
   };
@@ -84,19 +101,23 @@ class ActivitesBanqueController {
     ActivitesBanque.getById(id, (getError, existingActiviteBanque) => {
       if (getError) {
         return res.status(500).json({
+          status: 500,
           error: "Erreur lors de la récupération de l'activité banque",
         });
       }
       if (!existingActiviteBanque) {
-        return res.status(404).json({ error: "Activité banque non trouvée" });
+        return res
+          .status(404)
+          .json({ status: 404, error: "Activité banque non trouvée" });
       }
-      existingActiviteBanque.delete((deleteError) => {
-        if (deleteError) {
+      existingActiviteBanque.delete((deleteError, id) => {
+        if (!id) {
           return res.status(500).json({
+            status: 500,
             error: "Erreur lors de la suppression de l'activité banque",
           });
         }
-        return res.status(204).end();
+        return res.status(204).json({ status: 204, id });
       });
     });
   };

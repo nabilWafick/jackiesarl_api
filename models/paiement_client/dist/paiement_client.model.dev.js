@@ -60,6 +60,20 @@ function () {
         return callback(null);
       });
     }
+  }, {
+    key: "delete",
+    value: function _delete(callback) {
+      var _this = this;
+
+      var query = "DELETE FROM paiement_client WHERE id = ?";
+      connection.query(query, [this.id], function (error, results) {
+        if (error) {
+          return callback(error, null);
+        }
+
+        return callback(null, _this.id);
+      });
+    }
   }], [{
     key: "create",
     value: function create(paiementData, callback) {
@@ -122,18 +136,6 @@ function () {
           return new PaiementClient(paiementData.id, paiementData.montant, paiementData.banque, paiementData.reference, paiementData.categorie, paiementData.numero_bc, paiementData.bordereau, paiementData.est_valide, paiementData.id_client, paiementData.date_paiement);
         });
         return callback(null, paiementsList);
-      });
-    }
-  }, {
-    key: "delete",
-    value: function _delete(id, callback) {
-      var query = "DELETE FROM paiement_client WHERE id = ?";
-      connection.query(query, [id], function (error, results) {
-        if (error) {
-          return callback(error);
-        }
-
-        return callback(null);
       });
     }
   }]);

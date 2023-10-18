@@ -115,13 +115,13 @@ class AchatEntreprise {
     );
   }
 
-  static delete(bon_commande, callback) {
+  delete(callback) {
     const query = "DELETE FROM achat_entreprise WHERE bon_commande = ?";
-    connection.query(query, [bon_commande], (error, results) => {
+    connection.query(query, [this.bon_commande], (error, results) => {
       if (error) {
-        return callback(error);
+        return callback(error, null);
       }
-      return callback(null);
+      return callback(null, this.bon_commande);
     });
   }
 }

@@ -82,6 +82,19 @@ class ClientsController {
     });
   };
 
+  static getAllMatched = (req, res) => {
+    const name = req.params.name;
+    //console.log("searched name", name);
+    Clients.getAllMatched(name, (error, clients) => {
+      if (error) {
+        return res
+          .status(500)
+          .json({ error: "Erreur lors de la récupération des clients" });
+      }
+      return res.status(200).json(clients);
+    });
+  };
+
   static getAll = (req, res) => {
     Clients.getAll((error, clients) => {
       if (error) {

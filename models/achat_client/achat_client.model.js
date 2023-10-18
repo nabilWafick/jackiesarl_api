@@ -155,9 +155,9 @@ class AchatClient {
     const query = "DELETE FROM achat_client WHERE id = ?";
     connection.query(query, [this.id], (error, results) => {
       if (error) {
-        return callback(error);
+        return callback(error, null);
       }
-      return callback(null);
+      return callback(null, this.id);
     });
   }
 }

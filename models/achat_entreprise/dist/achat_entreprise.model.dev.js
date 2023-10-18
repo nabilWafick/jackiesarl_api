@@ -57,6 +57,20 @@ function () {
         return callback(null);
       });
     }
+  }, {
+    key: "delete",
+    value: function _delete(callback) {
+      var _this = this;
+
+      var query = "DELETE FROM achat_entreprise WHERE bon_commande = ?";
+      connection.query(query, [this.bon_commande], function (error, results) {
+        if (error) {
+          return callback(error, null);
+        }
+
+        return callback(null, _this.bon_commande);
+      });
+    }
   }], [{
     key: "create",
     value: function create(achatEntrepriseData, callback) {
@@ -103,18 +117,6 @@ function () {
           return new AchatEntreprise(achatEntrepriseData.bon_commande, achatEntrepriseData.quantite_achetee, achatEntrepriseData.montant, achatEntrepriseData.banque, achatEntrepriseData.cheque, achatEntrepriseData.bordereau, new Date(achatEntrepriseData.date_achat));
         });
         return callback(null, achatsEntreprise);
-      });
-    }
-  }, {
-    key: "delete",
-    value: function _delete(bon_commande, callback) {
-      var query = "DELETE FROM achat_entreprise WHERE bon_commande = ?";
-      connection.query(query, [bon_commande], function (error, results) {
-        if (error) {
-          return callback(error);
-        }
-
-        return callback(null);
       });
     }
   }]);

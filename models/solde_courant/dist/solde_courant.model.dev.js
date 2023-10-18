@@ -24,7 +24,7 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
-var connection = require('../_db/database');
+var connection = require("../_db/database");
 
 var SoldeCourant =
 /*#__PURE__*/
@@ -42,7 +42,7 @@ function () {
   _createClass(SoldeCourant, [{
     key: "update",
     value: function update(callback) {
-      var query = 'UPDATE solde_courant SET banque = ?, numero_compte = ?, solde_actuel = ?, date_ajout = ? WHERE id = ?';
+      var query = "UPDATE solde_courant SET banque = ?, numero_compte = ?, solde_actuel = ?, date_ajout = ? WHERE id = ?";
 
       var id = this.id,
           updatedData = _objectWithoutProperties(this, ["id"]);
@@ -55,10 +55,24 @@ function () {
         return callback(null);
       });
     }
+  }, {
+    key: "delete",
+    value: function _delete(callback) {
+      var _this = this;
+
+      var query = "DELETE FROM solde_courant WHERE id = ?";
+      connection.query(query, [this.id], function (error, results) {
+        if (error) {
+          return callback(error, null);
+        }
+
+        return callback(null, _this.id);
+      });
+    }
   }], [{
     key: "create",
     value: function create(soldeData, callback) {
-      var query = 'INSERT INTO solde_courant (id, banque, numero_compte, solde_actuel, date_ajout) VALUES (NULL, ?, ?, ?, ?)';
+      var query = "INSERT INTO solde_courant (id, banque, numero_compte, solde_actuel, date_ajout) VALUES (NULL, ?, ?, ?, ?)";
       var currentDate = new Date();
       connection.query(query, [soldeData.banque, soldeData.numero_compte, soldeData.solde_actuel, currentDate], function (error, results) {
         if (error) {
@@ -73,7 +87,7 @@ function () {
   }, {
     key: "getById",
     value: function getById(id, callback) {
-      var query = 'SELECT * FROM solde_courant WHERE id = ?';
+      var query = "SELECT * FROM solde_courant WHERE id = ?";
       connection.query(query, [id], function (error, results) {
         if (error) {
           return callback(error, null);
@@ -91,7 +105,7 @@ function () {
   }, {
     key: "getAll",
     value: function getAll(callback) {
-      var query = 'SELECT * FROM solde_courant';
+      var query = "SELECT * FROM solde_courant";
       connection.query(query, function (error, results) {
         if (error) {
           return callback(error, null);
@@ -101,18 +115,6 @@ function () {
           return new SoldeCourant(soldeData.id, soldeData.banque, soldeData.numero_compte, soldeData.solde_actuel, soldeData.date_ajout);
         });
         return callback(null, soldesList);
-      });
-    }
-  }, {
-    key: "delete",
-    value: function _delete(id, callback) {
-      var query = 'DELETE FROM solde_courant WHERE id = ?';
-      connection.query(query, [id], function (error, results) {
-        if (error) {
-          return callback(error);
-        }
-
-        return callback(null);
       });
     }
   }]);

@@ -1,5 +1,16 @@
+const { error } = require("console");
 const AchatClient = require("../../models/achat_client/achat_client.model");
-//const multer = require("multer");
+const fs = require("fs");
+
+deleteFile = (file) => {
+  fs.unlink(file, (error) => {
+    if (error) {
+      console.error("Erreur de la suppression du fichier :", error);
+    } else {
+      console.log("Fichier supprimé avec succès");
+    }
+  });
+};
 
 class AchatClientController {
   // Créer un nouvel achat client
@@ -70,21 +81,48 @@ class AchatClientController {
     const updatedData = req.body;
     AchatClient.getById(id, (getError, existingAchatClient) => {
       if (getError) {
-        return res
-          .status(500)
-          .json({ error: "Erreur lors de la récupération de l'achat client" });
+        return res.status(500).json({
+          status: 500,
+          error: "Erreur lors de la récupération de l'achat client",
+        });
       }
       if (!existingAchatClient) {
-        return res.status(404).json({ error: "Achat client non trouvé" });
+        return res
+          .status(404)
+          .json({ status: 404, error: "Achat client non trouvé" });
       }
       existingAchatClient = { ...existingAchatClient, ...updatedData };
+      const file = req.file;
+      console.log("existingAchatClient", existingAchatClient);
+      console.log("file", file);
+      if (file) {
+        const lastSlip = existingAchatClient.bordereau;
+        existingAchatClient = { ...existingAchatClient, bordereau: file.path };
+        if (lastSlip != "") {
+          deleteFile(lastSlip);
+        }
+      }
+      existingAchatClient = new AchatClient(
+        existingAchatClient.id,
+        existingAchatClient.quantite_achetee,
+        existingAchatClient.categorie,
+        existingAchatClient.montant,
+        existingAchatClient.numero_ctp,
+        existingAchatClient.bordereau,
+        existingAchatClient.numero_bc,
+        existingAchatClient.id_client,
+        existingAchatClient.date_achat
+      );
       existingAchatClient.update((updateError) => {
         if (updateError) {
-          return res
-            .status(500)
-            .json({ error: "Erreur lors de la mise à jour de l'achat client" });
+          return res.status(500).json({
+            status: 500,
+            error: "Erreur lors de la mise à jour de l'achat client",
+          });
         }
-        return res.status(200).json(existingAchatClient);
+        return res
+          .status(200)
+          .json({ status: 200, achatClient: existingAchatClient });
       });
     });
   };
@@ -94,21 +132,24 @@ class AchatClientController {
     const id = req.params.id;
     AchatClient.getById(id, (getError, existingAchatClient) => {
       if (getError) {
-        return res
-          .status(500)
-          .json({ error: "Erreur lors de la récupération de l'achat client" });
+        return res.status(500).json({
+          status: 500,
+          error: "Erreur lors de la récupération de l'achat client",
+        });
       }
       if (!existingAchatClient) {
-        return res.status(404).json({ error: "Achat client non trouvé" });
+        return res
+          .status(404)
+          .json({ status: 404, error: "Achat client non trouvé" });
       }
-      existingAchatClient.delete((deleteError) => {
-        if (deleteError) {
+      existingAchatClient.delete((deleteError, id) => {
+        if (!id) {
           return res
             .status(500)
             .json({ error: "Erreur lors de la suppression de l'achat client" });
         }
-        getById;
-        return res.status(204).end();
+        deleteFile(existingAchatClient.bordereau);
+        return res.status(204).json({ status: 204, id: id });
       });
     });
   };

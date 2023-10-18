@@ -93,7 +93,7 @@ class Brouillard {
         updatedData.stock_actuel,
         updatedData.nom_gerant,
         updatedData.numero_gerant,
-        updatedData.date_ajout,
+        new Date(updatedData.date_ajout),
         id,
       ],
       (error, results) => {
@@ -105,13 +105,13 @@ class Brouillard {
     );
   }
 
-  static delete(id, callback) {
+  delete(callback) {
     const query = "DELETE FROM brouillard WHERE id = ?";
-    connection.query(query, [id], (error, results) => {
+    connection.query(query, [this.id], (error, results) => {
       if (error) {
-        return callback(error);
+        return callback(error, null);
       }
-      return callback(null);
+      return callback(null, this.id);
     });
   }
 }

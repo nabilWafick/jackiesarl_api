@@ -51,12 +51,26 @@ function () {
       var id = this.id,
           updatedData = _objectWithoutProperties(this, ["id"]);
 
-      connection.query(query, [updatedData.id_depot, updatedData.quantite_avant_vente, updatedData.vente, updatedData.quantite_apres_vente, updatedData.versement, updatedData.depense, updatedData.observation, updatedData.date_remplissage, id], function (error, results) {
+      connection.query(query, [updatedData.id_depot, updatedData.quantite_avant_vente, updatedData.vente, updatedData.quantite_apres_vente, updatedData.versement, updatedData.depense, updatedData.observation, new Date(updatedData.date_remplissage), id], function (error, results) {
         if (error) {
           return callback(error);
         }
 
         return callback(null);
+      });
+    }
+  }, {
+    key: "delete",
+    value: function _delete(callback) {
+      var _this = this;
+
+      var query = "DELETE FROM activites_depot WHERE id = ?";
+      connection.query(query, [this.id], function (error, results) {
+        if (error) {
+          return callback(error, null);
+        }
+
+        return callback(null, _this.id);
       });
     }
   }], [{
@@ -121,18 +135,6 @@ function () {
         }); //console.log(activitesDepotList.length);
 
         return callback(null, activitesDepotList);
-      });
-    }
-  }, {
-    key: "delete",
-    value: function _delete(id, callback) {
-      var query = "DELETE FROM activites_depot WHERE id = ?";
-      connection.query(query, [id], function (error, results) {
-        if (error) {
-          return callback(error);
-        }
-
-        return callback(null);
       });
     }
   }]);

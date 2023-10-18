@@ -107,7 +107,17 @@ class Commandes {
     const { id, ...commandeData } = this;
     connection.query(
       query,
-      [...Object.values(commandeData), id],
+      [
+        commandeData.categorie,
+        commandeData.quantite_achetee,
+        commandeData.destination,
+        new Date(commandeData.date_commande),
+        new Date(commandeData.date_livraison),
+        commandeData.est_traitee,
+        commandeData.id_client,
+        new Date(commandeData.date_ajout),
+        id,
+      ],
       (error, results) => {
         if (error) {
           return callback(error);
@@ -117,13 +127,13 @@ class Commandes {
     );
   }
 
-  static delete(id, callback) {
+  delete(callback) {
     const query = "DELETE FROM commandes WHERE id = ?";
-    connection.query(query, [id], (error, results) => {
+    connection.query(query, [this.id], (error, results) => {
       if (error) {
-        return callback(error);
+        return callback(error, null);
       }
-      return callback(null);
+      return callback(null, this.id);
     });
   }
 }

@@ -34,12 +34,26 @@ function () {
       var id = this.id,
           updatedData = _objectWithoutProperties(this, ["id"]);
 
-      connection.query(query, [updatedData.depot, updatedData.stock_actuel, updatedData.nom_gerant, updatedData.numero_gerant, updatedData.date_ajout, id], function (error, results) {
+      connection.query(query, [updatedData.depot, updatedData.stock_actuel, updatedData.nom_gerant, updatedData.numero_gerant, new Date(updatedData.date_ajout), id], function (error, results) {
         if (error) {
           return callback(error);
         }
 
         return callback(null);
+      });
+    }
+  }, {
+    key: "delete",
+    value: function _delete(callback) {
+      var _this = this;
+
+      var query = "DELETE FROM brouillard WHERE id = ?";
+      connection.query(query, [this.id], function (error, results) {
+        if (error) {
+          return callback(error, null);
+        }
+
+        return callback(null, _this.id);
       });
     }
   }], [{
@@ -87,18 +101,6 @@ function () {
           return new Brouillard(brouillardData.id, brouillardData.depot, brouillardData.stock_actuel, brouillardData.nom_gerant, brouillardData.numero_gerant, new Date(brouillardData.date_ajout));
         });
         return callback(null, brouillardList);
-      });
-    }
-  }, {
-    key: "delete",
-    value: function _delete(id, callback) {
-      var query = "DELETE FROM brouillard WHERE id = ?";
-      connection.query(query, [id], function (error, results) {
-        if (error) {
-          return callback(error);
-        }
-
-        return callback(null);
       });
     }
   }]);

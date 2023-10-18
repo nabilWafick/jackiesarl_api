@@ -24,7 +24,7 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
-var connection = require('../_db/database');
+var connection = require("../_db/database");
 
 var Clients =
 /*#__PURE__*/
@@ -44,7 +44,7 @@ function () {
   _createClass(Clients, [{
     key: "update",
     value: function update(callback) {
-      var query = 'UPDATE clients SET nom = ?, prenoms = ?, numero_ifu = ?, numero_telephone = ?, email = ?, date_ajout = ? WHERE clients.id = ?';
+      var query = "UPDATE clients SET nom = ?, prenoms = ?, numero_ifu = ?, numero_telephone = ?, email = ?, date_ajout = ? WHERE clients.id = ?";
 
       var id = this.id,
           clientData = _objectWithoutProperties(this, ["id"]);
@@ -60,7 +60,7 @@ function () {
   }, {
     key: "delete",
     value: function _delete(callback) {
-      var query = 'DELETE FROM clients WHERE id = ?';
+      var query = "DELETE FROM clients WHERE id = ?";
       connection.query(query, [this.id], function (error, results) {
         if (error) {
           return callback(error);
@@ -72,9 +72,9 @@ function () {
   }], [{
     key: "create",
     value: function create(clientData, callback) {
-      var query = 'INSERT INTO clients (id, nom, prenoms, numero_ifu, numero_telephone, email, date_ajout) VALUES (NULL,?,?,?,?,?,?)';
+      var query = "INSERT INTO clients (id, nom, prenoms, numero_ifu, numero_telephone, email, date_ajout) VALUES (NULL,?,?,?,?,?,?)";
       var currentDate = new Date();
-      console.log('Current date');
+      console.log("Current date");
       console.log(currentDate);
       connection.query(query, [clientData.nom, clientData.prenoms, clientData.numero_ifu, clientData.numero_telephone, clientData.email, currentDate], function (error, results) {
         if (error) {
@@ -89,7 +89,7 @@ function () {
   }, {
     key: "getById",
     value: function getById(id, callback) {
-      var query = 'SELECT * FROM clients WHERE id = ?';
+      var query = "SELECT * FROM clients WHERE id = ?";
       connection.query(query, [id], function (error, results) {
         if (error) {
           return callback(error, null);
@@ -103,12 +103,27 @@ function () {
         var client = new Clients(clientData.id, clientData.nom, clientData.prenoms, clientData.numero_ifu, clientData.numero_telephone, clientData.email, clientData.date_ajout);
         return callback(null, client);
       });
+    }
+  }, {
+    key: "getAllMatched",
+    value: function getAllMatched(name, callback) {
+      var query = "SELECT * FROM clients WHERE nom LIKE '%".concat(name, "' or nom LIKE '").concat(name, "%' or nom LIKE '%").concat(name, "%' or prenoms LIKE '%").concat(name, "' or prenoms LIKE '").concat(name, "%' or prenoms LIKE '%").concat(name, "%'");
+      connection.query(query, function (error, results) {
+        if (error) {
+          return callback(error, null);
+        }
+
+        var clients = results.map(function (clientData) {
+          return new Clients(clientData.id, clientData.nom, clientData.prenoms, clientData.numero_ifu, clientData.numero_telephone, clientData.email, clientData.date_ajout);
+        });
+        return callback(null, clients);
+      });
     } // Méthode pour récupérer toutes les entrées de la table clients
 
   }, {
     key: "getAll",
     value: function getAll(callback) {
-      var query = 'SELECT * FROM clients';
+      var query = "SELECT * FROM clients";
       connection.query(query, function (error, results) {
         if (error) {
           return callback(error, null);

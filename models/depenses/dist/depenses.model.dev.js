@@ -24,7 +24,7 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
-var connection = require('../_db/database');
+var connection = require("../_db/database");
 
 var Depenses =
 /*#__PURE__*/
@@ -43,7 +43,7 @@ function () {
   _createClass(Depenses, [{
     key: "update",
     value: function update(callback) {
-      var query = 'UPDATE depenses SET description = ?, montant = ?, piece = ?, est_validee = ?, date_depense = ? WHERE id = ?';
+      var query = "UPDATE depenses SET description = ?, montant = ?, piece = ?, est_validee = ?, date_depense = ? WHERE id = ?";
 
       var id = this.id,
           updatedData = _objectWithoutProperties(this, ["id"]);
@@ -56,10 +56,24 @@ function () {
         return callback(null);
       });
     }
+  }, {
+    key: "delete",
+    value: function _delete(callback) {
+      var _this = this;
+
+      var query = "DELETE FROM depenses WHERE id = ?";
+      connection.query(query, [this.id], function (error, results) {
+        if (error) {
+          return callback(error, null);
+        }
+
+        return callback(null, _this.id);
+      });
+    }
   }], [{
     key: "create",
     value: function create(depenseData, callback) {
-      var query = 'INSERT INTO depenses (id, description, montant, piece, est_validee, date_depense) VALUES (NULL, ?, ?, ?, ?, ?)';
+      var query = "INSERT INTO depenses (id, description, montant, piece, est_validee, date_depense) VALUES (NULL, ?, ?, ?, ?, ?)";
       var currentDate = new Date();
       connection.query(query, [depenseData.description, depenseData.montant, depenseData.piece, depenseData.est_validee, currentDate], function (error, results) {
         if (error) {
@@ -74,7 +88,7 @@ function () {
   }, {
     key: "getById",
     value: function getById(id, callback) {
-      var query = 'SELECT * FROM depenses WHERE id = ?';
+      var query = "SELECT * FROM depenses WHERE id = ?";
       connection.query(query, [id], function (error, results) {
         if (error) {
           return callback(error, null);
@@ -92,7 +106,7 @@ function () {
   }, {
     key: "getAll",
     value: function getAll(callback) {
-      var query = 'SELECT * FROM depenses';
+      var query = "SELECT * FROM depenses";
       connection.query(query, function (error, results) {
         if (error) {
           return callback(error, null);
@@ -102,18 +116,6 @@ function () {
           return new Depenses(depenseData.id, depenseData.description, depenseData.montant, depenseData.piece, depenseData.est_validee, depenseData.date_depense);
         });
         return callback(null, depensesList);
-      });
-    }
-  }, {
-    key: "delete",
-    value: function _delete(id, callback) {
-      var query = 'DELETE FROM depenses WHERE id = ?';
-      connection.query(query, [id], function (error, results) {
-        if (error) {
-          return callback(error);
-        }
-
-        return callback(null);
       });
     }
   }]);

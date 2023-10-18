@@ -1,19 +1,27 @@
 const connection = require("../_db/database");
 
 class ActivitesBanque {
-  constructor(id, id_banque, description, debit, credit, solde, date_activite) {
+  constructor(
+    id,
+    id_banque,
+    description,
+    debit,
+    credit,
+    solde_actuel,
+    date_activite
+  ) {
     this.id = id;
     this.id_banque = id_banque;
     this.description = description;
     this.debit = debit;
     this.credit = credit;
-    this.solde = solde;
+    this.solde_actuel = solde_actuel;
     this.date_activite = date_activite;
   }
 
   static create(activitesBanqueData, callback) {
     const query =
-      "INSERT INTO activites_banque (id,id_banque, description, debit, credit, solde, date_activite) VALUES (NULL,?,?,?,?,?,?)";
+      "INSERT INTO activites_banque (id,id_banque, description, debit, credit, solde_actuel, date_activite) VALUES (NULL,?,?,?,?,?,?)";
     const currentDate = new Date();
     connection.query(
       query,
@@ -22,7 +30,7 @@ class ActivitesBanque {
         activitesBanqueData.description,
         activitesBanqueData.debit,
         activitesBanqueData.credit,
-        activitesBanqueData.solde,
+        activitesBanqueData.solde_actuel,
         currentDate,
       ],
       (error, results) => {
@@ -54,7 +62,7 @@ class ActivitesBanque {
         activitesBanqueData.description,
         activitesBanqueData.debit,
         activitesBanqueData.credit,
-        activitesBanqueData.solde,
+        activitesBanqueData.solde_actuel,
         new Date(activitesBanqueData.date_activite)
       );
       return callback(null, activitesBanque);
@@ -74,7 +82,7 @@ class ActivitesBanque {
           activitesBanqueData.description,
           activitesBanqueData.debit,
           activitesBanqueData.credit,
-          activitesBanqueData.solde,
+          activitesBanqueData.solde_actuel,
           new Date(activitesBanqueData.date_activite)
         );
       });
@@ -95,7 +103,7 @@ class ActivitesBanque {
           activitesBanqueData.description,
           activitesBanqueData.debit,
           activitesBanqueData.credit,
-          activitesBanqueData.solde,
+          activitesBanqueData.solde_actuel,
           new Date(activitesBanqueData.date_activite)
         );
       });
@@ -105,8 +113,8 @@ class ActivitesBanque {
 
   update(callback) {
     const query =
-      "UPDATE activites_banque SET id_banque = ?, description = ?, debit = ?, credit = ?, solde = ?, date_activite = ? WHERE id_banque = ?";
-    const { id_banque, ...updatedData } = this;
+      "UPDATE activites_banque SET id_banque = ?, description = ?, debit = ?, credit = ?, solde_actuel = ?, date_activite = ? WHERE id = ?";
+    const { id, ...updatedData } = this;
     connection.query(
       query,
       [
@@ -114,7 +122,7 @@ class ActivitesBanque {
         updatedData.description,
         updatedData.debit,
         updatedData.credit,
-        updatedData.solde,
+        updatedData.solde_actuel,
         updatedData.date_activite,
         id,
       ],
@@ -127,13 +135,13 @@ class ActivitesBanque {
     );
   }
 
-  static delete(id, callback) {
+  delete(callback) {
     const query = "DELETE FROM activites_banque WHERE id = ?";
-    connection.query(query, [id], (error, results) => {
+    connection.query(query, [this.id], (error, results) => {
       if (error) {
-        return callback(error);
+        return callback(error, null);
       }
-      return callback(null);
+      return callback(null, this.id);
     });
   }
 }

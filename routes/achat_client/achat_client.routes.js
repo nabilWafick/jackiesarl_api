@@ -1,8 +1,8 @@
 const express = require("express");
-const path = require("path");
 const router = express.Router();
 const AchatClientController = require("../../controllers/achat_client/achat_client.controller");
 const multer = require("multer");
+const path = require("path");
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -18,6 +18,7 @@ const storage = multer.diskStorage({
 });
 
 const upload = multer({ storage });
+
 // Routes pour la table `achat_client`
 router.post(
   "/achat-client",
@@ -30,7 +31,11 @@ router.get(
   "/achat-client/client/:id_client",
   AchatClientController.getAllOfClient
 );
-router.put("/achat-client/:id", AchatClientController.update);
+router.put(
+  "/achat-client/:id",
+  upload.single("bordereau"),
+  AchatClientController.update
+);
 router.delete("/achat-client/:id", AchatClientController.delete);
 
 module.exports = router;

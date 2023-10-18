@@ -109,13 +109,13 @@ class StockCamion {
     );
   }
 
-  static delete(id, callback) {
+  delete(callback) {
     const query = "DELETE FROM stock_camion WHERE id = ?";
-    connection.query(query, [id], (error, results) => {
+    connection.query(query, [this.id], (error, results) => {
       if (error) {
-        return callback(error);
+        return callback(error, null);
       }
-      return callback(null);
+      return callback(null, this.id);
     });
   }
 }

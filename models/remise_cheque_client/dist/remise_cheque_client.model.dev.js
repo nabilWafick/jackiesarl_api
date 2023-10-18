@@ -58,6 +58,20 @@ function () {
         return callback(null);
       });
     }
+  }, {
+    key: "delete",
+    value: function _delete(callback) {
+      var _this = this;
+
+      var query = "DELETE FROM remise_cheque_client WHERE id = ?";
+      connection.query(query, [this.id], function (error, results) {
+        if (error) {
+          return callback(error, null);
+        }
+
+        return callback(null, _this.id);
+      });
+    }
   }], [{
     key: "create",
     value: function create(remiseData, callback) {
@@ -119,18 +133,6 @@ function () {
           return new RemiseChequeClient(remiseData.id, remiseData.description, remiseData.banque, remiseData.montant, remiseData.reste, remiseData.est_validee, remiseData.id_client, remiseData.date_remise);
         });
         return callback(null, remisesList);
-      });
-    }
-  }, {
-    key: "delete",
-    value: function _delete(id, callback) {
-      var query = "DELETE FROM remise_cheque_client WHERE id = ?";
-      connection.query(query, [id], function (error, results) {
-        if (error) {
-          return callback(error);
-        }
-
-        return callback(null);
       });
     }
   }]);

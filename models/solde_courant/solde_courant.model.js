@@ -1,4 +1,4 @@
-const connection = require('../_db/database');
+const connection = require("../_db/database");
 
 class SoldeCourant {
   constructor(id, banque, numero_compte, solde_actuel, date_ajout) {
@@ -10,19 +10,33 @@ class SoldeCourant {
   }
 
   static create(soldeData, callback) {
-    const query = 'INSERT INTO solde_courant (id, banque, numero_compte, solde_actuel, date_ajout) VALUES (NULL, ?, ?, ?, ?)';
+    const query =
+      "INSERT INTO solde_courant (id, banque, numero_compte, solde_actuel, date_ajout) VALUES (NULL, ?, ?, ?, ?)";
     const currentDate = new Date();
-    connection.query(query, [soldeData.banque, soldeData.numero_compte, soldeData.solde_actuel, currentDate], (error, results) => {
-      if (error) {
-        return callback(error, null);
+    connection.query(
+      query,
+      [
+        soldeData.banque,
+        soldeData.numero_compte,
+        soldeData.solde_actuel,
+        currentDate,
+      ],
+      (error, results) => {
+        if (error) {
+          return callback(error, null);
+        }
+        const newSolde = new SoldeCourant(
+          results.insertId,
+          ...Object.values(soldeData),
+          currentDate
+        );
+        return callback(null, newSolde);
       }
-      const newSolde = new SoldeCourant(results.insertId, ...Object.values(soldeData),currentDate);
-      return callback(null, newSolde);
-    });
+    );
   }
 
   static getById(id, callback) {
-    const query = 'SELECT * FROM solde_courant WHERE id = ?';
+    const query = "SELECT * FROM solde_courant WHERE id = ?";
     connection.query(query, [id], (error, results) => {
       if (error) {
         return callback(error, null);
@@ -36,14 +50,14 @@ class SoldeCourant {
         soldeData.banque,
         soldeData.numero_compte,
         soldeData.solde_actuel,
-        soldeData.date_ajout,
+        soldeData.date_ajout
       );
       return callback(null, solde);
     });
   }
 
   static getAll(callback) {
-    const query = 'SELECT * FROM solde_courant';
+    const query = "SELECT * FROM solde_courant";
     connection.query(query, (error, results) => {
       if (error) {
         return callback(error, null);
@@ -54,7 +68,7 @@ class SoldeCourant {
           soldeData.banque,
           soldeData.numero_compte,
           soldeData.solde_actuel,
-          soldeData.date_ajout,
+          soldeData.date_ajout
         );
       });
       return callback(null, soldesList);
@@ -62,23 +76,28 @@ class SoldeCourant {
   }
 
   update(callback) {
-    const query = 'UPDATE solde_courant SET banque = ?, numero_compte = ?, solde_actuel = ?, date_ajout = ? WHERE id = ?';
+    const query =
+      "UPDATE solde_courant SET banque = ?, numero_compte = ?, solde_actuel = ?, date_ajout = ? WHERE id = ?";
     const { id, ...updatedData } = this;
-    connection.query(query, [...Object.values(updatedData), id], (error, results) => {
-      if (error) {
-        return callback(error);
+    connection.query(
+      query,
+      [...Object.values(updatedData), id],
+      (error, results) => {
+        if (error) {
+          return callback(error);
+        }
+        return callback(null);
       }
-      return callback(null);
-    });
+    );
   }
 
-  static delete(id, callback) {
-    const query = 'DELETE FROM solde_courant WHERE id = ?';
-    connection.query(query, [id], (error, results) => {
+  delete(callback) {
+    const query = "DELETE FROM solde_courant WHERE id = ?";
+    connection.query(query, [this.id], (error, results) => {
       if (error) {
-        return callback(error);
+        return callback(error, null);
       }
-      return callback(null);
+      return callback(null, this.id);
     });
   }
 }

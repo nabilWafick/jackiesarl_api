@@ -2,13 +2,13 @@
 
 var express = require("express");
 
-var path = require("path");
-
 var router = express.Router();
 
 var AchatClientController = require("../../controllers/achat_client/achat_client.controller");
 
 var multer = require("multer");
+
+var path = require("path");
 
 var storage = multer.diskStorage({
   destination: function destination(req, file, cb) {
@@ -29,6 +29,6 @@ router.post("/achat-client", upload.single("bordereau"), AchatClientController.c
 router.get("/achat-client/:id", AchatClientController.getById);
 router.get("/achat-client/", AchatClientController.getAll);
 router.get("/achat-client/client/:id_client", AchatClientController.getAllOfClient);
-router.put("/achat-client/:id", AchatClientController.update);
+router.put("/achat-client/:id", upload.single("bordereau"), AchatClientController.update);
 router["delete"]("/achat-client/:id", AchatClientController["delete"]);
 module.exports = router;
