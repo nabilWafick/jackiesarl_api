@@ -3,6 +3,7 @@ const connection = require("../_db/database");
 class AchatEntreprise {
   constructor(
     bon_commande,
+    categorie,
     quantite_achetee,
     montant,
     banque,
@@ -11,6 +12,7 @@ class AchatEntreprise {
     date_achat
   ) {
     this.bon_commande = bon_commande;
+    this.categorie = categorie;
     this.quantite_achetee = quantite_achetee;
     this.montant = montant;
     this.banque = banque;
@@ -21,12 +23,13 @@ class AchatEntreprise {
 
   static create(achatEntrepriseData, callback) {
     const query =
-      "INSERT INTO achat_entreprise (bon_commande, quantite_achetee, montant, banque, cheque, bordereau, date_achat) VALUES (?,?,?,?,?,?,?)";
+      "INSERT INTO achat_entreprise (bon_commande, categorie,quantite_achetee, montant, banque, cheque, bordereau, date_achat) VALUES (?,?,?,?,?,?,?,?)";
     const currentDate = new Date();
     connection.query(
       query,
       [
         achatEntrepriseData.bon_commande,
+        achatEntrepriseData.categorie,
         achatEntrepriseData.quantite_achetee,
         achatEntrepriseData.montant,
         achatEntrepriseData.banque,
@@ -47,7 +50,7 @@ class AchatEntreprise {
     );
   }
 
-  static getByBon_commande(bon_commande, callback) {
+  static getByBonCommande(bon_commande, callback) {
     const query = "SELECT * FROM achat_entreprise WHERE bon_commande = ?";
     connection.query(query, [bon_commande], (error, results) => {
       if (error) {
@@ -59,6 +62,7 @@ class AchatEntreprise {
       const achatEntrepriseData = results[0];
       const achatEntreprise = new AchatEntreprise(
         achatEntrepriseData.bon_commande,
+        achatEntreprise.categorie,
         achatEntrepriseData.quantite_achetee,
         achatEntrepriseData.montant,
         achatEntrepriseData.banque,
@@ -79,6 +83,7 @@ class AchatEntreprise {
       const achatsEntreprise = results.map((achatEntrepriseData) => {
         return new AchatEntreprise(
           achatEntrepriseData.bon_commande,
+          achatEntrepriseData.categorie,
           achatEntrepriseData.quantite_achetee,
           achatEntrepriseData.montant,
           achatEntrepriseData.banque,
@@ -93,11 +98,12 @@ class AchatEntreprise {
 
   update(callback) {
     const query =
-      "UPDATE achat_entreprise SET quantite_achetee = ?, montant = ?, banque = ?, cheque = ?, bordereau = ?, date_achat = ? WHERE bon_commande = ?";
+      "UPDATE achat_entreprise SET categorie = ?, quantite_achetee = ?, montant = ?, banque = ?, cheque = ?, bordereau = ?, date_achat = ? WHERE bon_commande = ?";
     const { bon_commande, ...updatedData } = this;
     connection.query(
       query,
       [
+        updatedData.categorie,
         updatedData.quantite_achetee,
         updatedData.montant,
         updatedData.banque,

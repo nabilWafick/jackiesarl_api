@@ -36,7 +36,7 @@ class AchatEntrepriseController {
   // Récupérer un achat entreprise par ID
   static getByBonCommande = (req, res) => {
     const bonCommande = req.params.bon_commande;
-    AchatEntreprise.getById(bonCommande, (error, achatEntreprise) => {
+    AchatEntreprise.getByBonCommande(bonCommande, (error, achatEntreprise) => {
       if (error) {
         return res.status(500).json({
           error: "Erreur lors de la récupération de l'achat entreprise",

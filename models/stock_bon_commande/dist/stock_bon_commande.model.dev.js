@@ -24,19 +24,19 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
-var connection = require('../_db/database');
+var connection = require("../_db/database");
 
 var StockBonCommande =
 /*#__PURE__*/
 function () {
-  function StockBonCommande(id, numero_bc, categorie, quantite_achetee, stock_avant_vente, vente, stock_apres_vente, date_rechargement) {
+  function StockBonCommande(id, numero_bc, categorie, quantite_achetee, stock_initial, stock_avant_vente, vente, stock_apres_vente, date_rechargement) {
     _classCallCheck(this, StockBonCommande);
 
     this.id = id;
     this.numero_bc = numero_bc;
     this.categorie = categorie;
     this.quantite_achetee = quantite_achetee;
-    this.stock_avant_vente = stock_avant_vente;
+    this.stock_initial = stock_initial, this.stock_avant_vente = stock_avant_vente;
     this.vente = vente;
     this.stock_apres_vente = stock_apres_vente;
     this.date_rechargement = date_rechargement;
@@ -45,7 +45,7 @@ function () {
   _createClass(StockBonCommande, [{
     key: "update",
     value: function update(callback) {
-      var query = 'UPDATE stock_bon_commande SET numero_bc = ?, categorie = ?, quantite_achetee = ?, stock_avant_vente = ?, vente = ?, stock_apres_vente = ?, date_rechargement = ? WHERE id = ?';
+      var query = "UPDATE stock_bon_commande SET numero_bc = ?, categorie = ?, quantite_achetee = ?, stock_avant_vente = ?, vente = ?, stock_apres_vente = ?, date_rechargement = ? WHERE id = ?";
 
       var id = this.id,
           updatedData = _objectWithoutProperties(this, ["id"]);
@@ -61,9 +61,9 @@ function () {
   }], [{
     key: "create",
     value: function create(stockData, callback) {
-      var query = 'INSERT INTO stock_bon_commande (id, numero_bc, categorie, quantite_achetee, stock_avant_vente, vente, stock_apres_vente, date_rechargement) VALUES (NULL, ?, ?, ?, ?, ?, ?, ?)';
+      var query = "INSERT INTO stock_bon_commande (id, numero_bc, categorie, quantite_achetee, stock_initial,stock_avant_vente, vente, stock_apres_vente, date_rechargement) VALUES (NULL, ?, ?,?, ?, ?, ?, ?, ?)";
       var currentDate = new Date();
-      connection.query(query, [stockData.numero_bc, stockData.categorie, stockData.quantite_achetee, stockData.stock_avant_vente, stockData.vente, stockData.stock_apres_vente, currentDate], function (error, results) {
+      connection.query(query, [stockData.numero_bc, stockData.categorie, stockData.quantite_achetee, stockData.stock_initial, stockData.stock_avant_vente, stockData.vente, stockData.stock_apres_vente, currentDate], function (error, results) {
         if (error) {
           return callback(error, null);
         }
@@ -76,7 +76,7 @@ function () {
   }, {
     key: "getById",
     value: function getById(id, callback) {
-      var query = 'SELECT * FROM stock_bon_commande WHERE id = ?';
+      var query = "SELECT * FROM stock_bon_commande WHERE id = ?";
       connection.query(query, [id], function (error, results) {
         if (error) {
           return callback(error, null);
@@ -87,21 +87,36 @@ function () {
         }
 
         var stockData = results[0];
-        var stock = new StockBonCommande(stockData.id, stockData.numero_bc, stockData.categorie, stockData.quantite_achetee, stockData.stock_avant_vente, stockData.vente, stockData.stock_apres_vente, stockData.date_rechargement);
+        var stock = new StockBonCommande(stockData.id, stockData.numero_bc, stockData.categorie, stockData.quantite_achetee, stockData.stock_initial, stockData.stock_avant_vente, stockData.vente, stockData.stock_apres_vente, stockData.date_rechargement);
         return callback(null, stock);
+      });
+    }
+  }, {
+    key: "getByBonCommande",
+    value: function getByBonCommande(numero_bc, callback) {
+      var query = "SELECT * FROM stock_bon_commande WHERE numero_bc = ?";
+      connection.query(query, [numero_bc], function (error, results) {
+        if (error) {
+          return callback(error, null);
+        }
+
+        var stocksList = results.map(function (stockData) {
+          return new StockBonCommande(stockData.id, stockData.numero_bc, stockData.categorie, stockData.quantite_achetee, stockData.stock_initial, stockData.stock_avant_vente, stockData.vente, stockData.stock_apres_vente, stockData.date_rechargement);
+        });
+        return callback(null, stocksList);
       });
     }
   }, {
     key: "getAll",
     value: function getAll(callback) {
-      var query = 'SELECT * FROM stock_bon_commande';
+      var query = "SELECT * FROM stock_bon_commande";
       connection.query(query, function (error, results) {
         if (error) {
           return callback(error, null);
         }
 
         var stocksList = results.map(function (stockData) {
-          return new StockBonCommande(stockData.id, stockData.numero_bc, stockData.categorie, stockData.quantite_achetee, stockData.stock_avant_vente, stockData.vente, stockData.stock_apres_vente, stockData.date_rechargement);
+          return new StockBonCommande(stockData.id, stockData.numero_bc, stockData.categorie, stockData.quantite_achetee, stockData.stock_initial, stockData.stock_avant_vente, stockData.vente, stockData.stock_apres_vente, stockData.date_rechargement);
         });
         return callback(null, stocksList);
       });
@@ -109,7 +124,7 @@ function () {
   }, {
     key: "delete",
     value: function _delete(id, callback) {
-      var query = 'DELETE FROM stock_bon_commande WHERE id = ?';
+      var query = "DELETE FROM stock_bon_commande WHERE id = ?";
       connection.query(query, [id], function (error, results) {
         if (error) {
           return callback(error);
