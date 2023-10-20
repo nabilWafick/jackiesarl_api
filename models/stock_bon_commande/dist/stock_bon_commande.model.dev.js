@@ -94,22 +94,25 @@ function () {
   }, {
     key: "getByBonCommande",
     value: function getByBonCommande(numero_bc, callback) {
-      var query = "SELECT * FROM stock_bon_commande WHERE numero_bc = ?";
+      var query = "SELECT numero_bc, categorie, quantite_achetee, SUM(stock_initial) AS stock_initial, SUM(stock_avant_vente) AS stock_avant_vente ,SUM(vente) AS vente, SUM(stock_apres_vente) AS stock_apres_vente  FROM stock_bon_commande WHERE numero_bc = ?";
       connection.query(query, [numero_bc], function (error, results) {
         if (error) {
           return callback(error, null);
         }
 
-        var stocksList = results.map(function (stockData) {
-          return new StockBonCommande(stockData.id, stockData.numero_bc, stockData.categorie, stockData.quantite_achetee, stockData.stock_initial, stockData.stock_avant_vente, stockData.vente, stockData.stock_apres_vente, stockData.date_rechargement);
-        });
-        return callback(null, stocksList);
+        if (results.length === 0) {
+          return callback(null, null); // Stock de bon de commande non trouvé
+        }
+
+        var stockData = results[0];
+        var stock = new StockBonCommande(stockData.id, stockData.numero_bc, stockData.categorie, stockData.quantite_achetee, stockData.stock_initial, stockData.stock_avant_vente, stockData.vente, stockData.stock_apres_vente, stockData.date_rechargement);
+        return callback(null, stock);
       });
     }
   }, {
     key: "getAll",
     value: function getAll(callback) {
-      var query = "SELECT * FROM stock_bon_commande";
+      var query = "SELECT * FROM stock_bon_commande ORDER BY numero_bc";
       connection.query(query, function (error, results) {
         if (error) {
           return callback(error, null);

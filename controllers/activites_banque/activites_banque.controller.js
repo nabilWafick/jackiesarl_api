@@ -1,18 +1,105 @@
 const ActivitesBanque = require("../../models/activites_banque/activites_banque.model");
+const SoldeCourant = require("../../models/solde_courant/solde_courant.model");
 
 class ActivitesBanqueController {
   // Créer une nouvelle activité banque
   static create = (req, res) => {
     const activiteBanqueData = req.body;
-    ActivitesBanque.create(activiteBanqueData, (error, activiteBanque) => {
-      if (error) {
-        return res.status(500).json({
-          status: 500,
-          error: "Erreur lors de la création de l'activité banque",
-        });
+    console.log("Activite Banque", activiteBanqueData);
+
+    SoldeCourant.getById(
+      activiteBanqueData.id_banque,
+      (error, soldeCourant) => {
+        if (error) {
+          return res.status(500).json({
+            status: 500,
+            error: "Erreur lors de la récupération du solde courant",
+          });
+        }
+        if (!soldeCourant) {
+          return res
+            .status(404)
+            .json({ status: 404, error: "La banque n'hesiste pas" });
+        }
+
+        if (activiteBanqueData.credit > soldeCourant.solde_actuel) {
+          return res.status(402).json({
+            status: 402,
+            error: `Le crédit est supérieur au solde actuel. Solde actuel: ${soldeCourant.solde_actuel}`,
+          });
+        } else {
+          if (activiteBanqueData.credit == 0) {
+            soldeCourant.solde_actuel += activiteBanqueData.debit;
+            activiteBanqueData.solde_actuel = soldeCourant.solde_actuel;
+            soldeCourant = new SoldeCourant(
+              soldeCourant.id,
+              soldeCourant.banque,
+              soldeCourant.numero_compte,
+              soldeCourant.solde_actuel,
+              soldeCourant.date_ajout
+            );
+            soldeCourant.update((updateError) => {
+              if (updateError) {
+                return res.status(500).json({
+                  status: 500,
+                  error: "Erreur lors de la mise à jour du solde courant",
+                });
+              }
+              ActivitesBanque.create(
+                activiteBanqueData,
+                (error, activiteBanque) => {
+                  if (error) {
+                    return res.status(500).json({
+                      status: 500,
+                      error: "Erreur lors de la création de l'activité banque",
+                    });
+                  }
+                  return res.status(201).json({ status: 201, activiteBanque });
+                }
+              );
+            });
+          } else if (
+            activiteBanqueData.credit != soldeCourant.solde_actuel &&
+            activiteBanqueData.debit == 0
+          ) {
+            soldeCourant.solde_actuel -= activiteBanqueData.credit;
+            activiteBanqueData.solde_actuel = soldeCourant.solde_actuel;
+            soldeCourant = new SoldeCourant(
+              soldeCourant.id,
+              soldeCourant.banque,
+              soldeCourant.numero_compte,
+              soldeCourant.solde_actuel,
+              soldeCourant.date_ajout
+            );
+            soldeCourant.update((updateError) => {
+              if (updateError) {
+                return res.status(500).json({
+                  status: 500,
+                  error: "Erreur lors de la mise à jour du solde courant",
+                });
+              }
+              ActivitesBanque.create(
+                activiteBanqueData,
+                (error, activiteBanque) => {
+                  if (error) {
+                    return res.status(500).json({
+                      status: 500,
+                      error: "Erreur lors de la création de l'activité banque",
+                    });
+                  }
+                  return res.status(201).json({ status: 201, activiteBanque }); // ligne 92
+                }
+              );
+            });
+          } else {
+            return res.status(402).json({
+              status: 402,
+              error: `Le crédit est égal au solde actuel. Solde actuel: ${soldeCourant.solde_actuel}`,
+            });
+          }
+        }
       }
-      return res.status(201).json({ status: 201, activiteBanque });
-    });
+    );
   };
 
   // Récupérer une activité banque par ID

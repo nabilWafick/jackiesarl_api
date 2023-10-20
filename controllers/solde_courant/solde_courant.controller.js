@@ -6,12 +6,10 @@ class SoldeCourantController {
     const soldeCourantData = req.body;
     SoldeCourant.create(soldeCourantData, (error, soldeCourant) => {
       if (error) {
-        return res
-          .status(500)
-          .json({
-            status: 500,
-            error: "Erreur lors de la création du solde courant",
-          });
+        return res.status(500).json({
+          status: 500,
+          error: "Erreur lors de la création du solde courant",
+        });
       }
       return res.status(201).json({ status: 201, soldeCourant });
     });
@@ -50,12 +48,10 @@ class SoldeCourantController {
     const updatedData = req.body;
     SoldeCourant.getById(id, (getError, existingSoldeCourant) => {
       if (getError) {
-        return res
-          .status(500)
-          .json({
-            status: 500,
-            error: "Erreur lors de la récupération du solde courant",
-          });
+        return res.status(500).json({
+          status: 500,
+          error: "Erreur lors de la récupération du solde courant",
+        });
       }
       if (!existingSoldeCourant) {
         return res
@@ -65,12 +61,10 @@ class SoldeCourantController {
       existingSoldeCourant = { ...existingSoldeCourant, ...updatedData };
       existingSoldeCourant.update((updateError) => {
         if (updateError) {
-          return res
-            .status(500)
-            .json({
-              status: 500,
-              error: "Erreur lors de la mise à jour du solde courant",
-            });
+          return res.status(500).json({
+            status: 500,
+            error: "Erreur lors de la mise à jour du solde courant",
+          });
         }
         return res.status(200).json({ status: 200, existingSoldeCourant });
       });
@@ -82,12 +76,10 @@ class SoldeCourantController {
     const id = req.params.id;
     SoldeCourant.getById(id, (getError, existingSoldeCourant) => {
       if (getError) {
-        return res
-          .status(500)
-          .json({
-            status: 500,
-            error: "Erreur lors de la récupération du solde courant",
-          });
+        return res.status(500).json({
+          status: 500,
+          error: "Erreur lors de la récupération du solde courant",
+        });
       }
       if (!existingSoldeCourant) {
         return res
@@ -96,12 +88,10 @@ class SoldeCourantController {
       }
       existingSoldeCourant.delete((deleteError, id) => {
         if (!id) {
-          return res
-            .status(500)
-            .json({
-              status: 500,
-              error: "Erreur lors de la suppression du solde courant",
-            });
+          return res.status(500).json({
+            status: 500,
+            error: "Erreur lors de la suppression du solde courant",
+          });
         }
         return res.status(204).json({ status: 204, id });
       });

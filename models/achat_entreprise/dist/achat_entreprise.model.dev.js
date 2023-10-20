@@ -101,7 +101,7 @@ function () {
         }
 
         var achatEntrepriseData = results[0];
-        var achatEntreprise = new AchatEntreprise(achatEntrepriseData.bon_commande, achatEntreprise.categorie, achatEntrepriseData.quantite_achetee, achatEntrepriseData.montant, achatEntrepriseData.banque, achatEntrepriseData.cheque, achatEntrepriseData.bordereau, new Date(achatEntrepriseData.date_achat));
+        var achatEntreprise = new AchatEntreprise(achatEntrepriseData.bon_commande, achatEntrepriseData.categorie, achatEntrepriseData.quantite_achetee, achatEntrepriseData.montant, achatEntrepriseData.banque, achatEntrepriseData.cheque, achatEntrepriseData.bordereau, new Date(achatEntrepriseData.date_achat));
         return callback(null, achatEntreprise);
       });
     }

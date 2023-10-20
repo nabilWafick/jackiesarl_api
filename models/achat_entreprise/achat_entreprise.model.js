@@ -62,7 +62,7 @@ class AchatEntreprise {
       const achatEntrepriseData = results[0];
       const achatEntreprise = new AchatEntreprise(
         achatEntrepriseData.bon_commande,
-        achatEntreprise.categorie,
+        achatEntrepriseData.categorie,
         achatEntrepriseData.quantite_achetee,
         achatEntrepriseData.montant,
         achatEntrepriseData.banque,

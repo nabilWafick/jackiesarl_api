@@ -16,6 +16,8 @@ class AchatClientController {
   // Créer un nouvel achat client
   static create = (req, res) => {
     const achatClientDataf = req.body;
+
+    // ============ Final ===============
     const file = req.file;
     console.log("achatClientDataf", achatClientDataf);
     console.log("file", file);

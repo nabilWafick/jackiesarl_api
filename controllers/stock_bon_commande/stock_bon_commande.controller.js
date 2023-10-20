@@ -16,40 +16,38 @@ class StockBonCommandeController {
             error: "Erreur lors de la récupération de l'achat entreprise",
           });
         }
+
         if (!achatEntreprise) {
           return res
             .status(404)
             .json({ status: 404, error: "Le bon de commande n'hexiste pas" });
         }
+
         // return res.status(200).json(achatEntreprise);
 
         // if bon_commande existe dans Achat Entreprise
 
-        // on verifie s'il est parmi Stock Bon Commande
+        // on verifie s'il est dans Stock Bon Commande
         StockBonCommande.getByBonCommande(
           stockBonCommandeData.numero_bc,
-          (error, stockBonCommandes) => {
+          (error, stockBonCommande) => {
             if (error) {
-              return res
-                .status(500)
-                .json({
-                  status: 500,
-                  error:
-                    "Erreur lors de la récupération du stock bon de commande",
-                });
+              return res.status(500).json({
+                status: 500,
+                error:
+                  "Erreur lors de la récupération du stock bon de commande",
+              });
             }
-            if (stockBonCommandes.length == 0) {
+            // le stock bon de commande n'esxiste pas dans la table
+            if (!stockBonCommande) {
               if (
                 stockBonCommandeData.stock_initial >
                 achatEntreprise.quantite_achetee
               ) {
-                return res
-                  .status(402)
-                  .json({
-                    status: 402,
-                    error:
-                      "La quantité demandée est supérieure à celle disponible",
-                  });
+                return res.status(401).json({
+                  status: 401,
+                  error: `La quantité demandée est supérieure à celle disponible.\n ${achatEntreprise.quantite_achetee} t en stock`,
+                });
               }
 
               // =================== Instruction Finale  ===================== //
@@ -78,34 +76,56 @@ class StockBonCommandeController {
                 }
               );
               // ====================== Instruction Finale  ====================== //
+
+              // le stock bon de commande existe dans la table
             } else {
+              if (stockBonCommande.stock_apres_vente > 0) {
+                return res.status(402).json({
+                  status: 402,
+                  error: `Le stock bon de commande n'est pas épuisé.\n
+                  \n ${stockBonCommande.stock_apres_vente} t en stock`,
+                });
+              } else if (
+                stockBonCommandeData.stock_initial >
+                achatEntreprise.quantite_achetee - stockBonCommande.vente
+              ) {
+                return res.status(401).json({
+                  status: 401,
+                  error: `La quantité demandée est supérieure à celle disponible.\n ${
+                    achatEntreprise.quantite_achetee - stockBonCommande.vente
+                  } t en stock`,
+                });
+              }
+
+              // ====================== Instruction Finale  ====================== //
+              stockBonCommandeData.categorie = achatEntreprise.categorie;
+              stockBonCommandeData.quantite_achetee =
+                achatEntreprise.quantite_achetee;
+              (stockBonCommandeData.stock_avant_vente =
+                stockBonCommandeData.stock_initial),
+                (stockBonCommandeData.vente = 0),
+                (stockBonCommandeData.stock_apres_vente =
+                  stockBonCommandeData.stock_initial);
+
+              StockBonCommande.create(
+                stockBonCommandeData,
+                (error, stockBonCommande) => {
+                  if (error) {
+                    return res.status(500).json({
+                      status: 500,
+                      error:
+                        "Erreur lors de la création du stock bon de commande",
+                    });
+                  }
+                  return res
+                    .status(201)
+                    .json({ status: 201, stockBonCommande });
+                }
+              );
+              // ====================== Instruction Finale  ====================== //
             }
           }
         );
-
-        // ====================== Instruction Finale  ====================== //
-        stockBonCommandeData.categorie = achatEntreprise.categorie;
-        stockBonCommandeData.quantite_achetee =
-          achatEntreprise.quantite_achetee;
-        (stockBonCommandeData.stock_avant_vente =
-          stockBonCommandeData.stock_initial),
-          (stockBonCommandeData.vente = 0),
-          (stockBonCommandeData.stock_apres_vente =
-            stockBonCommandeData.stock_initial);
-
-        StockBonCommande.create(
-          stockBonCommandeData,
-          (error, stockBonCommande) => {
-            if (error) {
-              return res.status(500).json({
-                status: 500,
-                error: "Erreur lors de la création du stock bon de commande",
-              });
-            }
-            return res.status(201).json({ status: 201, stockBonCommande });
-          }
-        );
-        // ====================== Instruction Finale  ====================== //
       }
     );
   };

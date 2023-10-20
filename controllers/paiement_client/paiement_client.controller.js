@@ -1,4 +1,5 @@
 const PaiementClient = require("../../models/paiement_client/paiement_client.model");
+const AchatEntreprise = require("../../models/achat_entreprise/achat_entreprise.model");
 const fs = require("fs");
 
 deleteFile = (file) => {
@@ -15,25 +16,43 @@ class PaiementClientController {
   // Créer un nouveau paiement client
   static create = (req, res) => {
     const paiementClientDataf = req.body;
-    const file = req.file;
-    console.log("paiementClientDataf", paiementClientDataf);
-    console.log("file", file);
-    const paiementClientData = {
-      ...paiementClientDataf,
-      bordereau: file ? file.path : "",
-    };
-    console.log("paiementClientData", paiementClientData);
-    PaiementClient.create(paiementClientData, (error, paiementClient) => {
-      if (error) {
-        return res.status(500).json({
-          status: 500,
-          error: "Erreur lors de la création du paiement client",
+
+    AchatEntreprise.getByBonCommande(
+      paiementClientDataf.numero_bc,
+      (error, achatEntreprise) => {
+        if (error) {
+          return res.status(500).json({
+            error: "Erreur lors de la récupération de l'achat entreprise",
+          });
+        }
+        if (!achatEntreprise) {
+          return res
+            .status(404)
+            .json({ status: 404, error: "Achat entreprise non trouvé" });
+        }
+        //  return res.status(200).json(achatEntreprise);
+        const file = req.file;
+        console.log("paiementClientDataf", paiementClientDataf);
+        console.log("file", file);
+        const paiementClientData = {
+          ...paiementClientDataf,
+          categorie: achatEntreprise.categorie,
+          bordereau: file ? file.path : "",
+        };
+        console.log("paiementClientData", paiementClientData);
+        PaiementClient.create(paiementClientData, (error, paiementClient) => {
+          if (error) {
+            return res.status(500).json({
+              status: 500,
+              error: "Erreur lors de la création du paiement client",
+            });
+          }
+          return res
+            .status(201)
+            .json({ status: 201, paiementClient: paiementClient });
         });
       }
-      return res
-        .status(201)
-        .json({ status: 201, paiementClient: paiementClient });
-    });
+    );
   };
 
   // Récupérer un paiement client par ID
@@ -91,46 +110,69 @@ class PaiementClientController {
           .status(404)
           .json({ status: 404, error: "Paiement client non trouvé" });
       }
-      existingPaiementClient = { ...existingPaiementClient, ...updatedData };
 
-      const file = req.file;
-      console.log("existingPaiementClient", existingPaiementClient);
-      console.log("file", file);
-      if (file) {
-        const lastSlip = existingPaiementClient.bordereau;
-        existingPaiementClient = {
-          ...existingPaiementClient,
-          bordereau: file.path,
-        };
-        if (lastSlip != "") {
-          deleteFile(lastSlip);
-        }
-      }
+      AchatEntreprise.getByBonCommande(
+        updatedData.numero_bc,
+        (error, achatEntreprise) => {
+          if (error) {
+            return res.status(500).json({
+              error: "Erreur lors de la récupération de l'achat entreprise",
+            });
+          }
+          if (!achatEntreprise) {
+            return res
+              .status(400)
+              .json({ status: 400, error: "Achat entreprise non trouvé" });
+          }
 
-      existingPaiementClient = new PaiementClient(
-        existingPaiementClient.id,
-        existingPaiementClient.montant,
-        existingPaiementClient.banque,
-        existingPaiementClient.reference,
-        existingPaiementClient.categorie,
-        existingPaiementClient.numero_bc,
-        existingPaiementClient.bordereau,
-        existingPaiementClient.est_valide,
-        existingPaiementClient.id_client,
-        existingPaiementClient.date_paiement
-      );
+          existingPaiementClient = {
+            ...existingPaiementClient,
+            ...updatedData,
+            categorie: achatEntreprise.categorie,
+          };
 
-      existingPaiementClient.update((updateError) => {
-        if (updateError) {
-          return res.status(500).json({
-            status: 500,
-            error: "Erreur lors de la mise à jour du paiement client",
+          const file = req.file;
+          console.log("existingPaiementClient", existingPaiementClient);
+          console.log("file", file);
+          if (file) {
+            const lastSlip = existingPaiementClient.bordereau;
+            existingPaiementClient = {
+              ...existingPaiementClient,
+              bordereau: file.path,
+            };
+            if (lastSlip != "") {
+              deleteFile(lastSlip);
+            }
+          }
+
+          existingPaiementClient = new PaiementClient(
+            existingPaiementClient.id,
+            existingPaiementClient.montant,
+            existingPaiementClient.banque,
+            existingPaiementClient.reference,
+            existingPaiementClient.categorie,
+            existingPaiementClient.numero_bc,
+            existingPaiementClient.bordereau,
+            existingPaiementClient.est_valide,
+            existingPaiementClient.id_client,
+            existingPaiementClient.date_paiement
+          );
+
+          existingPaiementClient.update((updateError) => {
+            if (updateError) {
+              return res.status(500).json({
+                status: 500,
+                error: "Erreur lors de la mise à jour du paiement client",
+              });
+            }
+            return res
+              .status(200)
+              .json({ status: 200, paiementClients: existingPaiementClient });
           });
+
+          // return res.status(200).json(achatEntreprise);
         }
-        return res
-          .status(200)
-          .json({ status: 200, paiementClients: existingPaiementClient });
-      });
+      );
     });
   };
 

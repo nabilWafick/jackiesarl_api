@@ -79,30 +79,35 @@ class StockBonCommande {
   }
 
   static getByBonCommande(numero_bc, callback) {
-    const query = "SELECT * FROM stock_bon_commande WHERE numero_bc = ?";
+    const query =
+      "SELECT numero_bc, categorie, quantite_achetee, SUM(stock_initial) AS stock_initial, SUM(stock_avant_vente) AS stock_avant_vente ,SUM(vente) AS vente, SUM(stock_apres_vente) AS stock_apres_vente  FROM stock_bon_commande WHERE numero_bc = ?";
     connection.query(query, [numero_bc], (error, results) => {
       if (error) {
         return callback(error, null);
       }
-      const stocksList = results.map((stockData) => {
-        return new StockBonCommande(
-          stockData.id,
-          stockData.numero_bc,
-          stockData.categorie,
-          stockData.quantite_achetee,
-          stockData.stock_initial,
-          stockData.stock_avant_vente,
-          stockData.vente,
-          stockData.stock_apres_vente,
-          stockData.date_rechargement
-        );
-      });
-      return callback(null, stocksList);
+      if (results.length === 0) {
+        return callback(null, null); // Stock de bon de commande non trouvé
+      }
+
+      const stockData = results[0];
+
+      const stock = new StockBonCommande(
+        stockData.id,
+        stockData.numero_bc,
+        stockData.categorie,
+        stockData.quantite_achetee,
+        stockData.stock_initial,
+        stockData.stock_avant_vente,
+        stockData.vente,
+        stockData.stock_apres_vente,
+        stockData.date_rechargement
+      );
+      return callback(null, stock);
     });
   }
 
   static getAll(callback) {
-    const query = "SELECT * FROM stock_bon_commande";
+    const query = "SELECT * FROM stock_bon_commande ORDER BY numero_bc";
     connection.query(query, (error, results) => {
       if (error) {
         return callback(error, null);
