@@ -1,19 +1,53 @@
 const ActivitesDepot = require("../../models/activites_depot/activites_depot.model");
+const Brouillard = require("../../models/brouillard/brouillard.model");
 
 class ActivitesDepotController {
   // Créer une nouvelle activité dépôt
   static create = (req, res) => {
     const activiteDepotData = req.body;
-    ActivitesDepot.create(activiteDepotData, (error, activiteDepot) => {
+
+    Brouillard.getById(activiteDepotData.id_depot, (error, brouillard) => {
       if (error) {
         return res
           .status(500)
-          .json({
-            status: 500,
-            error: "Erreur lors de la création de l'activité dépôt",
-          });
+          .json({ error: "Erreur lors de la récupération du brouillard" });
       }
-      return res.status(201).json({ status: 201, activiteDepot });
+      if (!brouillard) {
+        return res.status(404).json({ error: "Dépôt non trouvé" });
+      }
+
+      if (activiteDepotData.vente > brouillard.stock_actuel) {
+        return res
+          .status(402)
+          .json({
+            status: 402,
+            error: `La quantité de vente est supérieure au stock atuel. ${brouillard.stock_actuel} t disponible`,
+          });
+      } else {
+        activiteDepotData.quantite_avant_vente = brouillard.stock_actuel;
+        brouillard.stock_actuel -= activiteDepotData.vente;
+        activiteDepotData.quantite_apres_vente = brouillard.stock_actuel;
+
+        brouillard.update((updateError) => {
+          if (updateError) {
+            return res.status(500).json({
+              status: 500,
+              error: "Erreur lors de la mise à jour du brouillard",
+            });
+          }
+          // return res.status(200).json({ status: 200, existingBrouillard });
+          ActivitesDepot.create(activiteDepotData, (error, activiteDepot) => {
+            if (error) {
+              return res.status(500).json({
+                status: 500,
+                error: "Erreur lors de la création de l'activité dépôt",
+              });
+            }
+            return res.status(201).json({ status: 201, activiteDepot });
+          });
+        });
+      }
+      // return res.status(200).json(brouillard);
     });
   };
 
@@ -62,12 +96,10 @@ class ActivitesDepotController {
     const updatedData = req.body;
     ActivitesDepot.getById(id, (getError, existingActiviteDepot) => {
       if (getError) {
-        return res
-          .status(500)
-          .json({
-            status: 500,
-            error: "Erreur lors de la récupération de l'activité dépôt",
-          });
+        return res.status(500).json({
+          status: 500,
+          error: "Erreur lors de la récupération de l'activité dépôt",
+        });
       }
       if (!existingActiviteDepot) {
         return res
@@ -77,12 +109,10 @@ class ActivitesDepotController {
       existingActiviteDepot = { ...existingActiviteDepot, ...updatedData };
       existingActiviteDepot.update((updateError) => {
         if (updateError) {
-          return res
-            .status(500)
-            .json({
-              status: 500,
-              error: "Erreur lors de la mise à jour de l'activité dépôt",
-            });
+          return res.status(500).json({
+            status: 500,
+            error: "Erreur lors de la mise à jour de l'activité dépôt",
+          });
         }
         return res.status(200).json({ status: 200, existingActiviteDepot });
       });
@@ -94,12 +124,10 @@ class ActivitesDepotController {
     const id = req.params.id;
     ActivitesDepot.getById(id, (getError, existingActiviteDepot) => {
       if (getError) {
-        return res
-          .status(500)
-          .json({
-            status: 500,
-            error: "Erreur lors de la récupération de l'activité dépôt",
-          });
+        return res.status(500).json({
+          status: 500,
+          error: "Erreur lors de la récupération de l'activité dépôt",
+        });
       }
       if (!existingActiviteDepot) {
         return res
@@ -108,12 +136,10 @@ class ActivitesDepotController {
       }
       existingActiviteDepot.delete((deleteError, id) => {
         if (!id) {
-          return res
-            .status(500)
-            .json({
-              status: 500,
-              error: "Erreur lors de la suppression de l'activité dépôt",
-            });
+          return res.status(500).json({
+            status: 500,
+            error: "Erreur lors de la suppression de l'activité dépôt",
+          });
         }
         return res.status(204).json({ status: 204, id });
       });

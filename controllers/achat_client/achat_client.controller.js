@@ -1,5 +1,7 @@
-const { error } = require("console");
 const AchatClient = require("../../models/achat_client/achat_client.model");
+const StockBonCommande = require("../../models/stock_bon_commande/stock_bon_commande.model");
+const Clients = require("../../models/clients/clients.model");
+
 const fs = require("fs");
 
 deleteFile = (file) => {
@@ -15,25 +17,104 @@ deleteFile = (file) => {
 class AchatClientController {
   // Créer un nouvel achat client
   static create = (req, res) => {
-    const achatClientDataf = req.body;
-
-    // ============ Final ===============
-    const file = req.file;
+    let achatClientDataf = req.body;
     console.log("achatClientDataf", achatClientDataf);
-    console.log("file", file);
-    const achatClientData = {
+    console.log(typeof parseFloat(achatClientDataf.quantite_achetee));
+
+    achatClientDataf = {
       ...achatClientDataf,
-      bordereau: file ? file.path : "",
+      quantite_achetee: parseFloat(achatClientDataf.quantite_achetee),
+      montant: parseFloat(achatClientDataf.montant),
+      numero_bc: parseInt(achatClientDataf.numero_bc),
+      id_client: parseInt(achatClientDataf.id_client),
     };
-    console.log("achatClientData", achatClientData);
-    AchatClient.create(achatClientData, (error, achatClient) => {
-      if (error) {
-        return res.status(500).json({
-          status: 500,
-          error: "Erreur lors de la création de l'achat client",
-        });
+
+    console.log("achatClientDataf data parsed", achatClientDataf);
+    console.log(typeof achatClientDataf.quantite_achetee);
+
+    Clients.getById(achatClientDataf.id_client, (getError, existingClient) => {
+      if (getError) {
+        return res
+          .status(500)
+          .json({ error: "Erreur lors de la récupération du client" });
       }
-      return res.status(201).json({ status: 201, achatClient: achatClient });
+      if (!existingClient) {
+        return res
+          .status(401)
+          .json({ status: 401, error: "Client non trouvé" });
+      }
+
+      StockBonCommande.getLastBonCommande(
+        achatClientDataf.numero_bc,
+        (error, lastStockBonCommande) => {
+          if (error) {
+            return res.status(500).json({
+              status: 500,
+              error: "Erreur lors de la récupération du stock bon de commande",
+            });
+          }
+          // le stock bon de commande n'existe pas dans la table
+          if (!lastStockBonCommande) {
+            return res.status(404).json({
+              status: 404,
+              error: "Le stock bon de commande n'existe pas",
+            });
+            // le stock bon de commande existe dans la table
+          } else {
+            if (
+              achatClientDataf.quantite_achetee >
+              lastStockBonCommande.stock_apres_vente
+            ) {
+              return res.status(402).json({
+                status: 402,
+                error: `La quantité demandée est supérieure à celle disponible. ${lastStockBonCommande.stock_apres_vente} t en stock`,
+              });
+            } else {
+              lastStockBonCommande.stock_avant_vente =
+                lastStockBonCommande.stock_apres_vente;
+              lastStockBonCommande.vente += achatClientDataf.quantite_achetee;
+              lastStockBonCommande.stock_apres_vente -=
+                achatClientDataf.quantite_achetee;
+              achatClientDataf.categorie = lastStockBonCommande.categorie;
+
+              l;
+
+              lastStockBonCommande.update((updateError) => {
+                if (updateError) {
+                  return res.status(500).json({
+                    error:
+                      "Erreur lors de la mise à jour du stock bon de commande",
+                  });
+                }
+                //return res.status(200).json(existingStockBonCommande);
+
+                // ============ Final ===============
+                const file = req.file;
+                console.log("achatClientDataf", achatClientDataf);
+                console.log("file", file);
+                const achatClientData = {
+                  ...achatClientDataf,
+                  bordereau: file ? file.path : "",
+                };
+                console.log("achatClientData", achatClientData);
+                AchatClient.create(achatClientData, (error, achatClient) => {
+                  if (error) {
+                    return res.status(500).json({
+                      status: 500,
+                      error: "Erreur lors de la création de l'achat client",
+                    });
+                  }
+                  return res
+                    .status(201)
+                    .json({ status: 201, achatClient: achatClient });
+                });
+
+                // ================ Final ===========
+              });
+            }
+          }
+        }
+      );
     });
   };
 
