@@ -157,11 +157,21 @@ class StockBonCommande {
 
   update(callback) {
     const query =
-      "UPDATE stock_bon_commande SET numero_bc = ?, categorie = ?, quantite_achetee = ?, stock_avant_vente = ?, vente = ?, stock_apres_vente = ?, date_rechargement = ? WHERE id = ?";
+      "UPDATE stock_bon_commande SET numero_bc = ?, categorie = ?, quantite_achetee = ?, stock_initial = ?,stock_avant_vente = ?, vente = ?, stock_apres_vente = ?, date_rechargement = ? WHERE id = ?";
     const { id, ...updatedData } = this;
     connection.query(
       query,
-      [...Object.values(updatedData), id],
+      [
+        updatedData.numero_bc,
+        updatedData.categorie,
+        updatedData.quantite_achetee,
+        updatedData.stock_initial,
+        updatedData.stock_avant_vente,
+        updatedData.vente,
+        updatedData.stock_apres_vente,
+        new Date(updatedData.date_rechargement),
+        id,
+      ],
       (error, results) => {
         if (error) {
           return callback(error);

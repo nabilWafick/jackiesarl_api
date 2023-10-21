@@ -66,12 +66,10 @@ class DepensesController {
     const updatedData = req.body;
     Depenses.getById(id, (getError, existingDepense) => {
       if (getError) {
-        return res
-          .status(500)
-          .json({
-            status: 500,
-            error: "Erreur lors de la récupération de la dépense",
-          });
+        return res.status(500).json({
+          status: 500,
+          error: "Erreur lors de la récupération de la dépense",
+        });
       }
       if (!existingDepense) {
         return res
@@ -100,12 +98,10 @@ class DepensesController {
       );
       existingDepense.update((updateError) => {
         if (updateError) {
-          return res
-            .status(500)
-            .json({
-              status: 500,
-              error: "Erreur lors de la mise à jour de la dépense",
-            });
+          return res.status(500).json({
+            status: 500,
+            error: "Erreur lors de la mise à jour de la dépense",
+          });
         }
         return res.status(200).json({ status: 200, existingDepense });
       });
@@ -134,7 +130,10 @@ class DepensesController {
             error: "Erreur lors de la suppression de la dépense",
           });
         }
-        deleteFile(existingDepense.piece);
+        if (existingDepense.piece != "") {
+          deleteFile(existingDepense.piece);
+        }
+
         return res.status(204).json({ status: 204, id });
       });
     });

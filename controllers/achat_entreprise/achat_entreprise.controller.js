@@ -147,7 +147,8 @@ class AchatEntrepriseController {
               error: "Erreur lors de la suppression de l'achat entreprise",
             });
           }
-          deleteFile(existingAchatEntreprise.bordereau);
+          if (existingAchatEntreprise.bordereau != "")
+            deleteFile(existingAchatEntreprise.bordereau);
           return res.status(204).json({ status: 204, bon_commande });
         });
       }

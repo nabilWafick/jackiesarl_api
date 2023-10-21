@@ -199,7 +199,8 @@ class PaiementClientController {
             error: "Erreur lors de la suppression du paiement client",
           });
         }
-        deleteFile(existingPaiementClient.bordereau);
+        if (existingPaiementClient.bordereau != "")
+          deleteFile(existingPaiementClient.bordereau);
         return res.status(204).json({ status: 204, id: id });
       });
     });
