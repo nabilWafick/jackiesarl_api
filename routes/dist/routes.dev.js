@@ -20,6 +20,8 @@ var brouillardRoutes = require("./brouillard/brouillard.routes");
 
 var clientsRoutes = require("./clients/clients.routes");
 
+var clientsTonnagesRoutes = require("./clients_tonnages/clients_tonnages.routes");
+
 var commandesRoutes = require("./commandes/commandes.routes");
 
 var creancesRoutes = require("./creances/creances.routes");
@@ -52,6 +54,7 @@ router.use("/", autorisationsRoutes);
 router.use("/", avanceRoutes);
 router.use("/", brouillardRoutes);
 router.use("/", clientsRoutes);
+router.use("/", clientsTonnagesRoutes);
 router.use("/", commandesRoutes);
 router.use("/", creancesRoutes);
 router.use("/", depensesRoutes);

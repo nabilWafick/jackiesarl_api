@@ -72,6 +72,7 @@ class Clients {
     });
   }
 
+  /*
   static getAllMatched(name, callback) {
     const query = `SELECT * FROM clients WHERE nom LIKE '%${name}' or nom LIKE '${name}%' or nom LIKE '%${name}%' or prenoms LIKE '%${name}' or prenoms LIKE '${name}%' or prenoms LIKE '%${name}%'`;
     connection.query(query, (error, results) => {
@@ -92,6 +93,35 @@ class Clients {
       });
       return callback(null, clients);
     });
+  }
+  */
+  static getAllMatched(name, callback) {
+    const query =
+      "SELECT * FROM clients WHERE nom LIKE ? OR nom LIKE ? OR nom LIKE ? OR prenoms LIKE ? OR prenoms LIKE ? OR prenoms LIKE ?";
+    const searchTerm = `%${name}%`;
+
+    connection.query(
+      query,
+      [searchTerm, `%${name}`, `${name}%`, searchTerm, `%${name}`, `${name}%`],
+      (error, results) => {
+        if (error) {
+          return callback(error, null);
+        }
+
+        const clients = results.map((clientData) => {
+          return new Clients(
+            clientData.id,
+            clientData.nom,
+            clientData.prenoms,
+            clientData.numero_ifu,
+            clientData.numero_telephone,
+            clientData.email,
+            clientData.date_ajout
+          );
+        });
+        return callback(null, clients);
+      }
+    );
   }
 
   // Méthode pour récupérer toutes les entrées de la table clients

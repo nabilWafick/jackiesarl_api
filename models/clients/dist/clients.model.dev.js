@@ -104,11 +104,35 @@ function () {
         return callback(null, client);
       });
     }
+    /*
+    static getAllMatched(name, callback) {
+      const query = `SELECT * FROM clients WHERE nom LIKE '%${name}' or nom LIKE '${name}%' or nom LIKE '%${name}%' or prenoms LIKE '%${name}' or prenoms LIKE '${name}%' or prenoms LIKE '%${name}%'`;
+      connection.query(query, (error, results) => {
+        if (error) {
+          return callback(error, null);
+        }
+         const clients = results.map((clientData) => {
+          return new Clients(
+            clientData.id,
+            clientData.nom,
+            clientData.prenoms,
+            clientData.numero_ifu,
+            clientData.numero_telephone,
+            clientData.email,
+            clientData.date_ajout
+          );
+        });
+        return callback(null, clients);
+      });
+    }
+    */
+
   }, {
     key: "getAllMatched",
     value: function getAllMatched(name, callback) {
-      var query = "SELECT * FROM clients WHERE nom LIKE '%".concat(name, "' or nom LIKE '").concat(name, "%' or nom LIKE '%").concat(name, "%' or prenoms LIKE '%").concat(name, "' or prenoms LIKE '").concat(name, "%' or prenoms LIKE '%").concat(name, "%'");
-      connection.query(query, function (error, results) {
+      var query = "SELECT * FROM clients WHERE nom LIKE ? OR nom LIKE ? OR nom LIKE ? OR prenoms LIKE ? OR prenoms LIKE ? OR prenoms LIKE ?";
+      var searchTerm = "%".concat(name, "%");
+      connection.query(query, [searchTerm, "%".concat(name), "".concat(name, "%"), searchTerm, "%".concat(name), "".concat(name, "%")], function (error, results) {
         if (error) {
           return callback(error, null);
         }
