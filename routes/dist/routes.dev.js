@@ -38,6 +38,8 @@ var rapportsRoutes = require("./rapports/rapports.routes");
 
 var remiseChequeClientRoutes = require("./remise_cheque_client/remise_cheque_client.routes");
 
+var soldeClientRoutes = require("./solde_client/solde_client.routes");
+
 var soldeCourantRoutes = require("./solde_courant/solde_courant.routes");
 
 var stockBonCommandeRoutes = require("./stock_bon_commande/stock_bon_commande.routes");
@@ -63,6 +65,7 @@ router.use("/", modificationsRoutes);
 router.use("/", paiementClientRoutes);
 router.use("/", rapportsRoutes);
 router.use("/", remiseChequeClientRoutes);
+router.use("/", soldeClientRoutes);
 router.use("/", soldeCourantRoutes);
 router.use("/", stockBonCommandeRoutes);
 router.use("/", stockCamionRoutes);

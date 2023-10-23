@@ -13,12 +13,16 @@ deleteFile = (file) => {
 class AchatEntrepriseController {
   // Créer un nouvel achat entreprise
   static create = (req, res) => {
-    const achatEntrepriseDataf = req.body;
+    let achatEntrepriseDataf = req.body;
     const file = req.file;
     console.log("achatEntrepriseDataf", achatEntrepriseDataf);
     console.log("file", file);
-    const achatEntrepriseData = {
+    let achatEntrepriseData = {
       ...achatEntrepriseDataf,
+      bon_commande: parseFloat(achatEntrepriseDataf.bon_commande),
+      quantite_achetee: parseFloat(achatEntrepriseDataf.quantite_achetee),
+      montant: parseFloat(achatEntrepriseDataf.montant),
+      cheque: parseFloat(achatEntrepriseDataf.cheque),
       bordereau: file ? file.path : "",
     };
     console.log("achatEntrepriseData", achatEntrepriseData);
@@ -83,6 +87,10 @@ class AchatEntrepriseController {
         existingAchatEntreprise = {
           ...existingAchatEntreprise,
           ...updatedData,
+          bon_commande: parseFloat(updatedData.bon_commande),
+          quantite_achetee: parseFloat(updatedData.quantite_achetee),
+          montant: parseFloat(updatedData.montant),
+          cheque: parseFloat(updatedData.cheque),
         };
 
         const file = req.file;
