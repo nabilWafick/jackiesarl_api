@@ -17,12 +17,10 @@ class ActivitesDepotController {
       }
 
       if (activiteDepotData.vente > brouillard.stock_actuel) {
-        return res
-          .status(402)
-          .json({
-            status: 402,
-            error: `La quantité de vente est supérieure au stock atuel. ${brouillard.stock_actuel} t disponible`,
-          });
+        return res.status(402).json({
+          status: 402,
+          error: `La quantité de vente est supérieure au stock atuel. ${brouillard.stock_actuel} t disponible`,
+        });
       } else {
         activiteDepotData.quantite_avant_vente = brouillard.stock_actuel;
         brouillard.stock_actuel -= activiteDepotData.vente;
@@ -107,6 +105,17 @@ class ActivitesDepotController {
           .json({ status: 404, error: "Activité dépôt non trouvée" });
       }
       existingActiviteDepot = { ...existingActiviteDepot, ...updatedData };
+      existingActiviteDepot = new ActivitesDepot(
+        existingActiviteDepot.id,
+        existingActiviteDepot.id_depot,
+        existingActiviteDepot.quantite_avant_vente,
+        existingActiviteDepot.vente,
+        existingActiviteDepot.quantite_apres_vente,
+        existingActiviteDepot.versement,
+        existingActiviteDepot.depense,
+        existingActiviteDepot.observation,
+        existingActiviteDepot.date_remplissage
+      );
       existingActiviteDepot.update((updateError) => {
         if (updateError) {
           return res.status(500).json({

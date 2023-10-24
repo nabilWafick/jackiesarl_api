@@ -1,8 +1,9 @@
 const connection = require("../_db/database");
-
+const Clients = require("../clients/clients.model");
 class PaiementClient {
   constructor(
     id,
+    client,
     montant,
     banque,
     reference,
@@ -14,6 +15,7 @@ class PaiementClient {
     date_paiement
   ) {
     this.id = id;
+    this.client = client;
     this.montant = montant;
     this.banque = banque;
     this.reference = reference;
@@ -48,6 +50,7 @@ class PaiementClient {
         }
         const newPaiement = new PaiementClient(
           results.insertId,
+          undefined,
           ...Object.values(paiementData),
           currentDate
         );
@@ -68,6 +71,7 @@ class PaiementClient {
       const paiementData = results[0];
       const paiement = new PaiementClient(
         paiementData.id,
+        undefined,
         paiementData.montant,
         paiementData.banque,
         paiementData.reference,
@@ -83,7 +87,29 @@ class PaiementClient {
   }
 
   static getAll(callback) {
-    const query = "SELECT * FROM paiement_client";
+    const query = `SELECT
+    clients.id AS id_client,
+    clients.nom,
+    clients.prenoms,
+    clients.numero_ifu,
+    clients.numero_telephone,
+    clients.email,
+    clients.date_ajout AS date_ajout_client,
+    paiement_client.id AS id,
+    paiement_client.montant AS montant,
+    paiement_client.banque,
+    paiement_client.reference,
+    paiement_client.categorie,
+    paiement_client.numero_bc,
+    paiement_client.bordereau,
+    paiement_client.est_valide,
+    paiement_client.id_client AS id_client,
+    paiement_client.date_paiement
+FROM
+    clients, paiement_client 
+WHERE
+clients.id = paiement_client.id_client;
+`;
     connection.query(query, (error, results) => {
       if (error) {
         return callback(error, null);
@@ -91,6 +117,15 @@ class PaiementClient {
       const paiementsList = results.map((paiementData) => {
         return new PaiementClient(
           paiementData.id,
+          new Clients(
+            paiementData.id_client,
+            paiementData.nom,
+            paiementData.prenoms,
+            paiementData.numero_ifu,
+            paiementData.numero_telephone,
+            paiementData.email,
+            paiementData.date_ajout
+          ),
           paiementData.montant,
           paiementData.banque,
           paiementData.reference,
@@ -116,6 +151,7 @@ class PaiementClient {
         // console.log(typeof PaiementClientData.quantite_achetee);
         return new PaiementClient(
           paiementData.id,
+          undefined,
           paiementData.montant,
           paiementData.banque,
           paiementData.reference,
@@ -137,7 +173,18 @@ class PaiementClient {
     const { id, ...updatedData } = this;
     connection.query(
       query,
-      [...Object.values(updatedData), id],
+      [
+        updatedData.montant,
+        updatedData.banque,
+        updatedData.reference,
+        updatedData.categorie,
+        updatedData.numero_bc,
+        updatedData.bordereau,
+        updatedData.est_valide,
+        updatedData.id_client,
+        updatedData.date_paiement,
+        id,
+      ],
       (error, results) => {
         if (error) {
           return callback(error);

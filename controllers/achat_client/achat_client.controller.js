@@ -226,9 +226,9 @@ class AchatClientController {
                 updatedData.quantite_achetee >=
               0
             ) {
-              //   usedStockBonCommande.stock_avant_vente +=
-              //   existingAchatClient.quantite_achetee -
-              //    updatedData.quantite_achetee;
+              usedStockBonCommande.stock_avant_vente +=
+                existingAchatClient.quantite_achetee -
+                updatedData.quantite_achetee;
               usedStockBonCommande.vente +=
                 -existingAchatClient.quantite_achetee +
                 updatedData.quantite_achetee;
@@ -280,6 +280,7 @@ class AchatClientController {
                 }
                 existingAchatClient = new AchatClient(
                   existingAchatClient.id,
+                  undefined,
                   existingAchatClient.quantite_achetee,
                   existingAchatClient.categorie,
                   existingAchatClient.montant,
@@ -358,8 +359,8 @@ class AchatClientController {
                     });
                   }
 
-                  //     oldStockBonCommande.stock_avant_vente +=
-                  //       existingAchatClient.quantite_achetee;
+                  oldStockBonCommande.stock_avant_vente +=
+                    existingAchatClient.quantite_achetee;
                   oldStockBonCommande.vente -=
                     existingAchatClient.quantite_achetee;
                   oldStockBonCommande.stock_apres_vente +=
@@ -438,6 +439,7 @@ class AchatClientController {
                       }
                       existingAchatClient = new AchatClient(
                         existingAchatClient.id,
+                        undefined,
                         existingAchatClient.quantite_achetee,
                         existingAchatClient.categorie,
                         existingAchatClient.montant,

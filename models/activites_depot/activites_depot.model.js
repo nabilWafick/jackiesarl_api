@@ -77,6 +77,32 @@ class ActivitesDepot {
     });
   }
 
+  static getLastActiviteDepot(id_depot, callback) {
+    const query =
+      "SELECT * FROM activites_depot WHERE id_depot = ? ORDER BY id DESC LIMIT 1 ";
+    connection.query(query, [id_depot], (error, results) => {
+      if (error) {
+        return callback(error, null);
+      }
+      if (results.length === 0) {
+        return callback(null, null); // Activité dépôt non trouvée
+      }
+      const activitesDepotData = results[0];
+      const activitesDepot = new ActivitesDepot(
+        activitesDepotData.id,
+        activitesDepotData.id_depot,
+        activitesDepotData.quantite_avant_vente,
+        activitesDepotData.vente,
+        activitesDepotData.quantite_apres_vente,
+        activitesDepotData.versement,
+        activitesDepotData.depense,
+        activitesDepotData.observation,
+        new Date(activitesDepotData.date_remplissage)
+      );
+      return callback(null, activitesDepot);
+    });
+  }
+
   static getAll(callback) {
     const query = "SELECT * FROM activites_depot";
     connection.query(query, (error, results) => {

@@ -1,8 +1,10 @@
 const connection = require("../_db/database");
 
+const Clients = require("../clients/clients.model");
 class Commandes {
   constructor(
     id,
+    client,
     categorie,
     quantite_achetee,
     destination,
@@ -13,6 +15,7 @@ class Commandes {
     date_ajout
   ) {
     this.id = id;
+    this.client = client;
     this.categorie = categorie;
     this.quantite_achetee = quantite_achetee;
     this.destination = destination;
@@ -45,8 +48,9 @@ class Commandes {
         }
         const newCommande = new Commandes(
           results.insertId,
-          ...Object.values(commandeData),
-          currentDate
+          undefined,
+          ...Object.values(commandeData)
+          //currentDate
         );
         return callback(null, newCommande);
       }
@@ -65,6 +69,7 @@ class Commandes {
       const commandeData = results[0];
       const commande = new Commandes(
         commandeData.id,
+        undefined,
         commandeData.categorie,
         commandeData.quantite_achetee,
         commandeData.destination,
@@ -79,14 +84,43 @@ class Commandes {
   }
 
   static getAll(callback) {
-    const query = "SELECT * FROM commandes";
+    const query = `SELECT
+    clients.id AS id_client,
+    clients.nom,
+    clients.prenoms,
+    clients.numero_ifu,
+    clients.numero_telephone,
+    clients.email,
+    clients.date_ajout AS date_ajout_client,
+    commandes.id AS id_commande,
+    commandes.categorie,
+    commandes.quantite_achetee,
+    commandes.destination,
+    commandes.date_commande,
+    commandes.date_livraison,
+    commandes.est_traitee,
+    commandes.id_client,
+    commandes.date_ajout
+FROM
+    clients, commandes 
+WHERE
+    clients.id = commandes.id_client;`;
     connection.query(query, (error, results) => {
       if (error) {
         return callback(error, null);
       }
       const commandes = results.map((commandeData) => {
         return new Commandes(
-          commandeData.id,
+          commandeData.id_commande,
+          new Clients(
+            commandeData.id_client,
+            commandeData.nom,
+            commandeData.prenoms,
+            commandeData.numero_ifu,
+            commandeData.numero_telephone,
+            commandeData.email,
+            commandeData.date_ajout_client
+          ),
           commandeData.categorie,
           commandeData.quantite_achetee,
           commandeData.destination,

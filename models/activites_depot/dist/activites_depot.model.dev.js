@@ -107,6 +107,24 @@ function () {
       });
     }
   }, {
+    key: "getLastActiviteDepot",
+    value: function getLastActiviteDepot(id_depot, callback) {
+      var query = "SELECT * FROM activites_depot WHERE id_depot = ? ORDER BY id DESC LIMIT 1 ";
+      connection.query(query, [id_depot], function (error, results) {
+        if (error) {
+          return callback(error, null);
+        }
+
+        if (results.length === 0) {
+          return callback(null, null); // Activité dépôt non trouvée
+        }
+
+        var activitesDepotData = results[0];
+        var activitesDepot = new ActivitesDepot(activitesDepotData.id, activitesDepotData.id_depot, activitesDepotData.quantite_avant_vente, activitesDepotData.vente, activitesDepotData.quantite_apres_vente, activitesDepotData.versement, activitesDepotData.depense, activitesDepotData.observation, new Date(activitesDepotData.date_remplissage));
+        return callback(null, activitesDepot);
+      });
+    }
+  }, {
     key: "getAll",
     value: function getAll(callback) {
       var query = "SELECT * FROM activites_depot";

@@ -26,13 +26,16 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 var connection = require("../_db/database");
 
+var Clients = require("../clients/clients.model");
+
 var Commandes =
 /*#__PURE__*/
 function () {
-  function Commandes(id, categorie, quantite_achetee, destination, date_commande, date_livraison, est_traitee, id_client, date_ajout) {
+  function Commandes(id, client, categorie, quantite_achetee, destination, date_commande, date_livraison, est_traitee, id_client, date_ajout) {
     _classCallCheck(this, Commandes);
 
     this.id = id;
+    this.client = client;
     this.categorie = categorie;
     this.quantite_achetee = quantite_achetee;
     this.destination = destination;
@@ -83,7 +86,7 @@ function () {
           return callback(error, null);
         }
 
-        var newCommande = _construct(Commandes, [results.insertId].concat(_toConsumableArray(Object.values(commandeData)), [currentDate]));
+        var newCommande = _construct(Commandes, [results.insertId, undefined].concat(_toConsumableArray(Object.values(commandeData))));
 
         return callback(null, newCommande);
       });
@@ -102,21 +105,21 @@ function () {
         }
 
         var commandeData = results[0];
-        var commande = new Commandes(commandeData.id, commandeData.categorie, commandeData.quantite_achetee, commandeData.destination, commandeData.date_commande, commandeData.date_livraison, commandeData.est_traitee, commandeData.id_client, commandeData.date_ajout);
+        var commande = new Commandes(commandeData.id, undefined, commandeData.categorie, commandeData.quantite_achetee, commandeData.destination, commandeData.date_commande, commandeData.date_livraison, commandeData.est_traitee, commandeData.id_client, commandeData.date_ajout);
         return callback(null, commande);
       });
     }
   }, {
     key: "getAll",
     value: function getAll(callback) {
-      var query = "SELECT * FROM commandes";
+      var query = "SELECT\n    clients.id AS id_client,\n    clients.nom,\n    clients.prenoms,\n    clients.numero_ifu,\n    clients.numero_telephone,\n    clients.email,\n    clients.date_ajout AS date_ajout_client,\n    commandes.id AS id_commande,\n    commandes.categorie,\n    commandes.quantite_achetee,\n    commandes.destination,\n    commandes.date_commande,\n    commandes.date_livraison,\n    commandes.est_traitee,\n    commandes.id_client,\n    commandes.date_ajout\nFROM\n    clients, commandes \nWHERE\n    clients.id = commandes.id_client;";
       connection.query(query, function (error, results) {
         if (error) {
           return callback(error, null);
         }
 
         var commandes = results.map(function (commandeData) {
-          return new Commandes(commandeData.id, commandeData.categorie, commandeData.quantite_achetee, commandeData.destination, commandeData.date_commande, commandeData.date_livraison, commandeData.est_traitee, commandeData.id_client, commandeData.date_ajout);
+          return new Commandes(commandeData.id_commande, new Clients(commandeData.id_client, commandeData.nom, commandeData.prenoms, commandeData.numero_ifu, commandeData.numero_telephone, commandeData.email, commandeData.date_ajout_client), commandeData.categorie, commandeData.quantite_achetee, commandeData.destination, commandeData.date_commande, commandeData.date_livraison, commandeData.est_traitee, commandeData.id_client, commandeData.date_ajout);
         });
         return callback(null, commandes);
       });

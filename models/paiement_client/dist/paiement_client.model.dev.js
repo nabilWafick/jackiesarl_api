@@ -26,13 +26,16 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 var connection = require("../_db/database");
 
+var Clients = require("../clients/clients.model");
+
 var PaiementClient =
 /*#__PURE__*/
 function () {
-  function PaiementClient(id, montant, banque, reference, categorie, numero_bc, bordereau, est_valide, id_client, date_paiement) {
+  function PaiementClient(id, client, montant, banque, reference, categorie, numero_bc, bordereau, est_valide, id_client, date_paiement) {
     _classCallCheck(this, PaiementClient);
 
     this.id = id;
+    this.client = client;
     this.montant = montant;
     this.banque = banque;
     this.reference = reference;
@@ -52,7 +55,7 @@ function () {
       var id = this.id,
           updatedData = _objectWithoutProperties(this, ["id"]);
 
-      connection.query(query, [].concat(_toConsumableArray(Object.values(updatedData)), [id]), function (error, results) {
+      connection.query(query, [updatedData.montant, updatedData.banque, updatedData.reference, updatedData.categorie, updatedData.numero_bc, updatedData.bordereau, updatedData.est_valide, updatedData.id_client, updatedData.date_paiement, id], function (error, results) {
         if (error) {
           return callback(error);
         }
@@ -84,7 +87,7 @@ function () {
           return callback(error, null);
         }
 
-        var newPaiement = _construct(PaiementClient, [results.insertId].concat(_toConsumableArray(Object.values(paiementData)), [currentDate]));
+        var newPaiement = _construct(PaiementClient, [results.insertId, undefined].concat(_toConsumableArray(Object.values(paiementData)), [currentDate]));
 
         return callback(null, newPaiement);
       });
@@ -103,21 +106,21 @@ function () {
         }
 
         var paiementData = results[0];
-        var paiement = new PaiementClient(paiementData.id, paiementData.montant, paiementData.banque, paiementData.reference, paiementData.categorie, paiementData.numero_bc, paiementData.bordereau, paiementData.est_valide, paiementData.id_client, paiementData.date_paiement);
+        var paiement = new PaiementClient(paiementData.id, undefined, paiementData.montant, paiementData.banque, paiementData.reference, paiementData.categorie, paiementData.numero_bc, paiementData.bordereau, paiementData.est_valide, paiementData.id_client, paiementData.date_paiement);
         return callback(null, paiement);
       });
     }
   }, {
     key: "getAll",
     value: function getAll(callback) {
-      var query = "SELECT * FROM paiement_client";
+      var query = "SELECT\n    clients.id AS id_client,\n    clients.nom,\n    clients.prenoms,\n    clients.numero_ifu,\n    clients.numero_telephone,\n    clients.email,\n    clients.date_ajout AS date_ajout_client,\n    paiement_client.id AS id,\n    paiement_client.montant AS montant,\n    paiement_client.banque,\n    paiement_client.reference,\n    paiement_client.categorie,\n    paiement_client.numero_bc,\n    paiement_client.bordereau,\n    paiement_client.est_valide,\n    paiement_client.id_client AS id_client,\n    paiement_client.date_paiement\nFROM\n    clients, paiement_client \nWHERE\nclients.id = paiement_client.id_client;\n";
       connection.query(query, function (error, results) {
         if (error) {
           return callback(error, null);
         }
 
         var paiementsList = results.map(function (paiementData) {
-          return new PaiementClient(paiementData.id, paiementData.montant, paiementData.banque, paiementData.reference, paiementData.categorie, paiementData.numero_bc, paiementData.bordereau, paiementData.est_valide, paiementData.id_client, paiementData.date_paiement);
+          return new PaiementClient(paiementData.id, new Clients(paiementData.id_client, paiementData.nom, paiementData.prenoms, paiementData.numero_ifu, paiementData.numero_telephone, paiementData.email, paiementData.date_ajout), paiementData.montant, paiementData.banque, paiementData.reference, paiementData.categorie, paiementData.numero_bc, paiementData.bordereau, paiementData.est_valide, paiementData.id_client, paiementData.date_paiement);
         });
         return callback(null, paiementsList);
       });
@@ -133,7 +136,7 @@ function () {
 
         var paiementsList = results.map(function (paiementData) {
           // console.log(typeof PaiementClientData.quantite_achetee);
-          return new PaiementClient(paiementData.id, paiementData.montant, paiementData.banque, paiementData.reference, paiementData.categorie, paiementData.numero_bc, paiementData.bordereau, paiementData.est_valide, paiementData.id_client, paiementData.date_paiement);
+          return new PaiementClient(paiementData.id, undefined, paiementData.montant, paiementData.banque, paiementData.reference, paiementData.categorie, paiementData.numero_bc, paiementData.bordereau, paiementData.est_valide, paiementData.id_client, paiementData.date_paiement);
         });
         return callback(null, paiementsList);
       });

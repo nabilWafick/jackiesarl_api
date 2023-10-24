@@ -26,13 +26,16 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 var connection = require("../_db/database");
 
+var Clients = require("../clients/clients.model");
+
 var AchatClient =
 /*#__PURE__*/
 function () {
-  function AchatClient(id, quantite_achetee, categorie, montant, numero_ctp, bordereau, numero_bc, id_client, date_achat) {
+  function AchatClient(id, client, quantite_achetee, categorie, montant, numero_ctp, bordereau, numero_bc, id_client, date_achat) {
     _classCallCheck(this, AchatClient);
 
     this.id = id;
+    this.client = client;
     this.quantite_achetee = quantite_achetee;
     this.categorie = categorie;
     this.montant = montant;
@@ -102,21 +105,21 @@ function () {
         }
 
         var achatClientData = results[0];
-        var achatClient = new AchatClient(achatClientData.id, achatClientData.quantite_achetee, achatClientData.categorie, achatClientData.montant, achatClientData.numero_ctp, achatClientData.bordereau, achatClientData.numero_bc, achatClientData.id_client, new Date(achatClientData.date_achat));
+        var achatClient = new AchatClient(achatClientData.id, undefined, achatClientData.quantite_achetee, achatClientData.categorie, achatClientData.montant, achatClientData.numero_ctp, achatClientData.bordereau, achatClientData.numero_bc, achatClientData.id_client, new Date(achatClientData.date_achat));
         return callback(null, achatClient);
       });
     }
   }, {
     key: "getAll",
     value: function getAll(callback) {
-      var query = "SELECT * FROM achat_client";
+      var query = "SELECT\n    clients.id AS client_id,\n    clients.nom AS nom,\n    clients.prenoms AS prenoms,\n    clients.numero_ifu AS numero_ifu,\n    clients.numero_telephone AS numero_telephone,\n    clients.email AS email,\n    clients.date_ajout AS date_ajout,\n    achat_client.id AS achat_id,\n    achat_client.quantite_achetee,\n    achat_client.categorie AS categorie,\n    achat_client.montant AS montant,\n    achat_client.numero_ctp AS numero_ctp,\n    achat_client.bordereau AS bordereau,\n    achat_client.numero_bc AS numero_bc,\n    achat_client.date_achat AS date_achat\nFROM\n    clients\n, achat_client \nWHERE\nclients.id = achat_client.id_client;";
       connection.query(query, function (error, results) {
         if (error) {
           return callback(error, null);
         }
 
         var achatsClients = results.map(function (achatClientData) {
-          return new AchatClient(achatClientData.id, achatClientData.quantite_achetee, achatClientData.categorie, achatClientData.montant, achatClientData.numero_ctp, achatClientData.bordereau, achatClientData.numero_bc, achatClientData.id_client, new Date(achatClientData.date_achat));
+          return new AchatClient(achatClientData.achat_id, new Clients(achatClientData.client_id, achatClientData.nom, achatClientData.prenoms, achatClientData.numero_ifu, achatClientData.numero_telephone, achatClientData.email, achatClientData.date_ajout), achatClientData.quantite_achetee, achatClientData.categorie, achatClientData.montant, achatClientData.numero_ctp, achatClientData.bordereau, achatClientData.numero_bc, achatClientData.id_client, new Date(achatClientData.date_achat));
         });
         return callback(null, achatsClients);
       });
@@ -132,7 +135,7 @@ function () {
 
         var achatsClients = results.map(function (achatClientData) {
           // console.log(typeof achatClientData.quantite_achetee);
-          return new AchatClient(achatClientData.id, achatClientData.quantite_achetee, achatClientData.categorie, achatClientData.montant, achatClientData.numero_ctp, achatClientData.bordereau, achatClientData.numero_bc, achatClientData.id_client, new Date(achatClientData.date_achat));
+          return new AchatClient(achatClientData.id, undefined, achatClientData.quantite_achetee, achatClientData.categorie, achatClientData.montant, achatClientData.numero_ctp, achatClientData.bordereau, achatClientData.numero_bc, achatClientData.client_id, new Date(achatClientData.date_achat));
         });
         return callback(null, achatsClients);
       });

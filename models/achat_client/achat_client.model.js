@@ -1,8 +1,10 @@
 const connection = require("../_db/database");
+const Clients = require("../clients/clients.model");
 
 class AchatClient {
   constructor(
     id,
+    client,
     quantite_achetee,
     categorie,
     montant,
@@ -13,6 +15,7 @@ class AchatClient {
     date_achat
   ) {
     this.id = id;
+    this.client = client;
     this.quantite_achetee = quantite_achetee;
     this.categorie = categorie;
     this.montant = montant;
@@ -65,6 +68,7 @@ class AchatClient {
       const achatClientData = results[0];
       const achatClient = new AchatClient(
         achatClientData.id,
+        undefined,
         achatClientData.quantite_achetee,
         achatClientData.categorie,
         achatClientData.montant,
@@ -79,14 +83,43 @@ class AchatClient {
   }
 
   static getAll(callback) {
-    const query = "SELECT * FROM achat_client";
+    const query = `SELECT
+    clients.id AS client_id,
+    clients.nom AS nom,
+    clients.prenoms AS prenoms,
+    clients.numero_ifu AS numero_ifu,
+    clients.numero_telephone AS numero_telephone,
+    clients.email AS email,
+    clients.date_ajout AS date_ajout,
+    achat_client.id AS achat_id,
+    achat_client.quantite_achetee,
+    achat_client.categorie AS categorie,
+    achat_client.montant AS montant,
+    achat_client.numero_ctp AS numero_ctp,
+    achat_client.bordereau AS bordereau,
+    achat_client.numero_bc AS numero_bc,
+    achat_client.date_achat AS date_achat
+FROM
+    clients
+, achat_client 
+WHERE
+clients.id = achat_client.id_client;`;
     connection.query(query, (error, results) => {
       if (error) {
         return callback(error, null);
       }
       const achatsClients = results.map((achatClientData) => {
         return new AchatClient(
-          achatClientData.id,
+          achatClientData.achat_id,
+          new Clients(
+            achatClientData.client_id,
+            achatClientData.nom,
+            achatClientData.prenoms,
+            achatClientData.numero_ifu,
+            achatClientData.numero_telephone,
+            achatClientData.email,
+            achatClientData.date_ajout
+          ),
           achatClientData.quantite_achetee,
           achatClientData.categorie,
           achatClientData.montant,
@@ -102,7 +135,7 @@ class AchatClient {
   }
 
   static getAllOfClient(id_client, callback) {
-    const query = "SELECT * FROM achat_client WHERE id_client = ?";
+    const query = `SELECT * FROM achat_client WHERE id_client = ?`;
     connection.query(query, [id_client], (error, results) => {
       if (error) {
         return callback(error, null);
@@ -111,13 +144,14 @@ class AchatClient {
         // console.log(typeof achatClientData.quantite_achetee);
         return new AchatClient(
           achatClientData.id,
+          undefined,
           achatClientData.quantite_achetee,
           achatClientData.categorie,
           achatClientData.montant,
           achatClientData.numero_ctp,
           achatClientData.bordereau,
           achatClientData.numero_bc,
-          achatClientData.id_client,
+          achatClientData.client_id,
           new Date(achatClientData.date_achat)
         );
       });

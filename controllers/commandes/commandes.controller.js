@@ -64,6 +64,7 @@ class CommandesController {
 
       existingCommande = new Commandes(
         existingCommande.id,
+        undefined,
         existingCommande.categorie,
         existingCommande.quantite_achetee,
         existingCommande.destination,

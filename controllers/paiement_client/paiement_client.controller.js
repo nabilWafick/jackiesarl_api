@@ -147,6 +147,7 @@ class PaiementClientController {
 
           existingPaiementClient = new PaiementClient(
             existingPaiementClient.id,
+            undefined,
             existingPaiementClient.montant,
             existingPaiementClient.banque,
             existingPaiementClient.reference,
