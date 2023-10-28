@@ -108,37 +108,548 @@ function () {
         var achatClient = new AchatClient(achatClientData.id, undefined, achatClientData.quantite_achetee, achatClientData.categorie, achatClientData.montant, achatClientData.numero_ctp, achatClientData.bordereau, achatClientData.numero_bc, achatClientData.id_client, new Date(achatClientData.date_achat));
         return callback(null, achatClient);
       });
-    }
+    } // ================ All Client ================
+
   }, {
     key: "getAll",
-    value: function getAll(callback) {
-      var query = "SELECT\n    clients.id AS client_id,\n    clients.nom AS nom,\n    clients.prenoms AS prenoms,\n    clients.numero_ifu AS numero_ifu,\n    clients.numero_telephone AS numero_telephone,\n    clients.email AS email,\n    clients.date_ajout AS date_ajout,\n    achat_client.id AS achat_id,\n    achat_client.quantite_achetee,\n    achat_client.categorie AS categorie,\n    achat_client.montant AS montant,\n    achat_client.numero_ctp AS numero_ctp,\n    achat_client.bordereau AS bordereau,\n    achat_client.numero_bc AS numero_bc,\n    achat_client.date_achat AS date_achat\nFROM\n    clients\n, achat_client \nWHERE\nclients.id = achat_client.id_client;";
-      connection.query(query, function (error, results) {
-        if (error) {
-          return callback(error, null);
-        }
+    value: function getAll(startDate, endDate, callback) {
+      if (startDate && endDate) {
+        var query = "SELECT\n    clients.id AS client_id,\n    clients.nom AS nom,\n    clients.prenoms AS prenoms,\n    clients.numero_ifu AS numero_ifu,\n    clients.numero_telephone AS numero_telephone,\n    clients.email AS email,\n    clients.date_ajout AS date_ajout,\n    achat_client.id AS achat_id,\n    achat_client.quantite_achetee,\n    achat_client.categorie AS categorie,\n    achat_client.montant AS montant,\n    achat_client.numero_ctp AS numero_ctp,\n    achat_client.bordereau AS bordereau,\n    achat_client.numero_bc AS numero_bc,\n    achat_client.date_achat AS date_achat\n    FROM clients, achat_client\n    WHERE achat_client.date_achat BETWEEN ? AND ? AND\n    clients.id = achat_client.id_client\n    ORDER BY achat_client.id DESC ;";
+        connection.query(query, [new Date(startDate), new Date(endDate)], function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
 
-        var achatsClients = results.map(function (achatClientData) {
-          return new AchatClient(achatClientData.achat_id, new Clients(achatClientData.client_id, achatClientData.nom, achatClientData.prenoms, achatClientData.numero_ifu, achatClientData.numero_telephone, achatClientData.email, achatClientData.date_ajout), achatClientData.quantite_achetee, achatClientData.categorie, achatClientData.montant, achatClientData.numero_ctp, achatClientData.bordereau, achatClientData.numero_bc, achatClientData.id_client, new Date(achatClientData.date_achat));
+          var achatsClients = results.map(function (achatClientData) {
+            return new AchatClient(achatClientData.achat_id, new Clients(achatClientData.client_id, achatClientData.nom, achatClientData.prenoms, achatClientData.numero_ifu, achatClientData.numero_telephone, achatClientData.email, achatClientData.date_ajout), achatClientData.quantite_achetee, achatClientData.categorie, achatClientData.montant, achatClientData.numero_ctp, achatClientData.bordereau, achatClientData.numero_bc, achatClientData.id_client, new Date(achatClientData.date_achat));
+          });
+          return callback(null, achatsClients);
         });
-        return callback(null, achatsClients);
-      });
+      } else {
+        var _query = "SELECT\n    clients.id AS client_id,\n    clients.nom AS nom,\n    clients.prenoms AS prenoms,\n    clients.numero_ifu AS numero_ifu,\n    clients.numero_telephone AS numero_telephone,\n    clients.email AS email,\n    clients.date_ajout AS date_ajout,\n    achat_client.id AS achat_id,\n    achat_client.quantite_achetee,\n    achat_client.categorie AS categorie,\n    achat_client.montant AS montant,\n    achat_client.numero_ctp AS numero_ctp,\n    achat_client.bordereau AS bordereau,\n    achat_client.numero_bc AS numero_bc,\n    achat_client.date_achat AS date_achat\nFROM\n    clients\n, achat_client \nWHERE\n     clients.id = achat_client.id_client ORDER BY achat_client.id DESC;";
+        connection.query(_query, function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var achatsClients = results.map(function (achatClientData) {
+            return new AchatClient(achatClientData.achat_id, new Clients(achatClientData.client_id, achatClientData.nom, achatClientData.prenoms, achatClientData.numero_ifu, achatClientData.numero_telephone, achatClientData.email, achatClientData.date_ajout), achatClientData.quantite_achetee, achatClientData.categorie, achatClientData.montant, achatClientData.numero_ctp, achatClientData.bordereau, achatClientData.numero_bc, achatClientData.id_client, new Date(achatClientData.date_achat));
+          });
+          return callback(null, achatsClients);
+        });
+      }
     }
   }, {
-    key: "getAllOfClient",
-    value: function getAllOfClient(id_client, callback) {
-      var query = "SELECT * FROM achat_client WHERE id_client = ?";
-      connection.query(query, [id_client], function (error, results) {
-        if (error) {
-          return callback(error, null);
-        }
+    key: "getAllFromNewToOld",
+    value: function getAllFromNewToOld(startDate, endDate, callback) {
+      if (startDate && endDate) {
+        var query = "SELECT\n    clients.id AS client_id,\n    clients.nom AS nom,\n    clients.prenoms AS prenoms,\n    clients.numero_ifu AS numero_ifu,\n    clients.numero_telephone AS numero_telephone,\n    clients.email AS email,\n    clients.date_ajout AS date_ajout,\n    achat_client.id AS achat_id,\n    achat_client.quantite_achetee,\n    achat_client.categorie AS categorie,\n    achat_client.montant AS montant,\n    achat_client.numero_ctp AS numero_ctp,\n    achat_client.bordereau AS bordereau,\n    achat_client.numero_bc AS numero_bc,\n    achat_client.date_achat AS date_achat\nFROM\n    clients\n, achat_client \nWHERE\nachat_client.date_achat BETWEEN ? AND ? AND\n     clients.id = achat_client.id_client ORDER BY achat_client.id DESC ;";
+        connection.query(query, [new Date(startDate), new Date(endDate)], function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
 
-        var achatsClients = results.map(function (achatClientData) {
-          // console.log(typeof achatClientData.quantite_achetee);
-          return new AchatClient(achatClientData.id, undefined, achatClientData.quantite_achetee, achatClientData.categorie, achatClientData.montant, achatClientData.numero_ctp, achatClientData.bordereau, achatClientData.numero_bc, achatClientData.client_id, new Date(achatClientData.date_achat));
+          var achatsClients = results.map(function (achatClientData) {
+            return new AchatClient(achatClientData.achat_id, new Clients(achatClientData.client_id, achatClientData.nom, achatClientData.prenoms, achatClientData.numero_ifu, achatClientData.numero_telephone, achatClientData.email, achatClientData.date_ajout), achatClientData.quantite_achetee, achatClientData.categorie, achatClientData.montant, achatClientData.numero_ctp, achatClientData.bordereau, achatClientData.numero_bc, achatClientData.id_client, new Date(achatClientData.date_achat));
+          });
+          return callback(null, achatsClients);
         });
-        return callback(null, achatsClients);
-      });
+      } else {
+        var _query2 = "SELECT\n    clients.id AS client_id,\n    clients.nom AS nom,\n    clients.prenoms AS prenoms,\n    clients.numero_ifu AS numero_ifu,\n    clients.numero_telephone AS numero_telephone,\n    clients.email AS email,\n    clients.date_ajout AS date_ajout,\n    achat_client.id AS achat_id,\n    achat_client.quantite_achetee,\n    achat_client.categorie AS categorie,\n    achat_client.montant AS montant,\n    achat_client.numero_ctp AS numero_ctp,\n    achat_client.bordereau AS bordereau,\n    achat_client.numero_bc AS numero_bc,\n    achat_client.date_achat AS date_achat\nFROM\n    clients\n, achat_client \nWHERE\n     clients.id = achat_client.id_client ORDER BY achat_client.id DESC;";
+        connection.query(_query2, function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var achatsClients = results.map(function (achatClientData) {
+            return new AchatClient(achatClientData.achat_id, new Clients(achatClientData.client_id, achatClientData.nom, achatClientData.prenoms, achatClientData.numero_ifu, achatClientData.numero_telephone, achatClientData.email, achatClientData.date_ajout), achatClientData.quantite_achetee, achatClientData.categorie, achatClientData.montant, achatClientData.numero_ctp, achatClientData.bordereau, achatClientData.numero_bc, achatClientData.id_client, new Date(achatClientData.date_achat));
+          });
+          return callback(null, achatsClients);
+        });
+      }
+    }
+  }, {
+    key: "getAllFromOldToNew",
+    value: function getAllFromOldToNew(startDate, endDate, callback) {
+      if (startDate && endDate) {
+        var query = "SELECT\n    clients.id AS client_id,\n    clients.nom AS nom,\n    clients.prenoms AS prenoms,\n    clients.numero_ifu AS numero_ifu,\n    clients.numero_telephone AS numero_telephone,\n    clients.email AS email,\n    clients.date_ajout AS date_ajout,\n    achat_client.id AS achat_id,\n    achat_client.quantite_achetee,\n    achat_client.categorie AS categorie,\n    achat_client.montant AS montant,\n    achat_client.numero_ctp AS numero_ctp,\n    achat_client.bordereau AS bordereau,\n    achat_client.numero_bc AS numero_bc,\n    achat_client.date_achat AS date_achat\nFROM\n    clients\n, achat_client \nWHERE\nachat_client.date_achat BETWEEN ? AND ? AND\n     clients.id = achat_client.id_client ORDER BY achat_client.id ASC ;";
+        connection.query(query, [new Date(startDate), new Date(endDate)], function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var achatsClients = results.map(function (achatClientData) {
+            return new AchatClient(achatClientData.achat_id, new Clients(achatClientData.client_id, achatClientData.nom, achatClientData.prenoms, achatClientData.numero_ifu, achatClientData.numero_telephone, achatClientData.email, achatClientData.date_ajout), achatClientData.quantite_achetee, achatClientData.categorie, achatClientData.montant, achatClientData.numero_ctp, achatClientData.bordereau, achatClientData.numero_bc, achatClientData.id_client, new Date(achatClientData.date_achat));
+          });
+          return callback(null, achatsClients);
+        });
+      } else {
+        var _query3 = "SELECT\n    clients.id AS client_id,\n    clients.nom AS nom,\n    clients.prenoms AS prenoms,\n    clients.numero_ifu AS numero_ifu,\n    clients.numero_telephone AS numero_telephone,\n    clients.email AS email,\n    clients.date_ajout AS date_ajout,\n    achat_client.id AS achat_id,\n    achat_client.quantite_achetee,\n    achat_client.categorie AS categorie,\n    achat_client.montant AS montant,\n    achat_client.numero_ctp AS numero_ctp,\n    achat_client.bordereau AS bordereau,\n    achat_client.numero_bc AS numero_bc,\n    achat_client.date_achat AS date_achat\nFROM\n    clients\n, achat_client \nWHERE\n     clients.id = achat_client.id_client ORDER BY achat_client.id ASC;";
+        connection.query(_query3, function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var achatsClients = results.map(function (achatClientData) {
+            return new AchatClient(achatClientData.achat_id, new Clients(achatClientData.client_id, achatClientData.nom, achatClientData.prenoms, achatClientData.numero_ifu, achatClientData.numero_telephone, achatClientData.email, achatClientData.date_ajout), achatClientData.quantite_achetee, achatClientData.categorie, achatClientData.montant, achatClientData.numero_ctp, achatClientData.bordereau, achatClientData.numero_bc, achatClientData.id_client, new Date(achatClientData.date_achat));
+          });
+          return callback(null, achatsClients);
+        });
+      }
+    }
+  }, {
+    key: "getAllMostImportant",
+    value: function getAllMostImportant(startDate, endDate, callback) {
+      if (startDate && endDate) {
+        var query = "SELECT\n    clients.id AS client_id,\n    clients.nom AS nom,\n    clients.prenoms AS prenoms,\n    clients.numero_ifu AS numero_ifu,\n    clients.numero_telephone AS numero_telephone,\n    clients.email AS email,\n    clients.date_ajout AS date_ajout,\n    achat_client.id AS achat_id,\n    achat_client.quantite_achetee,\n    achat_client.categorie AS categorie,\n    achat_client.montant AS montant,\n    achat_client.numero_ctp AS numero_ctp,\n    achat_client.bordereau AS bordereau,\n    achat_client.numero_bc AS numero_bc,\n    achat_client.date_achat AS date_achat\nFROM\n    clients\n, achat_client \nWHERE\nachat_client.date_achat BETWEEN ? AND ? AND\n     clients.id = achat_client.id_client ORDER BY achat_client.quantite_achetee DESC ;";
+        connection.query(query, [new Date(startDate), new Date(endDate)], function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var achatsClients = results.map(function (achatClientData) {
+            return new AchatClient(achatClientData.achat_id, new Clients(achatClientData.client_id, achatClientData.nom, achatClientData.prenoms, achatClientData.numero_ifu, achatClientData.numero_telephone, achatClientData.email, achatClientData.date_ajout), achatClientData.quantite_achetee, achatClientData.categorie, achatClientData.montant, achatClientData.numero_ctp, achatClientData.bordereau, achatClientData.numero_bc, achatClientData.id_client, new Date(achatClientData.date_achat));
+          });
+          return callback(null, achatsClients);
+        });
+      } else {
+        var _query4 = "SELECT\n    clients.id AS client_id,\n    clients.nom AS nom,\n    clients.prenoms AS prenoms,\n    clients.numero_ifu AS numero_ifu,\n    clients.numero_telephone AS numero_telephone,\n    clients.email AS email,\n    clients.date_ajout AS date_ajout,\n    achat_client.id AS achat_id,\n    achat_client.quantite_achetee,\n    achat_client.categorie AS categorie,\n    achat_client.montant AS montant,\n    achat_client.numero_ctp AS numero_ctp,\n    achat_client.bordereau AS bordereau,\n    achat_client.numero_bc AS numero_bc,\n    achat_client.date_achat AS date_achat\nFROM\n    clients\n, achat_client \nWHERE\n     clients.id = achat_client.id_client ORDER BY achat_client.quantite_achetee DESC;";
+        connection.query(_query4, function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var achatsClients = results.map(function (achatClientData) {
+            return new AchatClient(achatClientData.achat_id, new Clients(achatClientData.client_id, achatClientData.nom, achatClientData.prenoms, achatClientData.numero_ifu, achatClientData.numero_telephone, achatClientData.email, achatClientData.date_ajout), achatClientData.quantite_achetee, achatClientData.categorie, achatClientData.montant, achatClientData.numero_ctp, achatClientData.bordereau, achatClientData.numero_bc, achatClientData.id_client, new Date(achatClientData.date_achat));
+          });
+          return callback(null, achatsClients);
+        });
+      }
+    }
+  }, {
+    key: "getAllLessImportant",
+    value: function getAllLessImportant(startDate, endDate, callback) {
+      if (startDate && endDate) {
+        var query = "SELECT\n    clients.id AS client_id,\n    clients.nom AS nom,\n    clients.prenoms AS prenoms,\n    clients.numero_ifu AS numero_ifu,\n    clients.numero_telephone AS numero_telephone,\n    clients.email AS email,\n    clients.date_ajout AS date_ajout,\n    achat_client.id AS achat_id,\n    achat_client.quantite_achetee,\n    achat_client.categorie AS categorie,\n    achat_client.montant AS montant,\n    achat_client.numero_ctp AS numero_ctp,\n    achat_client.bordereau AS bordereau,\n    achat_client.numero_bc AS numero_bc,\n    achat_client.date_achat AS date_achat\nFROM\n    clients\n, achat_client \nWHERE\nachat_client.date_achat BETWEEN ? AND ? AND\n     clients.id = achat_client.id_client ORDER BY achat_client.quantite_achetee ASC ;";
+        connection.query(query, [new Date(startDate), new Date(endDate)], function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var achatsClients = results.map(function (achatClientData) {
+            return new AchatClient(achatClientData.achat_id, new Clients(achatClientData.client_id, achatClientData.nom, achatClientData.prenoms, achatClientData.numero_ifu, achatClientData.numero_telephone, achatClientData.email, achatClientData.date_ajout), achatClientData.quantite_achetee, achatClientData.categorie, achatClientData.montant, achatClientData.numero_ctp, achatClientData.bordereau, achatClientData.numero_bc, achatClientData.id_client, new Date(achatClientData.date_achat));
+          });
+          return callback(null, achatsClients);
+        });
+      } else {
+        var _query5 = "SELECT\n    clients.id AS client_id,\n    clients.nom AS nom,\n    clients.prenoms AS prenoms,\n    clients.numero_ifu AS numero_ifu,\n    clients.numero_telephone AS numero_telephone,\n    clients.email AS email,\n    clients.date_ajout AS date_ajout,\n    achat_client.id AS achat_id,\n    achat_client.quantite_achetee,\n    achat_client.categorie AS categorie,\n    achat_client.montant AS montant,\n    achat_client.numero_ctp AS numero_ctp,\n    achat_client.bordereau AS bordereau,\n    achat_client.numero_bc AS numero_bc,\n    achat_client.date_achat AS date_achat\nFROM\n    clients\n, achat_client \nWHERE\n     clients.id = achat_client.id_client ORDER BY achat_client.quantite_achetee ASC;";
+        connection.query(_query5, function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var achatsClients = results.map(function (achatClientData) {
+            return new AchatClient(achatClientData.achat_id, new Clients(achatClientData.client_id, achatClientData.nom, achatClientData.prenoms, achatClientData.numero_ifu, achatClientData.numero_telephone, achatClientData.email, achatClientData.date_ajout), achatClientData.quantite_achetee, achatClientData.categorie, achatClientData.montant, achatClientData.numero_ctp, achatClientData.bordereau, achatClientData.numero_bc, achatClientData.id_client, new Date(achatClientData.date_achat));
+          });
+          return callback(null, achatsClients);
+        });
+      }
+    }
+  }, {
+    key: "getAllNOCIBEMostImportant",
+    value: function getAllNOCIBEMostImportant(startDate, endDate, callback) {
+      if (startDate && endDate) {
+        var query = "SELECT\n    clients.id AS client_id,\n    clients.nom AS nom,\n    clients.prenoms AS prenoms,\n    clients.numero_ifu AS numero_ifu,\n    clients.numero_telephone AS numero_telephone,\n    clients.email AS email,\n    clients.date_ajout AS date_ajout,\n    achat_client.id AS achat_id,\n    achat_client.quantite_achetee,\n    achat_client.categorie AS categorie,\n    achat_client.montant AS montant,\n    achat_client.numero_ctp AS numero_ctp,\n    achat_client.bordereau AS bordereau,\n    achat_client.numero_bc AS numero_bc,\n    achat_client.date_achat AS date_achat\nFROM\n    clients\n, achat_client \nWHERE achat_client.categorie = 'NOCIBE' AND\nachat_client.date_achat BETWEEN ? AND ? AND\n     clients.id = achat_client.id_client ORDER BY achat_client.quantite_achetee DESC;";
+        connection.query(query, [new Date(startDate), new Date(endDate)], function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var achatsClients = results.map(function (achatClientData) {
+            return new AchatClient(achatClientData.achat_id, new Clients(achatClientData.client_id, achatClientData.nom, achatClientData.prenoms, achatClientData.numero_ifu, achatClientData.numero_telephone, achatClientData.email, achatClientData.date_ajout), achatClientData.quantite_achetee, achatClientData.categorie, achatClientData.montant, achatClientData.numero_ctp, achatClientData.bordereau, achatClientData.numero_bc, achatClientData.id_client, new Date(achatClientData.date_achat));
+          });
+          return callback(null, achatsClients);
+        });
+      } else {
+        var _query6 = "SELECT\n    clients.id AS client_id,\n    clients.nom AS nom,\n    clients.prenoms AS prenoms,\n    clients.numero_ifu AS numero_ifu,\n    clients.numero_telephone AS numero_telephone,\n    clients.email AS email,\n    clients.date_ajout AS date_ajout,\n    achat_client.id AS achat_id,\n    achat_client.quantite_achetee,\n    achat_client.categorie AS categorie,\n    achat_client.montant AS montant,\n    achat_client.numero_ctp AS numero_ctp,\n    achat_client.bordereau AS bordereau,\n    achat_client.numero_bc AS numero_bc,\n    achat_client.date_achat AS date_achat\nFROM\n    clients\n, achat_client\nWHERE achat_client.categorie = 'NOCIBE' AND\n     clients.id = achat_client.id_client ORDER BY achat_client.quantite_achetee DESC";
+        connection.query(_query6, [new Date(startDate), new Date(endDate)], function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var achatsClients = results.map(function (achatClientData) {
+            return new AchatClient(achatClientData.achat_id, new Clients(achatClientData.client_id, achatClientData.nom, achatClientData.prenoms, achatClientData.numero_ifu, achatClientData.numero_telephone, achatClientData.email, achatClientData.date_ajout), achatClientData.quantite_achetee, achatClientData.categorie, achatClientData.montant, achatClientData.numero_ctp, achatClientData.bordereau, achatClientData.numero_bc, achatClientData.id_client, new Date(achatClientData.date_achat));
+          });
+          return callback(null, achatsClients);
+        });
+      }
+    }
+  }, {
+    key: "getAllNOCIBELessImportant",
+    value: function getAllNOCIBELessImportant(startDate, endDate, callback) {
+      if (startDate && endDate) {
+        var query = "SELECT\n    clients.id AS client_id,\n    clients.nom AS nom,\n    clients.prenoms AS prenoms,\n    clients.numero_ifu AS numero_ifu,\n    clients.numero_telephone AS numero_telephone,\n    clients.email AS email,\n    clients.date_ajout AS date_ajout,\n    achat_client.id AS achat_id,\n    achat_client.quantite_achetee,\n    achat_client.categorie AS categorie,\n    achat_client.montant AS montant,\n    achat_client.numero_ctp AS numero_ctp,\n    achat_client.bordereau AS bordereau,\n    achat_client.numero_bc AS numero_bc,\n    achat_client.date_achat AS date_achat\nFROM\n    clients\n, achat_client \nWHERE achat_client.categorie = 'NOCIBE' AND\nachat_client.date_achat BETWEEN ? AND ? AND\n     clients.id = achat_client.id_client ORDER BY achat_client.quantite_achetee ASC";
+        connection.query(query, [new Date(startDate), new Date(endDate)], function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var achatsClients = results.map(function (achatClientData) {
+            return new AchatClient(achatClientData.achat_id, new Clients(achatClientData.client_id, achatClientData.nom, achatClientData.prenoms, achatClientData.numero_ifu, achatClientData.numero_telephone, achatClientData.email, achatClientData.date_ajout), achatClientData.quantite_achetee, achatClientData.categorie, achatClientData.montant, achatClientData.numero_ctp, achatClientData.bordereau, achatClientData.numero_bc, achatClientData.id_client, new Date(achatClientData.date_achat));
+          });
+          return callback(null, achatsClients);
+        });
+      } else {
+        var _query7 = "SELECT\n    clients.id AS client_id,\n    clients.nom AS nom,\n    clients.prenoms AS prenoms,\n    clients.numero_ifu AS numero_ifu,\n    clients.numero_telephone AS numero_telephone,\n    clients.email AS email,\n    clients.date_ajout AS date_ajout,\n    achat_client.id AS achat_id,\n    achat_client.quantite_achetee,\n    achat_client.categorie AS categorie,\n    achat_client.montant AS montant,\n    achat_client.numero_ctp AS numero_ctp,\n    achat_client.bordereau AS bordereau,\n    achat_client.numero_bc AS numero_bc,\n    achat_client.date_achat AS date_achat\nFROM\n    clients\n, achat_client \nWHERE achat_client.categorie = 'NOCIBE' AND\n     clients.id = achat_client.id_client ORDER BY achat_client.quantite_achetee ASC";
+        connection.query(_query7, [new Date(startDate), new Date(endDate)], function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var achatsClients = results.map(function (achatClientData) {
+            return new AchatClient(achatClientData.achat_id, new Clients(achatClientData.client_id, achatClientData.nom, achatClientData.prenoms, achatClientData.numero_ifu, achatClientData.numero_telephone, achatClientData.email, achatClientData.date_ajout), achatClientData.quantite_achetee, achatClientData.categorie, achatClientData.montant, achatClientData.numero_ctp, achatClientData.bordereau, achatClientData.numero_bc, achatClientData.id_client, new Date(achatClientData.date_achat));
+          });
+          return callback(null, achatsClients);
+        });
+      }
+    }
+  }, {
+    key: "getAllCIMBENINMostImportant",
+    value: function getAllCIMBENINMostImportant(startDate, endDate, callback) {
+      if (startDate && endDate) {
+        var query = "SELECT\n    clients.id AS client_id,\n    clients.nom AS nom,\n    clients.prenoms AS prenoms,\n    clients.numero_ifu AS numero_ifu,\n    clients.numero_telephone AS numero_telephone,\n    clients.email AS email,\n    clients.date_ajout AS date_ajout,\n    achat_client.id AS achat_id,\n    achat_client.quantite_achetee,\n    achat_client.categorie AS categorie,\n    achat_client.montant AS montant,\n    achat_client.numero_ctp AS numero_ctp,\n    achat_client.bordereau AS bordereau,\n    achat_client.numero_bc AS numero_bc,\n    achat_client.date_achat AS date_achat\nFROM\n    clients\n, achat_client \nWHERE achat_client.categorie = 'CIM BENIN' AND\nachat_client.date_achat BETWEEN ? AND ? AND\n     clients.id = achat_client.id_client ORDER BY achat_client.quantite_achetee DESC";
+        connection.query(query, [new Date(startDate), new Date(endDate)], function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var achatsClients = results.map(function (achatClientData) {
+            return new AchatClient(achatClientData.achat_id, new Clients(achatClientData.client_id, achatClientData.nom, achatClientData.prenoms, achatClientData.numero_ifu, achatClientData.numero_telephone, achatClientData.email, achatClientData.date_ajout), achatClientData.quantite_achetee, achatClientData.categorie, achatClientData.montant, achatClientData.numero_ctp, achatClientData.bordereau, achatClientData.numero_bc, achatClientData.id_client, new Date(achatClientData.date_achat));
+          });
+          return callback(null, achatsClients);
+        });
+      } else {
+        var _query8 = "SELECT\n    clients.id AS client_id,\n    clients.nom AS nom,\n    clients.prenoms AS prenoms,\n    clients.numero_ifu AS numero_ifu,\n    clients.numero_telephone AS numero_telephone,\n    clients.email AS email,\n    clients.date_ajout AS date_ajout,\n    achat_client.id AS achat_id,\n    achat_client.quantite_achetee,\n    achat_client.categorie AS categorie,\n    achat_client.montant AS montant,\n    achat_client.numero_ctp AS numero_ctp,\n    achat_client.bordereau AS bordereau,\n    achat_client.numero_bc AS numero_bc,\n    achat_client.date_achat AS date_achat\nFROM\n    clients\n, achat_client \nWHERE achat_client.categorie = 'CIM BENIN' AND\n     clients.id = achat_client.id_client ORDER BY achat_client.quantite_achetee DESC";
+        connection.query(_query8, [new Date(startDate), new Date(endDate)], function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var achatsClients = results.map(function (achatClientData) {
+            return new AchatClient(achatClientData.achat_id, new Clients(achatClientData.client_id, achatClientData.nom, achatClientData.prenoms, achatClientData.numero_ifu, achatClientData.numero_telephone, achatClientData.email, achatClientData.date_ajout), achatClientData.quantite_achetee, achatClientData.categorie, achatClientData.montant, achatClientData.numero_ctp, achatClientData.bordereau, achatClientData.numero_bc, achatClientData.id_client, new Date(achatClientData.date_achat));
+          });
+          return callback(null, achatsClients);
+        });
+      }
+    }
+  }, {
+    key: "getAllCIMBENINLessImportant",
+    value: function getAllCIMBENINLessImportant(startDate, endDate, callback) {
+      if (startDate && endDate) {
+        var query = "SELECT\n    clients.id AS client_id,\n    clients.nom AS nom,\n    clients.prenoms AS prenoms,\n    clients.numero_ifu AS numero_ifu,\n    clients.numero_telephone AS numero_telephone,\n    clients.email AS email,\n    clients.date_ajout AS date_ajout,\n    achat_client.id AS achat_id,\n    achat_client.quantite_achetee,\n    achat_client.categorie AS categorie,\n    achat_client.montant AS montant,\n    achat_client.numero_ctp AS numero_ctp,\n    achat_client.bordereau AS bordereau,\n    achat_client.numero_bc AS numero_bc,\n    achat_client.date_achat AS date_achat\nFROM\n    clients\n, achat_client \nWHERE achat_client.categorie = 'CIM BENIN' AND\nachat_client.date_achat BETWEEN ? AND ? AND\n     clients.id = achat_client.id_client ORDER BY achat_client.quantite_achetee ASC";
+        connection.query(query, [new Date(startDate), new Date(endDate)], function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var achatsClients = results.map(function (achatClientData) {
+            return new AchatClient(achatClientData.achat_id, new Clients(achatClientData.client_id, achatClientData.nom, achatClientData.prenoms, achatClientData.numero_ifu, achatClientData.numero_telephone, achatClientData.email, achatClientData.date_ajout), achatClientData.quantite_achetee, achatClientData.categorie, achatClientData.montant, achatClientData.numero_ctp, achatClientData.bordereau, achatClientData.numero_bc, achatClientData.id_client, new Date(achatClientData.date_achat));
+          });
+          return callback(null, achatsClients);
+        });
+      } else {
+        var _query9 = "SELECT\n    clients.id AS client_id,\n    clients.nom AS nom,\n    clients.prenoms AS prenoms,\n    clients.numero_ifu AS numero_ifu,\n    clients.numero_telephone AS numero_telephone,\n    clients.email AS email,\n    clients.date_ajout AS date_ajout,\n    achat_client.id AS achat_id,\n    achat_client.quantite_achetee,\n    achat_client.categorie AS categorie,\n    achat_client.montant AS montant,\n    achat_client.numero_ctp AS numero_ctp,\n    achat_client.bordereau AS bordereau,\n    achat_client.numero_bc AS numero_bc,\n    achat_client.date_achat AS date_achat\nFROM\n    clients\n, achat_client \nWHERE achat_client.categorie = 'CIM BENIN' AND\n     clients.id = achat_client.id_client ORDER BY achat_client.quantite_achetee ASC";
+        connection.query(_query9, [new Date(startDate), new Date(endDate)], function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var achatsClients = results.map(function (achatClientData) {
+            return new AchatClient(achatClientData.achat_id, new Clients(achatClientData.client_id, achatClientData.nom, achatClientData.prenoms, achatClientData.numero_ifu, achatClientData.numero_telephone, achatClientData.email, achatClientData.date_ajout), achatClientData.quantite_achetee, achatClientData.categorie, achatClientData.montant, achatClientData.numero_ctp, achatClientData.bordereau, achatClientData.numero_bc, achatClientData.id_client, new Date(achatClientData.date_achat));
+          });
+          return callback(null, achatsClients);
+        });
+      }
+    } // =========== Defined Client ========
+
+  }, {
+    key: "getAllOfClient",
+    value: function getAllOfClient(startDate, endDate, id_client, callback) {
+      if (startDate && endDate) {
+        var query = "SELECT * FROM achat_client WHERE date_achat BETWEEN ? AND ? AND id_client = ? ORDER BY id DESC";
+        connection.query(query, [new Date(startDate), new Date(endDate), id_client], function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var achatsClients = results.map(function (achatClientData) {
+            // console.log(typeof achatClientData.quantite_achetee);
+            return new AchatClient(achatClientData.id, undefined, achatClientData.quantite_achetee, achatClientData.categorie, achatClientData.montant, achatClientData.numero_ctp, achatClientData.bordereau, achatClientData.numero_bc, achatClientData.client_id, new Date(achatClientData.date_achat));
+          });
+          return callback(null, achatsClients);
+        });
+      } else {
+        var _query10 = "SELECT * FROM achat_client WHERE id_client = ? ORDER BY id DESC";
+        connection.query(_query10, [id_client], function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var achatsClients = results.map(function (achatClientData) {
+            // console.log(typeof achatClientData.quantite_achetee);
+            return new AchatClient(achatClientData.id, undefined, achatClientData.quantite_achetee, achatClientData.categorie, achatClientData.montant, achatClientData.numero_ctp, achatClientData.bordereau, achatClientData.numero_bc, achatClientData.client_id, new Date(achatClientData.date_achat));
+          });
+          return callback(null, achatsClients);
+        });
+      }
+    }
+  }, {
+    key: "getAllOfClientFromNewToOld",
+    value: function getAllOfClientFromNewToOld(startDate, endDate, id_client, callback) {
+      if (startDate && endDate) {
+        var query = "SELECT * FROM achat_client WHERE date_achat BETWEEN ? AND ? AND id_client = ? ORDER BY id DESC";
+        connection.query(query, [new Date(startDate), new Date(endDate), id_client], function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var achatsClients = results.map(function (achatClientData) {
+            // console.log(typeof achatClientData.quantite_achetee);
+            return new AchatClient(achatClientData.id, undefined, achatClientData.quantite_achetee, achatClientData.categorie, achatClientData.montant, achatClientData.numero_ctp, achatClientData.bordereau, achatClientData.numero_bc, achatClientData.client_id, new Date(achatClientData.date_achat));
+          });
+          return callback(null, achatsClients);
+        });
+      } else {
+        var _query11 = "SELECT * FROM achat_client WHERE id_client = ? ORDER BY id DESC";
+        connection.query(_query11, [id_client], function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var achatsClients = results.map(function (achatClientData) {
+            // console.log(typeof achatClientData.quantite_achetee);
+            return new AchatClient(achatClientData.id, undefined, achatClientData.quantite_achetee, achatClientData.categorie, achatClientData.montant, achatClientData.numero_ctp, achatClientData.bordereau, achatClientData.numero_bc, achatClientData.client_id, new Date(achatClientData.date_achat));
+          });
+          return callback(null, achatsClients);
+        });
+      }
+    }
+  }, {
+    key: "getAllOfClientFromOldToNew",
+    value: function getAllOfClientFromOldToNew(startDate, endDate, id_client, callback) {
+      if (startDate && endDate) {
+        var query = "SELECT * FROM achat_client WHERE date_achat BETWEEN ? AND ? AND id_client = ? ORDER BY id ASC";
+        connection.query(query, [new Date(startDate), new Date(endDate), id_client], function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var achatsClients = results.map(function (achatClientData) {
+            // console.log(typeof achatClientData.quantite_achetee);
+            return new AchatClient(achatClientData.id, undefined, achatClientData.quantite_achetee, achatClientData.categorie, achatClientData.montant, achatClientData.numero_ctp, achatClientData.bordereau, achatClientData.numero_bc, achatClientData.client_id, new Date(achatClientData.date_achat));
+          });
+          return callback(null, achatsClients);
+        });
+      } else {
+        var _query12 = "SELECT * FROM achat_client WHERE id_client = ? ORDER BY id ASC";
+        connection.query(_query12, [id_client], function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var achatsClients = results.map(function (achatClientData) {
+            // console.log(typeof achatClientData.quantite_achetee);
+            return new AchatClient(achatClientData.id, undefined, achatClientData.quantite_achetee, achatClientData.categorie, achatClientData.montant, achatClientData.numero_ctp, achatClientData.bordereau, achatClientData.numero_bc, achatClientData.client_id, new Date(achatClientData.date_achat));
+          });
+          return callback(null, achatsClients);
+        });
+      }
+    }
+  }, {
+    key: "getAllOfClientMostImportant",
+    value: function getAllOfClientMostImportant(startDate, endDate, id_client, callback) {
+      if (startDate && endDate) {
+        var query = "SELECT * FROM achat_client WHERE date_achat BETWEEN ? AND ? AND id_client = ? ORDER BY quantite_achetee DESC";
+        connection.query(query, [new Date(startDate), new Date(endDate), id_client], function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var achatsClients = results.map(function (achatClientData) {
+            // console.log(typeof achatClientData.quantite_achetee);
+            return new AchatClient(achatClientData.id, undefined, achatClientData.quantite_achetee, achatClientData.categorie, achatClientData.montant, achatClientData.numero_ctp, achatClientData.bordereau, achatClientData.numero_bc, achatClientData.client_id, new Date(achatClientData.date_achat));
+          });
+          return callback(null, achatsClients);
+        });
+      } else {
+        var _query13 = "SELECT * FROM achat_client WHERE id_client = ? ORDER BY quantite_achetee DESC";
+        connection.query(_query13, [id_client], function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var achatsClients = results.map(function (achatClientData) {
+            // console.log(typeof achatClientData.quantite_achetee);
+            return new AchatClient(achatClientData.id, undefined, achatClientData.quantite_achetee, achatClientData.categorie, achatClientData.montant, achatClientData.numero_ctp, achatClientData.bordereau, achatClientData.numero_bc, achatClientData.client_id, new Date(achatClientData.date_achat));
+          });
+          return callback(null, achatsClients);
+        });
+      }
+    }
+  }, {
+    key: "getAllOfClientLessImportant",
+    value: function getAllOfClientLessImportant(startDate, endDate, id_client, callback) {
+      if (startDate && endDate) {
+        var query = "SELECT * FROM achat_client WHERE date_achat BETWEEN ? AND ? AND id_client = ? ORDER BY quantite_achetee ASC";
+        connection.query(query, [new Date(startDate), new Date(endDate), id_client], function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var achatsClients = results.map(function (achatClientData) {
+            // console.log(typeof achatClientData.quantite_achetee);
+            return new AchatClient(achatClientData.id, undefined, achatClientData.quantite_achetee, achatClientData.categorie, achatClientData.montant, achatClientData.numero_ctp, achatClientData.bordereau, achatClientData.numero_bc, achatClientData.client_id, new Date(achatClientData.date_achat));
+          });
+          return callback(null, achatsClients);
+        });
+      } else {
+        var _query14 = "SELECT * FROM achat_client WHERE id_client = ? ORDER BY quantite_achetee ASC";
+        connection.query(_query14, [id_client], function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var achatsClients = results.map(function (achatClientData) {
+            // console.log(typeof achatClientData.quantite_achetee);
+            return new AchatClient(achatClientData.id, undefined, achatClientData.quantite_achetee, achatClientData.categorie, achatClientData.montant, achatClientData.numero_ctp, achatClientData.bordereau, achatClientData.numero_bc, achatClientData.client_id, new Date(achatClientData.date_achat));
+          });
+          return callback(null, achatsClients);
+        });
+      }
+    }
+  }, {
+    key: "getAllOfClientCIMBENINMostImportant",
+    value: function getAllOfClientCIMBENINMostImportant(startDate, endDate, id_client, callback) {
+      if (startDate && endDate) {
+        var query = "SELECT * FROM achat_client WHERE date_achat BETWEEN ? AND ? AND id_client = ? AND categorie = 'CIM BENIN' ORDER BY quantite_achetee DESC";
+        connection.query(query, [new Date(startDate), new Date(endDate), id_client], function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var achatsClients = results.map(function (achatClientData) {
+            // console.log(typeof achatClientData.quantite_achetee);
+            return new AchatClient(achatClientData.id, undefined, achatClientData.quantite_achetee, achatClientData.categorie, achatClientData.montant, achatClientData.numero_ctp, achatClientData.bordereau, achatClientData.numero_bc, achatClientData.client_id, new Date(achatClientData.date_achat));
+          });
+          return callback(null, achatsClients);
+        });
+      } else {
+        var _query15 = "SELECT * FROM achat_client WHERE id_client = ? AND categorie = 'CIM BENIN' ORDER BY quantite_achetee DESC";
+        connection.query(_query15, [id_client], function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var achatsClients = results.map(function (achatClientData) {
+            // console.log(typeof achatClientData.quantite_achetee);
+            return new AchatClient(achatClientData.id, undefined, achatClientData.quantite_achetee, achatClientData.categorie, achatClientData.montant, achatClientData.numero_ctp, achatClientData.bordereau, achatClientData.numero_bc, achatClientData.client_id, new Date(achatClientData.date_achat));
+          });
+          return callback(null, achatsClients);
+        });
+      }
+    }
+  }, {
+    key: "getAllOfClientCIMBENINLessImportant",
+    value: function getAllOfClientCIMBENINLessImportant(startDate, endDate, id_client, callback) {
+      if (startDate && endDate) {
+        var query = "SELECT * FROM achat_client WHERE date_achat BETWEEN ? AND ? AND id_client = ? AND categorie = 'CIM BENIN' ORDER BY quantite_achetee ASC";
+        connection.query(query, [new Date(startDate), new Date(endDate), id_client], function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var achatsClients = results.map(function (achatClientData) {
+            // console.log(typeof achatClientData.quantite_achetee);
+            return new AchatClient(achatClientData.id, undefined, achatClientData.quantite_achetee, achatClientData.categorie, achatClientData.montant, achatClientData.numero_ctp, achatClientData.bordereau, achatClientData.numero_bc, achatClientData.client_id, new Date(achatClientData.date_achat));
+          });
+          return callback(null, achatsClients);
+        });
+      } else {
+        var _query16 = "SELECT * FROM achat_client WHERE id_client = ? AND categorie = 'CIM BENIN' ORDER BY quantite_achetee ASC";
+        connection.query(_query16, [id_client], function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var achatsClients = results.map(function (achatClientData) {
+            // console.log(typeof achatClientData.quantite_achetee);
+            return new AchatClient(achatClientData.id, undefined, achatClientData.quantite_achetee, achatClientData.categorie, achatClientData.montant, achatClientData.numero_ctp, achatClientData.bordereau, achatClientData.numero_bc, achatClientData.client_id, new Date(achatClientData.date_achat));
+          });
+          return callback(null, achatsClients);
+        });
+      }
+    }
+  }, {
+    key: "getAllOfClientNOCIBEMostImportant",
+    value: function getAllOfClientNOCIBEMostImportant(startDate, endDate, id_client, callback) {
+      if (startDate && endDate) {
+        var query = "SELECT * FROM achat_client WHERE date_achat BETWEEN ? AND ? AND id_client = ? AND categorie = 'NOCIBE' ORDER BY quantite_achetee DESC";
+        connection.query(query, [new Date(startDate), new Date(endDate), id_client], function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var achatsClients = results.map(function (achatClientData) {
+            // console.log(typeof achatClientData.quantite_achetee);
+            return new AchatClient(achatClientData.id, undefined, achatClientData.quantite_achetee, achatClientData.categorie, achatClientData.montant, achatClientData.numero_ctp, achatClientData.bordereau, achatClientData.numero_bc, achatClientData.client_id, new Date(achatClientData.date_achat));
+          });
+          return callback(null, achatsClients);
+        });
+      } else {
+        var _query17 = "SELECT * FROM achat_client WHERE id_client = ? AND categorie = 'NOCIBE' ORDER BY quantite_achetee DESC";
+        connection.query(_query17, [id_client], function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var achatsClients = results.map(function (achatClientData) {
+            // console.log(typeof achatClientData.quantite_achetee);
+            return new AchatClient(achatClientData.id, undefined, achatClientData.quantite_achetee, achatClientData.categorie, achatClientData.montant, achatClientData.numero_ctp, achatClientData.bordereau, achatClientData.numero_bc, achatClientData.client_id, new Date(achatClientData.date_achat));
+          });
+          return callback(null, achatsClients);
+        });
+      }
+    }
+  }, {
+    key: "getAllOfClientNOCIBELessImportant",
+    value: function getAllOfClientNOCIBELessImportant(startDate, endDate, id_client, callback) {
+      if (startDate && endDate) {
+        var query = "SELECT * FROM achat_client WHERE date_achat BETWEEN ? AND ? AND id_client = ? AND categorie = 'NOCIBE' ORDER BY quantite_achetee ASC";
+        connection.query(query, [new Date(startDate), new Date(endDate), id_client], function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var achatsClients = results.map(function (achatClientData) {
+            // console.log(typeof achatClientData.quantite_achetee);
+            return new AchatClient(achatClientData.id, undefined, achatClientData.quantite_achetee, achatClientData.categorie, achatClientData.montant, achatClientData.numero_ctp, achatClientData.bordereau, achatClientData.numero_bc, achatClientData.client_id, new Date(achatClientData.date_achat));
+          });
+          return callback(null, achatsClients);
+        });
+      } else {
+        var _query18 = "SELECT * FROM achat_client WHERE id_client = ? AND categorie = 'NOCIBE' ORDER BY quantite_achetee ASC";
+        connection.query(_query18, [id_client], function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var achatsClients = results.map(function (achatClientData) {
+            // console.log(typeof achatClientData.quantite_achetee);
+            return new AchatClient(achatClientData.id, undefined, achatClientData.quantite_achetee, achatClientData.categorie, achatClientData.montant, achatClientData.numero_ctp, achatClientData.bordereau, achatClientData.numero_bc, achatClientData.client_id, new Date(achatClientData.date_achat));
+          });
+          return callback(null, achatsClients);
+        });
+      }
     }
   }]);
 

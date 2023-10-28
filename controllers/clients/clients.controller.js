@@ -8,7 +8,7 @@ class ClientsController {
       clientData.email = null;
     }
     console.log("Client Data", clientData);
-    Clients.getAll((error, clients) => {
+    Clients.getAll(undefined, undefined, (error, clients) => {
       if (error) {
         return res.status(500).json({
           status: 500,
@@ -96,7 +96,48 @@ class ClientsController {
   };
 
   static getAll = (req, res) => {
-    Clients.getAll((error, clients) => {
+    const startDate = req.params.startDate;
+    const endDate = req.params.endDate;
+    Clients.getAll(startDate, endDate, (error, clients) => {
+      if (error) {
+        return res
+          .status(500)
+          .json({ error: "Erreur lors de la récupération des clients" });
+      }
+      return res.status(200).json(clients);
+    });
+  };
+
+  static getAllByAlphabeticalOrder = (req, res) => {
+    const startDate = req.params.startDate;
+    const endDate = req.params.endDate;
+    Clients.getAllByAlphabeticalOrder(startDate, endDate, (error, clients) => {
+      if (error) {
+        return res
+          .status(500)
+          .json({ error: "Erreur lors de la récupération des clients" });
+      }
+      return res.status(200).json(clients);
+    });
+  };
+
+  static getAllFromOldToNew = (req, res) => {
+    const startDate = req.params.startDate;
+    const endDate = req.params.endDate;
+    Clients.getAllFromOldToNew(startDate, endDate, (error, clients) => {
+      if (error) {
+        return res
+          .status(500)
+          .json({ error: "Erreur lors de la récupération des clients" });
+      }
+      return res.status(200).json(clients);
+    });
+  };
+
+  static getAllFromNewToOld = (req, res) => {
+    const startDate = req.params.startDate;
+    const endDate = req.params.endDate;
+    Clients.getAllFromNewToOld(startDate, endDate, (error, clients) => {
       if (error) {
         return res
           .status(500)

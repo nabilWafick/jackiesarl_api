@@ -125,25 +125,204 @@ class Clients {
   }
 
   // Méthode pour récupérer toutes les entrées de la table clients
-  static getAll(callback) {
-    const query = "SELECT * FROM clients";
-    connection.query(query, (error, results) => {
-      if (error) {
-        return callback(error, null);
-      }
-      const clients = results.map((clientData) => {
-        return new Clients(
-          clientData.id,
-          clientData.nom,
-          clientData.prenoms,
-          clientData.numero_ifu,
-          clientData.numero_telephone,
-          clientData.email,
-          clientData.date_ajout
-        );
+  static getAll(startDate, endDate, callback) {
+    if (startDate && endDate) {
+      const query =
+        "SELECT * FROM clients WHERE date_ajout BETWEEN ? AND ? ORDER BY id DESC ";
+      connection.query(
+        query,
+        [new Date(startDate), new Date(endDate)],
+        (error, results) => {
+          if (error) {
+            return callback(error, null);
+          }
+          const clients = results.map((clientData) => {
+            return new Clients(
+              clientData.id,
+              clientData.nom,
+              clientData.prenoms,
+              clientData.numero_ifu,
+              clientData.numero_telephone,
+              clientData.email,
+              clientData.date_ajout
+            );
+          });
+          return callback(null, clients);
+        }
+      );
+    } else {
+      const query = "SELECT * FROM clients ORDER BY id DESC";
+      connection.query(query, (error, results) => {
+        if (error) {
+          return callback(error, null);
+        }
+        const clients = results.map((clientData) => {
+          return new Clients(
+            clientData.id,
+            clientData.nom,
+            clientData.prenoms,
+            clientData.numero_ifu,
+            clientData.numero_telephone,
+            clientData.email,
+            clientData.date_ajout
+          );
+        });
+        return callback(null, clients);
       });
-      return callback(null, clients);
-    });
+    }
+  }
+
+  static getAllByAlphabeticalOrder(startDate, endDate, callback) {
+    if (startDate && endDate) {
+      const query =
+        "SELECT * FROM clients WHERE date_ajout BETWEEN ? AND ? ORDER BY nom ASC ";
+      connection.query(
+        query,
+        [new Date(startDate), new Date(endDate)],
+        (error, results) => {
+          if (error) {
+            return callback(error, null);
+          }
+          const clients = results.map((clientData) => {
+            return new Clients(
+              clientData.id,
+              clientData.nom,
+              clientData.prenoms,
+              clientData.numero_ifu,
+              clientData.numero_telephone,
+              clientData.email,
+              clientData.date_ajout
+            );
+          });
+          return callback(null, clients);
+        }
+      );
+    } else {
+      const query = "SELECT * FROM clients ORDER BY nom ASC";
+      connection.query(
+        query,
+        [new Date(startDate), new Date(endDate)],
+        (error, results) => {
+          if (error) {
+            return callback(error, null);
+          }
+          const clients = results.map((clientData) => {
+            return new Clients(
+              clientData.id,
+              clientData.nom,
+              clientData.prenoms,
+              clientData.numero_ifu,
+              clientData.numero_telephone,
+              clientData.email,
+              clientData.date_ajout
+            );
+          });
+          return callback(null, clients);
+        }
+      );
+    }
+  }
+
+  static getAllFromOldToNew(startDate, endDate, callback) {
+    if (startDate && endDate) {
+      const query =
+        "SELECT * FROM clients WHERE date_ajout BETWEEN ? AND ? ORDER BY date_ajout";
+      connection.query(
+        query,
+        [new Date(startDate), new Date(endDate)],
+        (error, results) => {
+          if (error) {
+            return callback(error, null);
+          }
+          const clients = results.map((clientData) => {
+            return new Clients(
+              clientData.id,
+              clientData.nom,
+              clientData.prenoms,
+              clientData.numero_ifu,
+              clientData.numero_telephone,
+              clientData.email,
+              clientData.date_ajout
+            );
+          });
+          return callback(null, clients);
+        }
+      );
+    } else {
+      const query = "SELECT * FROM clients ORDER BY date_ajout";
+      connection.query(
+        query,
+        [new Date(startDate), new Date(endDate)],
+        (error, results) => {
+          if (error) {
+            return callback(error, null);
+          }
+          const clients = results.map((clientData) => {
+            return new Clients(
+              clientData.id,
+              clientData.nom,
+              clientData.prenoms,
+              clientData.numero_ifu,
+              clientData.numero_telephone,
+              clientData.email,
+              clientData.date_ajout
+            );
+          });
+          return callback(null, clients);
+        }
+      );
+    }
+  }
+
+  static getAllFromNewToOld(startDate, endDate, callback) {
+    if (startDate && endDate) {
+      const query =
+        "SELECT * FROM clients WHERE date_ajout BETWEEN ? AND ? ORDER BY date_ajout DESC ";
+      connection.query(
+        query,
+        [new Date(startDate), new Date(endDate)],
+        (error, results) => {
+          if (error) {
+            return callback(error, null);
+          }
+          const clients = results.map((clientData) => {
+            return new Clients(
+              clientData.id,
+              clientData.nom,
+              clientData.prenoms,
+              clientData.numero_ifu,
+              clientData.numero_telephone,
+              clientData.email,
+              clientData.date_ajout
+            );
+          });
+          return callback(null, clients);
+        }
+      );
+    } else {
+      const query = "SELECT * FROM clients ORDER BY date_ajout DESC";
+      connection.query(
+        query,
+        [new Date(startDate), new Date(endDate)],
+        (error, results) => {
+          if (error) {
+            return callback(error, null);
+          }
+          const clients = results.map((clientData) => {
+            return new Clients(
+              clientData.id,
+              clientData.nom,
+              clientData.prenoms,
+              clientData.numero_ifu,
+              clientData.numero_telephone,
+              clientData.email,
+              clientData.date_ajout
+            );
+          });
+          return callback(null, clients);
+        }
+      );
+    }
   }
 
   update(callback) {

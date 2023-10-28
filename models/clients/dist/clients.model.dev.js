@@ -146,18 +146,119 @@ function () {
 
   }, {
     key: "getAll",
-    value: function getAll(callback) {
-      var query = "SELECT * FROM clients";
-      connection.query(query, function (error, results) {
-        if (error) {
-          return callback(error, null);
-        }
+    value: function getAll(startDate, endDate, callback) {
+      if (startDate && endDate) {
+        var query = "SELECT * FROM clients WHERE date_ajout BETWEEN ? AND ? ORDER BY id DESC ";
+        connection.query(query, [new Date(startDate), new Date(endDate)], function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
 
-        var clients = results.map(function (clientData) {
-          return new Clients(clientData.id, clientData.nom, clientData.prenoms, clientData.numero_ifu, clientData.numero_telephone, clientData.email, clientData.date_ajout);
+          var clients = results.map(function (clientData) {
+            return new Clients(clientData.id, clientData.nom, clientData.prenoms, clientData.numero_ifu, clientData.numero_telephone, clientData.email, clientData.date_ajout);
+          });
+          return callback(null, clients);
         });
-        return callback(null, clients);
-      });
+      } else {
+        var _query = "SELECT * FROM clients ORDER BY id DESC";
+        connection.query(_query, function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var clients = results.map(function (clientData) {
+            return new Clients(clientData.id, clientData.nom, clientData.prenoms, clientData.numero_ifu, clientData.numero_telephone, clientData.email, clientData.date_ajout);
+          });
+          return callback(null, clients);
+        });
+      }
+    }
+  }, {
+    key: "getAllByAlphabeticalOrder",
+    value: function getAllByAlphabeticalOrder(startDate, endDate, callback) {
+      if (startDate && endDate) {
+        var query = "SELECT * FROM clients WHERE date_ajout BETWEEN ? AND ? ORDER BY nom ASC ";
+        connection.query(query, [new Date(startDate), new Date(endDate)], function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var clients = results.map(function (clientData) {
+            return new Clients(clientData.id, clientData.nom, clientData.prenoms, clientData.numero_ifu, clientData.numero_telephone, clientData.email, clientData.date_ajout);
+          });
+          return callback(null, clients);
+        });
+      } else {
+        var _query2 = "SELECT * FROM clients ORDER BY nom ASC";
+        connection.query(_query2, [new Date(startDate), new Date(endDate)], function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var clients = results.map(function (clientData) {
+            return new Clients(clientData.id, clientData.nom, clientData.prenoms, clientData.numero_ifu, clientData.numero_telephone, clientData.email, clientData.date_ajout);
+          });
+          return callback(null, clients);
+        });
+      }
+    }
+  }, {
+    key: "getAllFromOldToNew",
+    value: function getAllFromOldToNew(startDate, endDate, callback) {
+      if (startDate && endDate) {
+        var query = "SELECT * FROM clients WHERE date_ajout BETWEEN ? AND ? ORDER BY date_ajout";
+        connection.query(query, [new Date(startDate), new Date(endDate)], function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var clients = results.map(function (clientData) {
+            return new Clients(clientData.id, clientData.nom, clientData.prenoms, clientData.numero_ifu, clientData.numero_telephone, clientData.email, clientData.date_ajout);
+          });
+          return callback(null, clients);
+        });
+      } else {
+        var _query3 = "SELECT * FROM clients ORDER BY date_ajout";
+        connection.query(_query3, [new Date(startDate), new Date(endDate)], function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var clients = results.map(function (clientData) {
+            return new Clients(clientData.id, clientData.nom, clientData.prenoms, clientData.numero_ifu, clientData.numero_telephone, clientData.email, clientData.date_ajout);
+          });
+          return callback(null, clients);
+        });
+      }
+    }
+  }, {
+    key: "getAllFromNewToOld",
+    value: function getAllFromNewToOld(startDate, endDate, callback) {
+      if (startDate && endDate) {
+        var query = "SELECT * FROM clients WHERE date_ajout BETWEEN ? AND ? ORDER BY date_ajout DESC ";
+        connection.query(query, [new Date(startDate), new Date(endDate)], function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var clients = results.map(function (clientData) {
+            return new Clients(clientData.id, clientData.nom, clientData.prenoms, clientData.numero_ifu, clientData.numero_telephone, clientData.email, clientData.date_ajout);
+          });
+          return callback(null, clients);
+        });
+      } else {
+        var _query4 = "SELECT * FROM clients ORDER BY date_ajout DESC";
+        connection.query(_query4, [new Date(startDate), new Date(endDate)], function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var clients = results.map(function (clientData) {
+            return new Clients(clientData.id, clientData.nom, clientData.prenoms, clientData.numero_ifu, clientData.numero_telephone, clientData.email, clientData.date_ajout);
+          });
+          return callback(null, clients);
+        });
+      }
     }
   }]);
 

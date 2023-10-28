@@ -4,6 +4,8 @@ const SoldeClient = require("../../models/solde_client/solde_client.model");
 
 class SoldeClientController {
   static getByIdClient = (req, res) => {
+    const startDate = req.params.startDate;
+    const endDate = req.params.endDate;
     const id_client = req.params.id_client;
 
     Clients.getById(id_client, (client_error, client) => {
@@ -18,35 +20,46 @@ class SoldeClientController {
           .status(404)
           .json({ status: 404, error: "Client non trouvé" });
       }
-      SoldeClient.getByIdClient(id_client, (soldeClientError, soldeClient) => {
-        if (soldeClientError) {
+      SoldeClient.getByIdClient(
+        startDate,
+        endDate,
+        id_client,
+        (soldeClientError, soldeClient) => {
+          if (soldeClientError) {
+            return res.status(500).json({
+              status: 500,
+              error: "Erreur lors de la récupéraition du solde du client",
+            });
+          }
+          if (!soldeClient) {
+            return res.status(404).json({
+              status: 404,
+              error: "Solde client non trouvé",
+            });
+          }
+          return res.status(200).json(soldeClient);
+        }
+      );
+    });
+  };
+
+  static getAll = (req, res) => {
+    const startDate = req.params.startDate;
+    const endDate = req.params.endDate;
+    SoldeClient.getAll(
+      startDate,
+      endDate,
+      (soldesClientsError, soldesClients) => {
+        if (soldesClientsError) {
           return res.status(500).json({
             status: 500,
             error: "Erreur lors de la récupéraition du solde du client",
           });
         }
-        if (!soldeClient) {
-          return res.status(404).json({
-            status: 404,
-            error: "Solde client non trouvé",
-          });
-        }
-        return res.status(200).json(soldeClient);
-      });
-    });
-  };
 
-  static getAll = (req, res) => {
-    SoldeClient.getAll((soldesClientsError, soldesClients) => {
-      if (soldesClientsError) {
-        return res.status(500).json({
-          status: 500,
-          error: "Erreur lors de la récupéraition du solde du client",
-        });
+        return res.status(200).json(soldesClients);
       }
-
-      return res.status(200).json(soldesClients);
-    });
+    );
   };
 }
 

@@ -3,7 +3,6 @@ const StockBonCommande = require("../../models/stock_bon_commande/stock_bon_comm
 const Clients = require("../../models/clients/clients.model");
 
 const fs = require("fs");
-const { error } = require("console");
 
 deleteFile = (file) => {
   fs.unlink(file, (error) => {
@@ -152,7 +151,9 @@ class AchatClientController {
 
   // Récupérer tous les achats clients
   static getAll = (req, res) => {
-    AchatClient.getAll((error, achatsClients) => {
+    const startDate = req.params.startDate;
+    const endDate = req.params.endDate;
+    AchatClient.getAll(startDate, endDate, (error, achatsClients) => {
       if (error) {
         return res.status(500).json({
           error: "Erreur lors de la récupération des achats des clients",
@@ -162,16 +163,313 @@ class AchatClientController {
     });
   };
 
+  static getAllFromNewToOld = (req, res) => {
+    const startDate = req.params.startDate;
+    const endDate = req.params.endDate;
+    AchatClient.getAllFromNewToOld(
+      startDate,
+      endDate,
+      (error, achatsClients) => {
+        if (error) {
+          return res.status(500).json({
+            error: "Erreur lors de la récupération des achats des clients",
+          });
+        }
+        return res.status(200).json(achatsClients);
+      }
+    );
+  };
+
+  static getAllFromOldToNew = (req, res) => {
+    const startDate = req.params.startDate;
+    const endDate = req.params.endDate;
+    AchatClient.getAllFromOldToNew(
+      startDate,
+      endDate,
+      (error, achatsClients) => {
+        if (error) {
+          return res.status(500).json({
+            error: "Erreur lors de la récupération des achats des clients",
+          });
+        }
+        return res.status(200).json(achatsClients);
+      }
+    );
+  };
+
+  static getAllMostImportant = (req, res) => {
+    const startDate = req.params.startDate;
+    const endDate = req.params.endDate;
+    AchatClient.getAllMostImportant(
+      startDate,
+      endDate,
+      (error, achatsClients) => {
+        if (error) {
+          return res.status(500).json({
+            error: "Erreur lors de la récupération des achats des clients",
+          });
+        }
+        return res.status(200).json(achatsClients);
+      }
+    );
+  };
+
+  static getAllLessImportant = (req, res) => {
+    const startDate = req.params.startDate;
+    const endDate = req.params.endDate;
+    AchatClient.getAllLessImportant(
+      startDate,
+      endDate,
+      (error, achatsClients) => {
+        if (error) {
+          return res.status(500).json({
+            error: "Erreur lors de la récupération des achats des clients",
+          });
+        }
+        return res.status(200).json(achatsClients);
+      }
+    );
+  };
+
+  static getAllNOCIBEMostImportant = (req, res) => {
+    const startDate = req.params.startDate;
+    const endDate = req.params.endDate;
+    AchatClient.getAllNOCIBEMostImportant(
+      startDate,
+      endDate,
+      (error, achatsClients) => {
+        if (error) {
+          return res.status(500).json({
+            error: "Erreur lors de la récupération des achats des clients",
+          });
+        }
+        return res.status(200).json(achatsClients);
+      }
+    );
+  };
+
+  static getAllNOCIBELessImportant = (req, res) => {
+    const startDate = req.params.startDate;
+    const endDate = req.params.endDate;
+    AchatClient.getAllNOCIBELessImportant(
+      startDate,
+      endDate,
+      (error, achatsClients) => {
+        if (error) {
+          return res.status(500).json({
+            error: "Erreur lors de la récupération des achats des clients",
+          });
+        }
+        return res.status(200).json(achatsClients);
+      }
+    );
+  };
+
+  static getAllCIMBENINMostImportant = (req, res) => {
+    const startDate = req.params.startDate;
+    const endDate = req.params.endDate;
+    AchatClient.getAllCIMBENINMostImportant(
+      startDate,
+      endDate,
+      (error, achatsClients) => {
+        if (error) {
+          return res.status(500).json({
+            error: "Erreur lors de la récupération des achats des clients",
+          });
+        }
+        return res.status(200).json(achatsClients);
+      }
+    );
+  };
+
+  static getAllCIMBENINLessImportant = (req, res) => {
+    const startDate = req.params.startDate;
+    const endDate = req.params.endDate;
+    AchatClient.getAllCIMBENINLessImportant(
+      startDate,
+      endDate,
+      (error, achatsClients) => {
+        if (error) {
+          return res.status(500).json({
+            error: "Erreur lors de la récupération des achats des clients",
+          });
+        }
+        return res.status(200).json(achatsClients);
+      }
+    );
+  };
+
+  // ================ Defined User ================
+
   static getAllOfClient = (req, res) => {
     const id_client = req.params.id_client;
-    AchatClient.getAllOfClient(id_client, (error, achatsClient) => {
-      if (error) {
-        return res.status(500).json({
-          error: "Erreur lors de la récupération des achats du client",
-        });
+    const startDate = req.params.startDate;
+    const endDate = req.params.endDate;
+    AchatClient.getAllOfClient(
+      startDate,
+      endDate,
+      id_client,
+      (error, achatsClient) => {
+        if (error) {
+          return res.status(500).json({
+            error: "Erreur lors de la récupération des achats du client",
+          });
+        }
+        return res.status(200).json(achatsClient);
       }
-      return res.status(200).json(achatsClient);
-    });
+    );
+  };
+
+  static getAllOfClientFromNewToOld = (req, res) => {
+    const id_client = req.params.id_client;
+    const startDate = req.params.startDate;
+    const endDate = req.params.endDate;
+    AchatClient.getAllOfClientFromNewToOld(
+      startDate,
+      endDate,
+      id_client,
+      (error, achatsClient) => {
+        if (error) {
+          return res.status(500).json({
+            error: "Erreur lors de la récupération des achats du client",
+          });
+        }
+        return res.status(200).json(achatsClient);
+      }
+    );
+  };
+
+  static getAllOfClientFromOldToNew = (req, res) => {
+    const id_client = req.params.id_client;
+    const startDate = req.params.startDate;
+    const endDate = req.params.endDate;
+    AchatClient.getAllOfClientFromOldToNew(
+      startDate,
+      endDate,
+      id_client,
+      (error, achatsClient) => {
+        if (error) {
+          return res.status(500).json({
+            error: "Erreur lors de la récupération des achats du client",
+          });
+        }
+        return res.status(200).json(achatsClient);
+      }
+    );
+  };
+
+  static getAllOfClientMostImportant = (req, res) => {
+    const id_client = req.params.id_client;
+    const startDate = req.params.startDate;
+    const endDate = req.params.endDate;
+    AchatClient.getAllOfClientMostImportant(
+      startDate,
+      endDate,
+      id_client,
+      (error, achatsClient) => {
+        if (error) {
+          return res.status(500).json({
+            error: "Erreur lors de la récupération des achats du client",
+          });
+        }
+        return res.status(200).json(achatsClient);
+      }
+    );
+  };
+
+  static getAllOfClientLessImportant = (req, res) => {
+    const id_client = req.params.id_client;
+    const startDate = req.params.startDate;
+    const endDate = req.params.endDate;
+    AchatClient.getAllOfClientLessImportant(
+      startDate,
+      endDate,
+      id_client,
+      (error, achatsClient) => {
+        if (error) {
+          return res.status(500).json({
+            error: "Erreur lors de la récupération des achats du client",
+          });
+        }
+        return res.status(200).json(achatsClient);
+      }
+    );
+  };
+
+  static getAllOfClientCIMBENINMostImportant = (req, res) => {
+    const id_client = req.params.id_client;
+    const startDate = req.params.startDate;
+    const endDate = req.params.endDate;
+    AchatClient.getAllOfClientCIMBENINMostImportant(
+      startDate,
+      endDate,
+      id_client,
+      (error, achatsClient) => {
+        if (error) {
+          return res.status(500).json({
+            error: "Erreur lors de la récupération des achats du client",
+          });
+        }
+        return res.status(200).json(achatsClient);
+      }
+    );
+  };
+
+  static getAllOfClientCIMBENINLessImportant = (req, res) => {
+    const id_client = req.params.id_client;
+    const startDate = req.params.startDate;
+    const endDate = req.params.endDate;
+    AchatClient.getAllOfClientCIMBENINLessImportant(
+      startDate,
+      endDate,
+      id_client,
+      (error, achatsClient) => {
+        if (error) {
+          return res.status(500).json({
+            error: "Erreur lors de la récupération des achats du client",
+          });
+        }
+        return res.status(200).json(achatsClient);
+      }
+    );
+  };
+
+  static getAllOfClientNOCIBEMostImportant = (req, res) => {
+    const id_client = req.params.id_client;
+    const startDate = req.params.startDate;
+    const endDate = req.params.endDate;
+    AchatClient.getAllOfClientNOCIBEMostImportant(
+      startDate,
+      endDate,
+      id_client,
+      (error, achatsClient) => {
+        if (error) {
+          return res.status(500).json({
+            error: "Erreur lors de la récupération des achats du client",
+          });
+        }
+        return res.status(200).json(achatsClient);
+      }
+    );
+  };
+
+  static getAllOfClientNOCIBELessImportant = (req, res) => {
+    const id_client = req.params.id_client;
+    const startDate = req.params.startDate;
+    const endDate = req.params.endDate;
+    AchatClient.getAllOfClientNOCIBELessImportant(
+      startDate,
+      endDate,
+      id_client,
+      (error, achatsClient) => {
+        if (error) {
+          return res.status(500).json({
+            error: "Erreur lors de la récupération des achats du client",
+          });
+        }
+        return res.status(200).json(achatsClient);
+      }
+    );
   };
 
   // Mettre à jour un achat client par ID

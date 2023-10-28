@@ -82,8 +82,64 @@ class AchatClient {
     });
   }
 
-  static getAll(callback) {
-    const query = `SELECT
+  // ================ All Client ================
+
+  static getAll(startDate, endDate, callback) {
+    if (startDate && endDate) {
+      const query = `SELECT
+    clients.id AS client_id,
+    clients.nom AS nom,
+    clients.prenoms AS prenoms,
+    clients.numero_ifu AS numero_ifu,
+    clients.numero_telephone AS numero_telephone,
+    clients.email AS email,
+    clients.date_ajout AS date_ajout,
+    achat_client.id AS achat_id,
+    achat_client.quantite_achetee,
+    achat_client.categorie AS categorie,
+    achat_client.montant AS montant,
+    achat_client.numero_ctp AS numero_ctp,
+    achat_client.bordereau AS bordereau,
+    achat_client.numero_bc AS numero_bc,
+    achat_client.date_achat AS date_achat
+    FROM clients, achat_client
+    WHERE achat_client.date_achat BETWEEN ? AND ? AND
+    clients.id = achat_client.id_client
+    ORDER BY achat_client.id DESC ;`;
+      connection.query(
+        query,
+        [new Date(startDate), new Date(endDate)],
+        (error, results) => {
+          if (error) {
+            return callback(error, null);
+          }
+          const achatsClients = results.map((achatClientData) => {
+            return new AchatClient(
+              achatClientData.achat_id,
+              new Clients(
+                achatClientData.client_id,
+                achatClientData.nom,
+                achatClientData.prenoms,
+                achatClientData.numero_ifu,
+                achatClientData.numero_telephone,
+                achatClientData.email,
+                achatClientData.date_ajout
+              ),
+              achatClientData.quantite_achetee,
+              achatClientData.categorie,
+              achatClientData.montant,
+              achatClientData.numero_ctp,
+              achatClientData.bordereau,
+              achatClientData.numero_bc,
+              achatClientData.id_client,
+              new Date(achatClientData.date_achat)
+            );
+          });
+          return callback(null, achatsClients);
+        }
+      );
+    } else {
+      const query = `SELECT
     clients.id AS client_id,
     clients.nom AS nom,
     clients.prenoms AS prenoms,
@@ -103,60 +159,1432 @@ FROM
     clients
 , achat_client 
 WHERE
-clients.id = achat_client.id_client;`;
-    connection.query(query, (error, results) => {
-      if (error) {
-        return callback(error, null);
-      }
-      const achatsClients = results.map((achatClientData) => {
-        return new AchatClient(
-          achatClientData.achat_id,
-          new Clients(
-            achatClientData.client_id,
-            achatClientData.nom,
-            achatClientData.prenoms,
-            achatClientData.numero_ifu,
-            achatClientData.numero_telephone,
-            achatClientData.email,
-            achatClientData.date_ajout
-          ),
-          achatClientData.quantite_achetee,
-          achatClientData.categorie,
-          achatClientData.montant,
-          achatClientData.numero_ctp,
-          achatClientData.bordereau,
-          achatClientData.numero_bc,
-          achatClientData.id_client,
-          new Date(achatClientData.date_achat)
-        );
+     clients.id = achat_client.id_client ORDER BY achat_client.id DESC;`;
+      connection.query(query, (error, results) => {
+        if (error) {
+          return callback(error, null);
+        }
+        const achatsClients = results.map((achatClientData) => {
+          return new AchatClient(
+            achatClientData.achat_id,
+            new Clients(
+              achatClientData.client_id,
+              achatClientData.nom,
+              achatClientData.prenoms,
+              achatClientData.numero_ifu,
+              achatClientData.numero_telephone,
+              achatClientData.email,
+              achatClientData.date_ajout
+            ),
+            achatClientData.quantite_achetee,
+            achatClientData.categorie,
+            achatClientData.montant,
+            achatClientData.numero_ctp,
+            achatClientData.bordereau,
+            achatClientData.numero_bc,
+            achatClientData.id_client,
+            new Date(achatClientData.date_achat)
+          );
+        });
+        return callback(null, achatsClients);
       });
-      return callback(null, achatsClients);
-    });
+    }
   }
 
-  static getAllOfClient(id_client, callback) {
-    const query = `SELECT * FROM achat_client WHERE id_client = ?`;
-    connection.query(query, [id_client], (error, results) => {
-      if (error) {
-        return callback(error, null);
-      }
-      const achatsClients = results.map((achatClientData) => {
-        // console.log(typeof achatClientData.quantite_achetee);
-        return new AchatClient(
-          achatClientData.id,
-          undefined,
-          achatClientData.quantite_achetee,
-          achatClientData.categorie,
-          achatClientData.montant,
-          achatClientData.numero_ctp,
-          achatClientData.bordereau,
-          achatClientData.numero_bc,
-          achatClientData.client_id,
-          new Date(achatClientData.date_achat)
-        );
+  static getAllFromNewToOld(startDate, endDate, callback) {
+    if (startDate && endDate) {
+      const query = `SELECT
+    clients.id AS client_id,
+    clients.nom AS nom,
+    clients.prenoms AS prenoms,
+    clients.numero_ifu AS numero_ifu,
+    clients.numero_telephone AS numero_telephone,
+    clients.email AS email,
+    clients.date_ajout AS date_ajout,
+    achat_client.id AS achat_id,
+    achat_client.quantite_achetee,
+    achat_client.categorie AS categorie,
+    achat_client.montant AS montant,
+    achat_client.numero_ctp AS numero_ctp,
+    achat_client.bordereau AS bordereau,
+    achat_client.numero_bc AS numero_bc,
+    achat_client.date_achat AS date_achat
+FROM
+    clients
+, achat_client 
+WHERE
+achat_client.date_achat BETWEEN ? AND ? AND
+     clients.id = achat_client.id_client ORDER BY achat_client.id DESC ;`;
+      connection.query(
+        query,
+        [new Date(startDate), new Date(endDate)],
+        (error, results) => {
+          if (error) {
+            return callback(error, null);
+          }
+          const achatsClients = results.map((achatClientData) => {
+            return new AchatClient(
+              achatClientData.achat_id,
+              new Clients(
+                achatClientData.client_id,
+                achatClientData.nom,
+                achatClientData.prenoms,
+                achatClientData.numero_ifu,
+                achatClientData.numero_telephone,
+                achatClientData.email,
+                achatClientData.date_ajout
+              ),
+              achatClientData.quantite_achetee,
+              achatClientData.categorie,
+              achatClientData.montant,
+              achatClientData.numero_ctp,
+              achatClientData.bordereau,
+              achatClientData.numero_bc,
+              achatClientData.id_client,
+              new Date(achatClientData.date_achat)
+            );
+          });
+          return callback(null, achatsClients);
+        }
+      );
+    } else {
+      const query = `SELECT
+    clients.id AS client_id,
+    clients.nom AS nom,
+    clients.prenoms AS prenoms,
+    clients.numero_ifu AS numero_ifu,
+    clients.numero_telephone AS numero_telephone,
+    clients.email AS email,
+    clients.date_ajout AS date_ajout,
+    achat_client.id AS achat_id,
+    achat_client.quantite_achetee,
+    achat_client.categorie AS categorie,
+    achat_client.montant AS montant,
+    achat_client.numero_ctp AS numero_ctp,
+    achat_client.bordereau AS bordereau,
+    achat_client.numero_bc AS numero_bc,
+    achat_client.date_achat AS date_achat
+FROM
+    clients
+, achat_client 
+WHERE
+     clients.id = achat_client.id_client ORDER BY achat_client.id DESC;`;
+      connection.query(query, (error, results) => {
+        if (error) {
+          return callback(error, null);
+        }
+        const achatsClients = results.map((achatClientData) => {
+          return new AchatClient(
+            achatClientData.achat_id,
+            new Clients(
+              achatClientData.client_id,
+              achatClientData.nom,
+              achatClientData.prenoms,
+              achatClientData.numero_ifu,
+              achatClientData.numero_telephone,
+              achatClientData.email,
+              achatClientData.date_ajout
+            ),
+            achatClientData.quantite_achetee,
+            achatClientData.categorie,
+            achatClientData.montant,
+            achatClientData.numero_ctp,
+            achatClientData.bordereau,
+            achatClientData.numero_bc,
+            achatClientData.id_client,
+            new Date(achatClientData.date_achat)
+          );
+        });
+        return callback(null, achatsClients);
       });
-      return callback(null, achatsClients);
-    });
+    }
+  }
+
+  static getAllFromOldToNew(startDate, endDate, callback) {
+    if (startDate && endDate) {
+      const query = `SELECT
+    clients.id AS client_id,
+    clients.nom AS nom,
+    clients.prenoms AS prenoms,
+    clients.numero_ifu AS numero_ifu,
+    clients.numero_telephone AS numero_telephone,
+    clients.email AS email,
+    clients.date_ajout AS date_ajout,
+    achat_client.id AS achat_id,
+    achat_client.quantite_achetee,
+    achat_client.categorie AS categorie,
+    achat_client.montant AS montant,
+    achat_client.numero_ctp AS numero_ctp,
+    achat_client.bordereau AS bordereau,
+    achat_client.numero_bc AS numero_bc,
+    achat_client.date_achat AS date_achat
+FROM
+    clients
+, achat_client 
+WHERE
+achat_client.date_achat BETWEEN ? AND ? AND
+     clients.id = achat_client.id_client ORDER BY achat_client.id ASC ;`;
+      connection.query(
+        query,
+        [new Date(startDate), new Date(endDate)],
+        (error, results) => {
+          if (error) {
+            return callback(error, null);
+          }
+          const achatsClients = results.map((achatClientData) => {
+            return new AchatClient(
+              achatClientData.achat_id,
+              new Clients(
+                achatClientData.client_id,
+                achatClientData.nom,
+                achatClientData.prenoms,
+                achatClientData.numero_ifu,
+                achatClientData.numero_telephone,
+                achatClientData.email,
+                achatClientData.date_ajout
+              ),
+              achatClientData.quantite_achetee,
+              achatClientData.categorie,
+              achatClientData.montant,
+              achatClientData.numero_ctp,
+              achatClientData.bordereau,
+              achatClientData.numero_bc,
+              achatClientData.id_client,
+              new Date(achatClientData.date_achat)
+            );
+          });
+          return callback(null, achatsClients);
+        }
+      );
+    } else {
+      const query = `SELECT
+    clients.id AS client_id,
+    clients.nom AS nom,
+    clients.prenoms AS prenoms,
+    clients.numero_ifu AS numero_ifu,
+    clients.numero_telephone AS numero_telephone,
+    clients.email AS email,
+    clients.date_ajout AS date_ajout,
+    achat_client.id AS achat_id,
+    achat_client.quantite_achetee,
+    achat_client.categorie AS categorie,
+    achat_client.montant AS montant,
+    achat_client.numero_ctp AS numero_ctp,
+    achat_client.bordereau AS bordereau,
+    achat_client.numero_bc AS numero_bc,
+    achat_client.date_achat AS date_achat
+FROM
+    clients
+, achat_client 
+WHERE
+     clients.id = achat_client.id_client ORDER BY achat_client.id ASC;`;
+      connection.query(query, (error, results) => {
+        if (error) {
+          return callback(error, null);
+        }
+        const achatsClients = results.map((achatClientData) => {
+          return new AchatClient(
+            achatClientData.achat_id,
+            new Clients(
+              achatClientData.client_id,
+              achatClientData.nom,
+              achatClientData.prenoms,
+              achatClientData.numero_ifu,
+              achatClientData.numero_telephone,
+              achatClientData.email,
+              achatClientData.date_ajout
+            ),
+            achatClientData.quantite_achetee,
+            achatClientData.categorie,
+            achatClientData.montant,
+            achatClientData.numero_ctp,
+            achatClientData.bordereau,
+            achatClientData.numero_bc,
+            achatClientData.id_client,
+            new Date(achatClientData.date_achat)
+          );
+        });
+        return callback(null, achatsClients);
+      });
+    }
+  }
+
+  static getAllMostImportant(startDate, endDate, callback) {
+    if (startDate && endDate) {
+      const query = `SELECT
+    clients.id AS client_id,
+    clients.nom AS nom,
+    clients.prenoms AS prenoms,
+    clients.numero_ifu AS numero_ifu,
+    clients.numero_telephone AS numero_telephone,
+    clients.email AS email,
+    clients.date_ajout AS date_ajout,
+    achat_client.id AS achat_id,
+    achat_client.quantite_achetee,
+    achat_client.categorie AS categorie,
+    achat_client.montant AS montant,
+    achat_client.numero_ctp AS numero_ctp,
+    achat_client.bordereau AS bordereau,
+    achat_client.numero_bc AS numero_bc,
+    achat_client.date_achat AS date_achat
+FROM
+    clients
+, achat_client 
+WHERE
+achat_client.date_achat BETWEEN ? AND ? AND
+     clients.id = achat_client.id_client ORDER BY achat_client.quantite_achetee DESC ;`;
+      connection.query(
+        query,
+        [new Date(startDate), new Date(endDate)],
+        (error, results) => {
+          if (error) {
+            return callback(error, null);
+          }
+          const achatsClients = results.map((achatClientData) => {
+            return new AchatClient(
+              achatClientData.achat_id,
+              new Clients(
+                achatClientData.client_id,
+                achatClientData.nom,
+                achatClientData.prenoms,
+                achatClientData.numero_ifu,
+                achatClientData.numero_telephone,
+                achatClientData.email,
+                achatClientData.date_ajout
+              ),
+              achatClientData.quantite_achetee,
+              achatClientData.categorie,
+              achatClientData.montant,
+              achatClientData.numero_ctp,
+              achatClientData.bordereau,
+              achatClientData.numero_bc,
+              achatClientData.id_client,
+              new Date(achatClientData.date_achat)
+            );
+          });
+          return callback(null, achatsClients);
+        }
+      );
+    } else {
+      const query = `SELECT
+    clients.id AS client_id,
+    clients.nom AS nom,
+    clients.prenoms AS prenoms,
+    clients.numero_ifu AS numero_ifu,
+    clients.numero_telephone AS numero_telephone,
+    clients.email AS email,
+    clients.date_ajout AS date_ajout,
+    achat_client.id AS achat_id,
+    achat_client.quantite_achetee,
+    achat_client.categorie AS categorie,
+    achat_client.montant AS montant,
+    achat_client.numero_ctp AS numero_ctp,
+    achat_client.bordereau AS bordereau,
+    achat_client.numero_bc AS numero_bc,
+    achat_client.date_achat AS date_achat
+FROM
+    clients
+, achat_client 
+WHERE
+     clients.id = achat_client.id_client ORDER BY achat_client.quantite_achetee DESC;`;
+      connection.query(query, (error, results) => {
+        if (error) {
+          return callback(error, null);
+        }
+        const achatsClients = results.map((achatClientData) => {
+          return new AchatClient(
+            achatClientData.achat_id,
+            new Clients(
+              achatClientData.client_id,
+              achatClientData.nom,
+              achatClientData.prenoms,
+              achatClientData.numero_ifu,
+              achatClientData.numero_telephone,
+              achatClientData.email,
+              achatClientData.date_ajout
+            ),
+            achatClientData.quantite_achetee,
+            achatClientData.categorie,
+            achatClientData.montant,
+            achatClientData.numero_ctp,
+            achatClientData.bordereau,
+            achatClientData.numero_bc,
+            achatClientData.id_client,
+            new Date(achatClientData.date_achat)
+          );
+        });
+        return callback(null, achatsClients);
+      });
+    }
+  }
+
+  static getAllLessImportant(startDate, endDate, callback) {
+    if (startDate && endDate) {
+      const query = `SELECT
+    clients.id AS client_id,
+    clients.nom AS nom,
+    clients.prenoms AS prenoms,
+    clients.numero_ifu AS numero_ifu,
+    clients.numero_telephone AS numero_telephone,
+    clients.email AS email,
+    clients.date_ajout AS date_ajout,
+    achat_client.id AS achat_id,
+    achat_client.quantite_achetee,
+    achat_client.categorie AS categorie,
+    achat_client.montant AS montant,
+    achat_client.numero_ctp AS numero_ctp,
+    achat_client.bordereau AS bordereau,
+    achat_client.numero_bc AS numero_bc,
+    achat_client.date_achat AS date_achat
+FROM
+    clients
+, achat_client 
+WHERE
+achat_client.date_achat BETWEEN ? AND ? AND
+     clients.id = achat_client.id_client ORDER BY achat_client.quantite_achetee ASC ;`;
+      connection.query(
+        query,
+        [new Date(startDate), new Date(endDate)],
+        (error, results) => {
+          if (error) {
+            return callback(error, null);
+          }
+          const achatsClients = results.map((achatClientData) => {
+            return new AchatClient(
+              achatClientData.achat_id,
+              new Clients(
+                achatClientData.client_id,
+                achatClientData.nom,
+                achatClientData.prenoms,
+                achatClientData.numero_ifu,
+                achatClientData.numero_telephone,
+                achatClientData.email,
+                achatClientData.date_ajout
+              ),
+              achatClientData.quantite_achetee,
+              achatClientData.categorie,
+              achatClientData.montant,
+              achatClientData.numero_ctp,
+              achatClientData.bordereau,
+              achatClientData.numero_bc,
+              achatClientData.id_client,
+              new Date(achatClientData.date_achat)
+            );
+          });
+          return callback(null, achatsClients);
+        }
+      );
+    } else {
+      const query = `SELECT
+    clients.id AS client_id,
+    clients.nom AS nom,
+    clients.prenoms AS prenoms,
+    clients.numero_ifu AS numero_ifu,
+    clients.numero_telephone AS numero_telephone,
+    clients.email AS email,
+    clients.date_ajout AS date_ajout,
+    achat_client.id AS achat_id,
+    achat_client.quantite_achetee,
+    achat_client.categorie AS categorie,
+    achat_client.montant AS montant,
+    achat_client.numero_ctp AS numero_ctp,
+    achat_client.bordereau AS bordereau,
+    achat_client.numero_bc AS numero_bc,
+    achat_client.date_achat AS date_achat
+FROM
+    clients
+, achat_client 
+WHERE
+     clients.id = achat_client.id_client ORDER BY achat_client.quantite_achetee ASC;`;
+      connection.query(query, (error, results) => {
+        if (error) {
+          return callback(error, null);
+        }
+        const achatsClients = results.map((achatClientData) => {
+          return new AchatClient(
+            achatClientData.achat_id,
+            new Clients(
+              achatClientData.client_id,
+              achatClientData.nom,
+              achatClientData.prenoms,
+              achatClientData.numero_ifu,
+              achatClientData.numero_telephone,
+              achatClientData.email,
+              achatClientData.date_ajout
+            ),
+            achatClientData.quantite_achetee,
+            achatClientData.categorie,
+            achatClientData.montant,
+            achatClientData.numero_ctp,
+            achatClientData.bordereau,
+            achatClientData.numero_bc,
+            achatClientData.id_client,
+            new Date(achatClientData.date_achat)
+          );
+        });
+        return callback(null, achatsClients);
+      });
+    }
+  }
+
+  static getAllNOCIBEMostImportant(startDate, endDate, callback) {
+    if (startDate && endDate) {
+      const query = `SELECT
+    clients.id AS client_id,
+    clients.nom AS nom,
+    clients.prenoms AS prenoms,
+    clients.numero_ifu AS numero_ifu,
+    clients.numero_telephone AS numero_telephone,
+    clients.email AS email,
+    clients.date_ajout AS date_ajout,
+    achat_client.id AS achat_id,
+    achat_client.quantite_achetee,
+    achat_client.categorie AS categorie,
+    achat_client.montant AS montant,
+    achat_client.numero_ctp AS numero_ctp,
+    achat_client.bordereau AS bordereau,
+    achat_client.numero_bc AS numero_bc,
+    achat_client.date_achat AS date_achat
+FROM
+    clients
+, achat_client 
+WHERE achat_client.categorie = 'NOCIBE' AND
+achat_client.date_achat BETWEEN ? AND ? AND
+     clients.id = achat_client.id_client ORDER BY achat_client.quantite_achetee DESC;`;
+      connection.query(
+        query,
+        [new Date(startDate), new Date(endDate)],
+        (error, results) => {
+          if (error) {
+            return callback(error, null);
+          }
+          const achatsClients = results.map((achatClientData) => {
+            return new AchatClient(
+              achatClientData.achat_id,
+              new Clients(
+                achatClientData.client_id,
+                achatClientData.nom,
+                achatClientData.prenoms,
+                achatClientData.numero_ifu,
+                achatClientData.numero_telephone,
+                achatClientData.email,
+                achatClientData.date_ajout
+              ),
+              achatClientData.quantite_achetee,
+              achatClientData.categorie,
+              achatClientData.montant,
+              achatClientData.numero_ctp,
+              achatClientData.bordereau,
+              achatClientData.numero_bc,
+              achatClientData.id_client,
+              new Date(achatClientData.date_achat)
+            );
+          });
+          return callback(null, achatsClients);
+        }
+      );
+    } else {
+      const query = `SELECT
+    clients.id AS client_id,
+    clients.nom AS nom,
+    clients.prenoms AS prenoms,
+    clients.numero_ifu AS numero_ifu,
+    clients.numero_telephone AS numero_telephone,
+    clients.email AS email,
+    clients.date_ajout AS date_ajout,
+    achat_client.id AS achat_id,
+    achat_client.quantite_achetee,
+    achat_client.categorie AS categorie,
+    achat_client.montant AS montant,
+    achat_client.numero_ctp AS numero_ctp,
+    achat_client.bordereau AS bordereau,
+    achat_client.numero_bc AS numero_bc,
+    achat_client.date_achat AS date_achat
+FROM
+    clients
+, achat_client
+WHERE achat_client.categorie = 'NOCIBE' AND
+     clients.id = achat_client.id_client ORDER BY achat_client.quantite_achetee DESC`;
+      connection.query(
+        query,
+        [new Date(startDate), new Date(endDate)],
+        (error, results) => {
+          if (error) {
+            return callback(error, null);
+          }
+          const achatsClients = results.map((achatClientData) => {
+            return new AchatClient(
+              achatClientData.achat_id,
+              new Clients(
+                achatClientData.client_id,
+                achatClientData.nom,
+                achatClientData.prenoms,
+                achatClientData.numero_ifu,
+                achatClientData.numero_telephone,
+                achatClientData.email,
+                achatClientData.date_ajout
+              ),
+              achatClientData.quantite_achetee,
+              achatClientData.categorie,
+              achatClientData.montant,
+              achatClientData.numero_ctp,
+              achatClientData.bordereau,
+              achatClientData.numero_bc,
+              achatClientData.id_client,
+              new Date(achatClientData.date_achat)
+            );
+          });
+          return callback(null, achatsClients);
+        }
+      );
+    }
+  }
+
+  static getAllNOCIBELessImportant(startDate, endDate, callback) {
+    if (startDate && endDate) {
+      const query = `SELECT
+    clients.id AS client_id,
+    clients.nom AS nom,
+    clients.prenoms AS prenoms,
+    clients.numero_ifu AS numero_ifu,
+    clients.numero_telephone AS numero_telephone,
+    clients.email AS email,
+    clients.date_ajout AS date_ajout,
+    achat_client.id AS achat_id,
+    achat_client.quantite_achetee,
+    achat_client.categorie AS categorie,
+    achat_client.montant AS montant,
+    achat_client.numero_ctp AS numero_ctp,
+    achat_client.bordereau AS bordereau,
+    achat_client.numero_bc AS numero_bc,
+    achat_client.date_achat AS date_achat
+FROM
+    clients
+, achat_client 
+WHERE achat_client.categorie = 'NOCIBE' AND
+achat_client.date_achat BETWEEN ? AND ? AND
+     clients.id = achat_client.id_client ORDER BY achat_client.quantite_achetee ASC`;
+      connection.query(
+        query,
+        [new Date(startDate), new Date(endDate)],
+        (error, results) => {
+          if (error) {
+            return callback(error, null);
+          }
+          const achatsClients = results.map((achatClientData) => {
+            return new AchatClient(
+              achatClientData.achat_id,
+              new Clients(
+                achatClientData.client_id,
+                achatClientData.nom,
+                achatClientData.prenoms,
+                achatClientData.numero_ifu,
+                achatClientData.numero_telephone,
+                achatClientData.email,
+                achatClientData.date_ajout
+              ),
+              achatClientData.quantite_achetee,
+              achatClientData.categorie,
+              achatClientData.montant,
+              achatClientData.numero_ctp,
+              achatClientData.bordereau,
+              achatClientData.numero_bc,
+              achatClientData.id_client,
+              new Date(achatClientData.date_achat)
+            );
+          });
+          return callback(null, achatsClients);
+        }
+      );
+    } else {
+      const query = `SELECT
+    clients.id AS client_id,
+    clients.nom AS nom,
+    clients.prenoms AS prenoms,
+    clients.numero_ifu AS numero_ifu,
+    clients.numero_telephone AS numero_telephone,
+    clients.email AS email,
+    clients.date_ajout AS date_ajout,
+    achat_client.id AS achat_id,
+    achat_client.quantite_achetee,
+    achat_client.categorie AS categorie,
+    achat_client.montant AS montant,
+    achat_client.numero_ctp AS numero_ctp,
+    achat_client.bordereau AS bordereau,
+    achat_client.numero_bc AS numero_bc,
+    achat_client.date_achat AS date_achat
+FROM
+    clients
+, achat_client 
+WHERE achat_client.categorie = 'NOCIBE' AND
+     clients.id = achat_client.id_client ORDER BY achat_client.quantite_achetee ASC`;
+      connection.query(
+        query,
+        [new Date(startDate), new Date(endDate)],
+        (error, results) => {
+          if (error) {
+            return callback(error, null);
+          }
+          const achatsClients = results.map((achatClientData) => {
+            return new AchatClient(
+              achatClientData.achat_id,
+              new Clients(
+                achatClientData.client_id,
+                achatClientData.nom,
+                achatClientData.prenoms,
+                achatClientData.numero_ifu,
+                achatClientData.numero_telephone,
+                achatClientData.email,
+                achatClientData.date_ajout
+              ),
+              achatClientData.quantite_achetee,
+              achatClientData.categorie,
+              achatClientData.montant,
+              achatClientData.numero_ctp,
+              achatClientData.bordereau,
+              achatClientData.numero_bc,
+              achatClientData.id_client,
+              new Date(achatClientData.date_achat)
+            );
+          });
+          return callback(null, achatsClients);
+        }
+      );
+    }
+  }
+
+  static getAllCIMBENINMostImportant(startDate, endDate, callback) {
+    if (startDate && endDate) {
+      const query = `SELECT
+    clients.id AS client_id,
+    clients.nom AS nom,
+    clients.prenoms AS prenoms,
+    clients.numero_ifu AS numero_ifu,
+    clients.numero_telephone AS numero_telephone,
+    clients.email AS email,
+    clients.date_ajout AS date_ajout,
+    achat_client.id AS achat_id,
+    achat_client.quantite_achetee,
+    achat_client.categorie AS categorie,
+    achat_client.montant AS montant,
+    achat_client.numero_ctp AS numero_ctp,
+    achat_client.bordereau AS bordereau,
+    achat_client.numero_bc AS numero_bc,
+    achat_client.date_achat AS date_achat
+FROM
+    clients
+, achat_client 
+WHERE achat_client.categorie = 'CIM BENIN' AND
+achat_client.date_achat BETWEEN ? AND ? AND
+     clients.id = achat_client.id_client ORDER BY achat_client.quantite_achetee DESC`;
+      connection.query(
+        query,
+        [new Date(startDate), new Date(endDate)],
+        (error, results) => {
+          if (error) {
+            return callback(error, null);
+          }
+          const achatsClients = results.map((achatClientData) => {
+            return new AchatClient(
+              achatClientData.achat_id,
+              new Clients(
+                achatClientData.client_id,
+                achatClientData.nom,
+                achatClientData.prenoms,
+                achatClientData.numero_ifu,
+                achatClientData.numero_telephone,
+                achatClientData.email,
+                achatClientData.date_ajout
+              ),
+              achatClientData.quantite_achetee,
+              achatClientData.categorie,
+              achatClientData.montant,
+              achatClientData.numero_ctp,
+              achatClientData.bordereau,
+              achatClientData.numero_bc,
+              achatClientData.id_client,
+              new Date(achatClientData.date_achat)
+            );
+          });
+          return callback(null, achatsClients);
+        }
+      );
+    } else {
+      const query = `SELECT
+    clients.id AS client_id,
+    clients.nom AS nom,
+    clients.prenoms AS prenoms,
+    clients.numero_ifu AS numero_ifu,
+    clients.numero_telephone AS numero_telephone,
+    clients.email AS email,
+    clients.date_ajout AS date_ajout,
+    achat_client.id AS achat_id,
+    achat_client.quantite_achetee,
+    achat_client.categorie AS categorie,
+    achat_client.montant AS montant,
+    achat_client.numero_ctp AS numero_ctp,
+    achat_client.bordereau AS bordereau,
+    achat_client.numero_bc AS numero_bc,
+    achat_client.date_achat AS date_achat
+FROM
+    clients
+, achat_client 
+WHERE achat_client.categorie = 'CIM BENIN' AND
+     clients.id = achat_client.id_client ORDER BY achat_client.quantite_achetee DESC`;
+      connection.query(
+        query,
+        [new Date(startDate), new Date(endDate)],
+        (error, results) => {
+          if (error) {
+            return callback(error, null);
+          }
+          const achatsClients = results.map((achatClientData) => {
+            return new AchatClient(
+              achatClientData.achat_id,
+              new Clients(
+                achatClientData.client_id,
+                achatClientData.nom,
+                achatClientData.prenoms,
+                achatClientData.numero_ifu,
+                achatClientData.numero_telephone,
+                achatClientData.email,
+                achatClientData.date_ajout
+              ),
+              achatClientData.quantite_achetee,
+              achatClientData.categorie,
+              achatClientData.montant,
+              achatClientData.numero_ctp,
+              achatClientData.bordereau,
+              achatClientData.numero_bc,
+              achatClientData.id_client,
+              new Date(achatClientData.date_achat)
+            );
+          });
+          return callback(null, achatsClients);
+        }
+      );
+    }
+  }
+
+  static getAllCIMBENINLessImportant(startDate, endDate, callback) {
+    if (startDate && endDate) {
+      const query = `SELECT
+    clients.id AS client_id,
+    clients.nom AS nom,
+    clients.prenoms AS prenoms,
+    clients.numero_ifu AS numero_ifu,
+    clients.numero_telephone AS numero_telephone,
+    clients.email AS email,
+    clients.date_ajout AS date_ajout,
+    achat_client.id AS achat_id,
+    achat_client.quantite_achetee,
+    achat_client.categorie AS categorie,
+    achat_client.montant AS montant,
+    achat_client.numero_ctp AS numero_ctp,
+    achat_client.bordereau AS bordereau,
+    achat_client.numero_bc AS numero_bc,
+    achat_client.date_achat AS date_achat
+FROM
+    clients
+, achat_client 
+WHERE achat_client.categorie = 'CIM BENIN' AND
+achat_client.date_achat BETWEEN ? AND ? AND
+     clients.id = achat_client.id_client ORDER BY achat_client.quantite_achetee ASC`;
+      connection.query(
+        query,
+        [new Date(startDate), new Date(endDate)],
+        (error, results) => {
+          if (error) {
+            return callback(error, null);
+          }
+          const achatsClients = results.map((achatClientData) => {
+            return new AchatClient(
+              achatClientData.achat_id,
+              new Clients(
+                achatClientData.client_id,
+                achatClientData.nom,
+                achatClientData.prenoms,
+                achatClientData.numero_ifu,
+                achatClientData.numero_telephone,
+                achatClientData.email,
+                achatClientData.date_ajout
+              ),
+              achatClientData.quantite_achetee,
+              achatClientData.categorie,
+              achatClientData.montant,
+              achatClientData.numero_ctp,
+              achatClientData.bordereau,
+              achatClientData.numero_bc,
+              achatClientData.id_client,
+              new Date(achatClientData.date_achat)
+            );
+          });
+          return callback(null, achatsClients);
+        }
+      );
+    } else {
+      const query = `SELECT
+    clients.id AS client_id,
+    clients.nom AS nom,
+    clients.prenoms AS prenoms,
+    clients.numero_ifu AS numero_ifu,
+    clients.numero_telephone AS numero_telephone,
+    clients.email AS email,
+    clients.date_ajout AS date_ajout,
+    achat_client.id AS achat_id,
+    achat_client.quantite_achetee,
+    achat_client.categorie AS categorie,
+    achat_client.montant AS montant,
+    achat_client.numero_ctp AS numero_ctp,
+    achat_client.bordereau AS bordereau,
+    achat_client.numero_bc AS numero_bc,
+    achat_client.date_achat AS date_achat
+FROM
+    clients
+, achat_client 
+WHERE achat_client.categorie = 'CIM BENIN' AND
+     clients.id = achat_client.id_client ORDER BY achat_client.quantite_achetee ASC`;
+      connection.query(
+        query,
+        [new Date(startDate), new Date(endDate)],
+        (error, results) => {
+          if (error) {
+            return callback(error, null);
+          }
+          const achatsClients = results.map((achatClientData) => {
+            return new AchatClient(
+              achatClientData.achat_id,
+              new Clients(
+                achatClientData.client_id,
+                achatClientData.nom,
+                achatClientData.prenoms,
+                achatClientData.numero_ifu,
+                achatClientData.numero_telephone,
+                achatClientData.email,
+                achatClientData.date_ajout
+              ),
+              achatClientData.quantite_achetee,
+              achatClientData.categorie,
+              achatClientData.montant,
+              achatClientData.numero_ctp,
+              achatClientData.bordereau,
+              achatClientData.numero_bc,
+              achatClientData.id_client,
+              new Date(achatClientData.date_achat)
+            );
+          });
+          return callback(null, achatsClients);
+        }
+      );
+    }
+  }
+
+  // =========== Defined Client ========
+
+  static getAllOfClient(startDate, endDate, id_client, callback) {
+    if (startDate && endDate) {
+      const query = `SELECT * FROM achat_client WHERE date_achat BETWEEN ? AND ? AND id_client = ? ORDER BY id DESC`;
+      connection.query(
+        query,
+        [new Date(startDate), new Date(endDate), id_client],
+        (error, results) => {
+          if (error) {
+            return callback(error, null);
+          }
+          const achatsClients = results.map((achatClientData) => {
+            // console.log(typeof achatClientData.quantite_achetee);
+            return new AchatClient(
+              achatClientData.id,
+              undefined,
+              achatClientData.quantite_achetee,
+              achatClientData.categorie,
+              achatClientData.montant,
+              achatClientData.numero_ctp,
+              achatClientData.bordereau,
+              achatClientData.numero_bc,
+              achatClientData.client_id,
+              new Date(achatClientData.date_achat)
+            );
+          });
+          return callback(null, achatsClients);
+        }
+      );
+    } else {
+      const query = `SELECT * FROM achat_client WHERE id_client = ? ORDER BY id DESC`;
+      connection.query(query, [id_client], (error, results) => {
+        if (error) {
+          return callback(error, null);
+        }
+        const achatsClients = results.map((achatClientData) => {
+          // console.log(typeof achatClientData.quantite_achetee);
+          return new AchatClient(
+            achatClientData.id,
+            undefined,
+            achatClientData.quantite_achetee,
+            achatClientData.categorie,
+            achatClientData.montant,
+            achatClientData.numero_ctp,
+            achatClientData.bordereau,
+            achatClientData.numero_bc,
+            achatClientData.client_id,
+            new Date(achatClientData.date_achat)
+          );
+        });
+        return callback(null, achatsClients);
+      });
+    }
+  }
+
+  static getAllOfClientFromNewToOld(startDate, endDate, id_client, callback) {
+    if (startDate && endDate) {
+      const query = `SELECT * FROM achat_client WHERE date_achat BETWEEN ? AND ? AND id_client = ? ORDER BY id DESC`;
+      connection.query(
+        query,
+        [new Date(startDate), new Date(endDate), id_client],
+        (error, results) => {
+          if (error) {
+            return callback(error, null);
+          }
+          const achatsClients = results.map((achatClientData) => {
+            // console.log(typeof achatClientData.quantite_achetee);
+            return new AchatClient(
+              achatClientData.id,
+              undefined,
+              achatClientData.quantite_achetee,
+              achatClientData.categorie,
+              achatClientData.montant,
+              achatClientData.numero_ctp,
+              achatClientData.bordereau,
+              achatClientData.numero_bc,
+              achatClientData.client_id,
+              new Date(achatClientData.date_achat)
+            );
+          });
+          return callback(null, achatsClients);
+        }
+      );
+    } else {
+      const query = `SELECT * FROM achat_client WHERE id_client = ? ORDER BY id DESC`;
+      connection.query(query, [id_client], (error, results) => {
+        if (error) {
+          return callback(error, null);
+        }
+        const achatsClients = results.map((achatClientData) => {
+          // console.log(typeof achatClientData.quantite_achetee);
+          return new AchatClient(
+            achatClientData.id,
+            undefined,
+            achatClientData.quantite_achetee,
+            achatClientData.categorie,
+            achatClientData.montant,
+            achatClientData.numero_ctp,
+            achatClientData.bordereau,
+            achatClientData.numero_bc,
+            achatClientData.client_id,
+            new Date(achatClientData.date_achat)
+          );
+        });
+        return callback(null, achatsClients);
+      });
+    }
+  }
+
+  static getAllOfClientFromOldToNew(startDate, endDate, id_client, callback) {
+    if (startDate && endDate) {
+      const query = `SELECT * FROM achat_client WHERE date_achat BETWEEN ? AND ? AND id_client = ? ORDER BY id ASC`;
+      connection.query(
+        query,
+        [new Date(startDate), new Date(endDate), id_client],
+        (error, results) => {
+          if (error) {
+            return callback(error, null);
+          }
+          const achatsClients = results.map((achatClientData) => {
+            // console.log(typeof achatClientData.quantite_achetee);
+            return new AchatClient(
+              achatClientData.id,
+              undefined,
+              achatClientData.quantite_achetee,
+              achatClientData.categorie,
+              achatClientData.montant,
+              achatClientData.numero_ctp,
+              achatClientData.bordereau,
+              achatClientData.numero_bc,
+              achatClientData.client_id,
+              new Date(achatClientData.date_achat)
+            );
+          });
+          return callback(null, achatsClients);
+        }
+      );
+    } else {
+      const query = `SELECT * FROM achat_client WHERE id_client = ? ORDER BY id ASC`;
+      connection.query(query, [id_client], (error, results) => {
+        if (error) {
+          return callback(error, null);
+        }
+        const achatsClients = results.map((achatClientData) => {
+          // console.log(typeof achatClientData.quantite_achetee);
+          return new AchatClient(
+            achatClientData.id,
+            undefined,
+            achatClientData.quantite_achetee,
+            achatClientData.categorie,
+            achatClientData.montant,
+            achatClientData.numero_ctp,
+            achatClientData.bordereau,
+            achatClientData.numero_bc,
+            achatClientData.client_id,
+            new Date(achatClientData.date_achat)
+          );
+        });
+        return callback(null, achatsClients);
+      });
+    }
+  }
+
+  static getAllOfClientMostImportant(startDate, endDate, id_client, callback) {
+    if (startDate && endDate) {
+      const query = `SELECT * FROM achat_client WHERE date_achat BETWEEN ? AND ? AND id_client = ? ORDER BY quantite_achetee DESC`;
+      connection.query(
+        query,
+        [new Date(startDate), new Date(endDate), id_client],
+        (error, results) => {
+          if (error) {
+            return callback(error, null);
+          }
+          const achatsClients = results.map((achatClientData) => {
+            // console.log(typeof achatClientData.quantite_achetee);
+            return new AchatClient(
+              achatClientData.id,
+              undefined,
+              achatClientData.quantite_achetee,
+              achatClientData.categorie,
+              achatClientData.montant,
+              achatClientData.numero_ctp,
+              achatClientData.bordereau,
+              achatClientData.numero_bc,
+              achatClientData.client_id,
+              new Date(achatClientData.date_achat)
+            );
+          });
+          return callback(null, achatsClients);
+        }
+      );
+    } else {
+      const query = `SELECT * FROM achat_client WHERE id_client = ? ORDER BY quantite_achetee DESC`;
+      connection.query(query, [id_client], (error, results) => {
+        if (error) {
+          return callback(error, null);
+        }
+        const achatsClients = results.map((achatClientData) => {
+          // console.log(typeof achatClientData.quantite_achetee);
+          return new AchatClient(
+            achatClientData.id,
+            undefined,
+            achatClientData.quantite_achetee,
+            achatClientData.categorie,
+            achatClientData.montant,
+            achatClientData.numero_ctp,
+            achatClientData.bordereau,
+            achatClientData.numero_bc,
+            achatClientData.client_id,
+            new Date(achatClientData.date_achat)
+          );
+        });
+        return callback(null, achatsClients);
+      });
+    }
+  }
+
+  static getAllOfClientLessImportant(startDate, endDate, id_client, callback) {
+    if (startDate && endDate) {
+      const query = `SELECT * FROM achat_client WHERE date_achat BETWEEN ? AND ? AND id_client = ? ORDER BY quantite_achetee ASC`;
+      connection.query(
+        query,
+        [new Date(startDate), new Date(endDate), id_client],
+        (error, results) => {
+          if (error) {
+            return callback(error, null);
+          }
+          const achatsClients = results.map((achatClientData) => {
+            // console.log(typeof achatClientData.quantite_achetee);
+            return new AchatClient(
+              achatClientData.id,
+              undefined,
+              achatClientData.quantite_achetee,
+              achatClientData.categorie,
+              achatClientData.montant,
+              achatClientData.numero_ctp,
+              achatClientData.bordereau,
+              achatClientData.numero_bc,
+              achatClientData.client_id,
+              new Date(achatClientData.date_achat)
+            );
+          });
+          return callback(null, achatsClients);
+        }
+      );
+    } else {
+      const query = `SELECT * FROM achat_client WHERE id_client = ? ORDER BY quantite_achetee ASC`;
+      connection.query(query, [id_client], (error, results) => {
+        if (error) {
+          return callback(error, null);
+        }
+        const achatsClients = results.map((achatClientData) => {
+          // console.log(typeof achatClientData.quantite_achetee);
+          return new AchatClient(
+            achatClientData.id,
+            undefined,
+            achatClientData.quantite_achetee,
+            achatClientData.categorie,
+            achatClientData.montant,
+            achatClientData.numero_ctp,
+            achatClientData.bordereau,
+            achatClientData.numero_bc,
+            achatClientData.client_id,
+            new Date(achatClientData.date_achat)
+          );
+        });
+        return callback(null, achatsClients);
+      });
+    }
+  }
+
+  static getAllOfClientCIMBENINMostImportant(
+    startDate,
+    endDate,
+    id_client,
+    callback
+  ) {
+    if (startDate && endDate) {
+      const query = `SELECT * FROM achat_client WHERE date_achat BETWEEN ? AND ? AND id_client = ? AND categorie = 'CIM BENIN' ORDER BY quantite_achetee DESC`;
+      connection.query(
+        query,
+        [new Date(startDate), new Date(endDate), id_client],
+        (error, results) => {
+          if (error) {
+            return callback(error, null);
+          }
+          const achatsClients = results.map((achatClientData) => {
+            // console.log(typeof achatClientData.quantite_achetee);
+            return new AchatClient(
+              achatClientData.id,
+              undefined,
+              achatClientData.quantite_achetee,
+              achatClientData.categorie,
+              achatClientData.montant,
+              achatClientData.numero_ctp,
+              achatClientData.bordereau,
+              achatClientData.numero_bc,
+              achatClientData.client_id,
+              new Date(achatClientData.date_achat)
+            );
+          });
+          return callback(null, achatsClients);
+        }
+      );
+    } else {
+      const query = `SELECT * FROM achat_client WHERE id_client = ? AND categorie = 'CIM BENIN' ORDER BY quantite_achetee DESC`;
+      connection.query(query, [id_client], (error, results) => {
+        if (error) {
+          return callback(error, null);
+        }
+        const achatsClients = results.map((achatClientData) => {
+          // console.log(typeof achatClientData.quantite_achetee);
+          return new AchatClient(
+            achatClientData.id,
+            undefined,
+            achatClientData.quantite_achetee,
+            achatClientData.categorie,
+            achatClientData.montant,
+            achatClientData.numero_ctp,
+            achatClientData.bordereau,
+            achatClientData.numero_bc,
+            achatClientData.client_id,
+            new Date(achatClientData.date_achat)
+          );
+        });
+        return callback(null, achatsClients);
+      });
+    }
+  }
+
+  static getAllOfClientCIMBENINLessImportant(
+    startDate,
+    endDate,
+    id_client,
+    callback
+  ) {
+    if (startDate && endDate) {
+      const query = `SELECT * FROM achat_client WHERE date_achat BETWEEN ? AND ? AND id_client = ? AND categorie = 'CIM BENIN' ORDER BY quantite_achetee ASC`;
+      connection.query(
+        query,
+        [new Date(startDate), new Date(endDate), id_client],
+        (error, results) => {
+          if (error) {
+            return callback(error, null);
+          }
+          const achatsClients = results.map((achatClientData) => {
+            // console.log(typeof achatClientData.quantite_achetee);
+            return new AchatClient(
+              achatClientData.id,
+              undefined,
+              achatClientData.quantite_achetee,
+              achatClientData.categorie,
+              achatClientData.montant,
+              achatClientData.numero_ctp,
+              achatClientData.bordereau,
+              achatClientData.numero_bc,
+              achatClientData.client_id,
+              new Date(achatClientData.date_achat)
+            );
+          });
+          return callback(null, achatsClients);
+        }
+      );
+    } else {
+      const query = `SELECT * FROM achat_client WHERE id_client = ? AND categorie = 'CIM BENIN' ORDER BY quantite_achetee ASC`;
+      connection.query(query, [id_client], (error, results) => {
+        if (error) {
+          return callback(error, null);
+        }
+        const achatsClients = results.map((achatClientData) => {
+          // console.log(typeof achatClientData.quantite_achetee);
+          return new AchatClient(
+            achatClientData.id,
+            undefined,
+            achatClientData.quantite_achetee,
+            achatClientData.categorie,
+            achatClientData.montant,
+            achatClientData.numero_ctp,
+            achatClientData.bordereau,
+            achatClientData.numero_bc,
+            achatClientData.client_id,
+            new Date(achatClientData.date_achat)
+          );
+        });
+        return callback(null, achatsClients);
+      });
+    }
+  }
+
+  static getAllOfClientNOCIBEMostImportant(
+    startDate,
+    endDate,
+    id_client,
+    callback
+  ) {
+    if (startDate && endDate) {
+      const query = `SELECT * FROM achat_client WHERE date_achat BETWEEN ? AND ? AND id_client = ? AND categorie = 'NOCIBE' ORDER BY quantite_achetee DESC`;
+      connection.query(
+        query,
+        [new Date(startDate), new Date(endDate), id_client],
+        (error, results) => {
+          if (error) {
+            return callback(error, null);
+          }
+          const achatsClients = results.map((achatClientData) => {
+            // console.log(typeof achatClientData.quantite_achetee);
+            return new AchatClient(
+              achatClientData.id,
+              undefined,
+              achatClientData.quantite_achetee,
+              achatClientData.categorie,
+              achatClientData.montant,
+              achatClientData.numero_ctp,
+              achatClientData.bordereau,
+              achatClientData.numero_bc,
+              achatClientData.client_id,
+              new Date(achatClientData.date_achat)
+            );
+          });
+          return callback(null, achatsClients);
+        }
+      );
+    } else {
+      const query = `SELECT * FROM achat_client WHERE id_client = ? AND categorie = 'NOCIBE' ORDER BY quantite_achetee DESC`;
+      connection.query(query, [id_client], (error, results) => {
+        if (error) {
+          return callback(error, null);
+        }
+        const achatsClients = results.map((achatClientData) => {
+          // console.log(typeof achatClientData.quantite_achetee);
+          return new AchatClient(
+            achatClientData.id,
+            undefined,
+            achatClientData.quantite_achetee,
+            achatClientData.categorie,
+            achatClientData.montant,
+            achatClientData.numero_ctp,
+            achatClientData.bordereau,
+            achatClientData.numero_bc,
+            achatClientData.client_id,
+            new Date(achatClientData.date_achat)
+          );
+        });
+        return callback(null, achatsClients);
+      });
+    }
+  }
+
+  static getAllOfClientNOCIBELessImportant(
+    startDate,
+    endDate,
+    id_client,
+    callback
+  ) {
+    if (startDate && endDate) {
+      const query = `SELECT * FROM achat_client WHERE date_achat BETWEEN ? AND ? AND id_client = ? AND categorie = 'NOCIBE' ORDER BY quantite_achetee ASC`;
+      connection.query(
+        query,
+        [new Date(startDate), new Date(endDate), id_client],
+        (error, results) => {
+          if (error) {
+            return callback(error, null);
+          }
+          const achatsClients = results.map((achatClientData) => {
+            // console.log(typeof achatClientData.quantite_achetee);
+            return new AchatClient(
+              achatClientData.id,
+              undefined,
+              achatClientData.quantite_achetee,
+              achatClientData.categorie,
+              achatClientData.montant,
+              achatClientData.numero_ctp,
+              achatClientData.bordereau,
+              achatClientData.numero_bc,
+              achatClientData.client_id,
+              new Date(achatClientData.date_achat)
+            );
+          });
+          return callback(null, achatsClients);
+        }
+      );
+    } else {
+      const query = `SELECT * FROM achat_client WHERE id_client = ? AND categorie = 'NOCIBE' ORDER BY quantite_achetee ASC`;
+      connection.query(query, [id_client], (error, results) => {
+        if (error) {
+          return callback(error, null);
+        }
+        const achatsClients = results.map((achatClientData) => {
+          // console.log(typeof achatClientData.quantite_achetee);
+          return new AchatClient(
+            achatClientData.id,
+            undefined,
+            achatClientData.quantite_achetee,
+            achatClientData.categorie,
+            achatClientData.montant,
+            achatClientData.numero_ctp,
+            achatClientData.bordereau,
+            achatClientData.numero_bc,
+            achatClientData.client_id,
+            new Date(achatClientData.date_achat)
+          );
+        });
+        return callback(null, achatsClients);
+      });
+    }
   }
 
   update(callback) {

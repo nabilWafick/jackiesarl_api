@@ -26,11 +26,109 @@ router.post(
   AchatClientController.create
 );
 router.get("/achat-client/:id", AchatClientController.getById);
-router.get("/achat-client/", AchatClientController.getAll);
+
+// =================== All clients default
+
 router.get(
-  "/achat-client/client/:id_client",
+  "/achats-clients-default/:startDate?/:endDate?",
+  AchatClientController.getAll
+);
+
+// ================  Seniority
+
+router.get(
+  "/achats-clients/new-to-old/:startDate?/:endDate?",
+  AchatClientController.getAllFromNewToOld
+);
+router.get(
+  "/achats-clients/old-to-new/:startDate?/:endDate?",
+  AchatClientController.getAllFromOldToNew
+);
+
+// ================= Importance
+
+router.get(
+  "/achats-clients/most-important/:startDate?/:endDate?",
+  AchatClientController.getAllMostImportant
+);
+router.get(
+  "/achats-clients/less-important/:startDate?/:endDate?",
+  AchatClientController.getAllLessImportant
+);
+
+// ================= CIM BENIN Importance
+
+router.get(
+  "/achats-clients/cim-benin-most-important/:startDate?/:endDate?",
+  AchatClientController.getAllCIMBENINMostImportant
+);
+router.get(
+  "/achats-clients/cim-benin-less-important/:startDate?/:endDate?",
+  AchatClientController.getAllCIMBENINLessImportant
+);
+
+// ================= NOCIBE Importance
+
+router.get(
+  "/achats-clients/nocibe-most-important/:startDate?/:endDate?",
+  AchatClientController.getAllNOCIBEMostImportant
+);
+router.get(
+  "/achats-clients/nocibe-less-important/:startDate?/:endDate?",
+  AchatClientController.getAllNOCIBELessImportant
+);
+
+// ====================== Selectionned Client default
+
+router.get(
+  "/achats-client/client-default/:id_client/:startDate?/:endDate?",
   AchatClientController.getAllOfClient
 );
+
+// ====================== Seniority
+
+router.get(
+  "/achats-client/client/:id_client/old-to-new/:startDate?/:endDate?",
+  AchatClientController.getAllOfClientFromOldToNew
+);
+router.get(
+  "/achats-client/client/:id_client/new-to-important/:startDate?/:endDate?",
+  AchatClientController.getAllOfClientFromNewToOld
+);
+
+// ====================== Importance
+
+router.get(
+  "/achats-client/client/:id_client/most-important/:startDate?/:endDate?",
+  AchatClientController.getAllOfClientMostImportant
+);
+router.get(
+  "/achats-client/client/:id_client/less-important/:startDate?/:endDate?",
+  AchatClientController.getAllOfClientLessImportant
+);
+
+// ================= CIM BENIN Importance
+
+router.get(
+  "/achats-client/client/:id_client/cim-benin-most-important/:startDate?/:endDate?",
+  AchatClientController.getAllOfClientCIMBENINMostImportant
+);
+router.get(
+  "/achats-client/client/:id_client/cim-benin-less-important/:startDate?/:endDate?",
+  AchatClientController.getAllOfClientCIMBENINLessImportant
+);
+
+// ================= NOCIBE Importance
+
+router.get(
+  "/achats-client/client/:id_client/nocibe-most-important/:startDate?/:endDate?",
+  AchatClientController.getAllOfClientNOCIBEMostImportant
+);
+router.get(
+  "/achats-client/client/:id_client/nocibe-less-important/:startDate?/:endDate?",
+  AchatClientController.getAllOfClientNOCIBELessImportant
+);
+
 router.put(
   "/achat-client/:id",
   upload.single("bordereau"),

@@ -72,7 +72,9 @@ class PaiementClientController {
   };
 
   static getAll = (req, res) => {
-    PaiementClient.getAll((error, paiementClients) => {
+    const startDate = req.params.startDate;
+    const endDate = req.params.endDate;
+    PaiementClient.getAll(startDate, endDate, (error, paiementClients) => {
       if (error) {
         return res.status(500).json({
           error: "Erreur lors de la récupération des paiements clients",
@@ -82,16 +84,385 @@ class PaiementClientController {
     });
   };
 
-  static getAllOfClient = (req, res) => {
-    const id_client = req.params.id_client;
-    PaiementClient.getAllOfClient(id_client, (error, paiementsClient) => {
-      if (error) {
-        return res.status(500).json({
-          error: "Erreur lors de la récupération des paiements du client",
-        });
+  static getAllFromNewToOld = (req, res) => {
+    const startDate = req.params.startDate;
+    const endDate = req.params.endDate;
+    PaiementClient.getAllFromNewToOld(
+      startDate,
+      endDate,
+      (error, paiementClients) => {
+        if (error) {
+          return res.status(500).json({
+            error: "Erreur lors de la récupération des paiements clients",
+          });
+        }
+        return res.status(200).json(paiementClients);
       }
-      return res.status(200).json(paiementsClient);
-    });
+    );
+  };
+
+  static getAllFromOldToNew = (req, res) => {
+    const startDate = req.params.startDate;
+    const endDate = req.params.endDate;
+    PaiementClient.getAllFromOldToNew(
+      startDate,
+      endDate,
+      (error, paiementClients) => {
+        if (error) {
+          return res.status(500).json({
+            error: "Erreur lors de la récupération des paiements clients",
+          });
+        }
+        return res.status(200).json(paiementClients);
+      }
+    );
+  };
+
+  static getAllMostImportant = (req, res) => {
+    const startDate = req.params.startDate;
+    const endDate = req.params.endDate;
+    PaiementClient.getAllMostImportant(
+      startDate,
+      endDate,
+      (error, paiementClients) => {
+        if (error) {
+          return res.status(500).json({
+            error: "Erreur lors de la récupération des paiements clients",
+          });
+        }
+        return res.status(200).json(paiementClients);
+      }
+    );
+  };
+
+  static getAllLessImportant = (req, res) => {
+    const startDate = req.params.startDate;
+    const endDate = req.params.endDate;
+    PaiementClient.getAllLessImportant(
+      startDate,
+      endDate,
+      (error, paiementClients) => {
+        if (error) {
+          return res.status(500).json({
+            error: "Erreur lors de la récupération des paiements clients",
+          });
+        }
+        return res.status(200).json(paiementClients);
+      }
+    );
+  };
+
+  static getAllNOCIBEMostImportant = (req, res) => {
+    const startDate = req.params.startDate;
+    const endDate = req.params.endDate;
+    PaiementClient.getAllNOCIBEMostImportant(
+      startDate,
+      endDate,
+      (error, paiementClients) => {
+        if (error) {
+          return res.status(500).json({
+            error: "Erreur lors de la récupération des paiements clients",
+          });
+        }
+        return res.status(200).json(paiementClients);
+      }
+    );
+  };
+
+  static getAllNOCIBELessImportant = (req, res) => {
+    const startDate = req.params.startDate;
+    const endDate = req.params.endDate;
+    PaiementClient.getAllNOCIBELessImportant(
+      startDate,
+      endDate,
+      (error, paiementClients) => {
+        if (error) {
+          return res.status(500).json({
+            error: "Erreur lors de la récupération des paiements clients",
+          });
+        }
+        return res.status(200).json(paiementClients);
+      }
+    );
+  };
+
+  static getAllCIMBENINMostImportant = (req, res) => {
+    const startDate = req.params.startDate;
+    const endDate = req.params.endDate;
+    PaiementClient.getAllCIMBENINMostImportant(
+      startDate,
+      endDate,
+      (error, paiementClients) => {
+        if (error) {
+          return res.status(500).json({
+            error: "Erreur lors de la récupération des paiements clients",
+          });
+        }
+        return res.status(200).json(paiementClients);
+      }
+    );
+  };
+
+  static getAllCIMBENINLessImportant = (req, res) => {
+    const startDate = req.params.startDate;
+    const endDate = req.params.endDate;
+    PaiementClient.getAllCIMBENINLessImportant(
+      startDate,
+      endDate,
+      (error, paiementClients) => {
+        if (error) {
+          return res.status(500).json({
+            error: "Erreur lors de la récupération des paiements clients",
+          });
+        }
+        return res.status(200).json(paiementClients);
+      }
+    );
+  };
+
+  static getAllValidated = (req, res) => {
+    const startDate = req.params.startDate;
+    const endDate = req.params.endDate;
+    PaiementClient.getAllValidated(
+      startDate,
+      endDate,
+      (error, paiementClients) => {
+        if (error) {
+          return res.status(500).json({
+            error: "Erreur lors de la récupération des paiements clients",
+          });
+        }
+        return res.status(200).json(paiementClients);
+      }
+    );
+  };
+
+  static getAllUnValidated = (req, res) => {
+    const startDate = req.params.startDate;
+    const endDate = req.params.endDate;
+    PaiementClient.getAllUnValidated(
+      startDate,
+      endDate,
+      (error, paiementClients) => {
+        if (error) {
+          return res.status(500).json({
+            error: "Erreur lors de la récupération des paiements clients",
+          });
+        }
+        return res.status(200).json(paiementClients);
+      }
+    );
+  };
+
+  // Selected Client
+
+  static getAllOfClient = (req, res) => {
+    const startDate = req.params.startDate;
+    const endDate = req.params.endDate;
+    const id_client = req.params.id_client;
+    PaiementClient.getAllOfClient(
+      startDate,
+      endDate,
+      id_client,
+      (error, paiementsClient) => {
+        if (error) {
+          return res.status(500).json({
+            error: "Erreur lors de la récupération des paiements du client",
+          });
+        }
+        return res.status(200).json(paiementsClient);
+      }
+    );
+  };
+
+  static getAllOfClientFromNewToOld = (req, res) => {
+    const startDate = req.params.startDate;
+    const endDate = req.params.endDate;
+    const id_client = req.params.id_client;
+    PaiementClient.getAllOfClientFromNewToOld(
+      startDate,
+      endDate,
+      id_client,
+      (error, paiementsClient) => {
+        if (error) {
+          return res.status(500).json({
+            error: "Erreur lors de la récupération des paiements du client",
+          });
+        }
+        return res.status(200).json(paiementsClient);
+      }
+    );
+  };
+
+  static getAllOfClientFromOldToNew = (req, res) => {
+    const startDate = req.params.startDate;
+    const endDate = req.params.endDate;
+    const id_client = req.params.id_client;
+    PaiementClient.getAllOfClientFromOldToNew(
+      startDate,
+      endDate,
+      id_client,
+      (error, paiementsClient) => {
+        if (error) {
+          return res.status(500).json({
+            error: "Erreur lors de la récupération des paiements du client",
+          });
+        }
+        return res.status(200).json(paiementsClient);
+      }
+    );
+  };
+
+  static getAllOfClientMostImportant = (req, res) => {
+    const startDate = req.params.startDate;
+    const endDate = req.params.endDate;
+    const id_client = req.params.id_client;
+    PaiementClient.getAllOfClientMostImportant(
+      startDate,
+      endDate,
+      id_client,
+      (error, paiementsClient) => {
+        if (error) {
+          return res.status(500).json({
+            error: "Erreur lors de la récupération des paiements du client",
+          });
+        }
+        return res.status(200).json(paiementsClient);
+      }
+    );
+  };
+
+  static getAllOfClientLessImportant = (req, res) => {
+    const startDate = req.params.startDate;
+    const endDate = req.params.endDate;
+    const id_client = req.params.id_client;
+    PaiementClient.getAllOfClientLessImportant(
+      startDate,
+      endDate,
+      id_client,
+      (error, paiementsClient) => {
+        if (error) {
+          return res.status(500).json({
+            error: "Erreur lors de la récupération des paiements du client",
+          });
+        }
+        return res.status(200).json(paiementsClient);
+      }
+    );
+  };
+
+  static getAllOfClientCIMBENINMostImportant = (req, res) => {
+    const startDate = req.params.startDate;
+    const endDate = req.params.endDate;
+    const id_client = req.params.id_client;
+    PaiementClient.getAllOfClientCIMBENINMostImportant(
+      startDate,
+      endDate,
+      id_client,
+      (error, paiementsClient) => {
+        if (error) {
+          return res.status(500).json({
+            error: "Erreur lors de la récupération des paiements du client",
+          });
+        }
+        return res.status(200).json(paiementsClient);
+      }
+    );
+  };
+
+  static getAllOfClientCIMBENINLessImportant = (req, res) => {
+    const startDate = req.params.startDate;
+    const endDate = req.params.endDate;
+    const id_client = req.params.id_client;
+    PaiementClient.getAllOfClientCIMBENINLessImportant(
+      startDate,
+      endDate,
+      id_client,
+      (error, paiementsClient) => {
+        if (error) {
+          return res.status(500).json({
+            error: "Erreur lors de la récupération des paiements du client",
+          });
+        }
+        return res.status(200).json(paiementsClient);
+      }
+    );
+  };
+
+  static getAllOfClientNOCIBEMostImportant = (req, res) => {
+    const startDate = req.params.startDate;
+    const endDate = req.params.endDate;
+    const id_client = req.params.id_client;
+    PaiementClient.getAllOfClientNOCIBEMostImportant(
+      startDate,
+      endDate,
+      id_client,
+      (error, paiementsClient) => {
+        if (error) {
+          return res.status(500).json({
+            error: "Erreur lors de la récupération des paiements du client",
+          });
+        }
+        return res.status(200).json(paiementsClient);
+      }
+    );
+  };
+
+  static getAllOfClientNOCIBELessImportant = (req, res) => {
+    const startDate = req.params.startDate;
+    const endDate = req.params.endDate;
+    const id_client = req.params.id_client;
+    PaiementClient.getAllOfClientNOCIBELessImportant(
+      startDate,
+      endDate,
+      id_client,
+      (error, paiementsClient) => {
+        if (error) {
+          return res.status(500).json({
+            error: "Erreur lors de la récupération des paiements du client",
+          });
+        }
+        return res.status(200).json(paiementsClient);
+      }
+    );
+  };
+
+  static getAllOfClientUnvalidated = (req, res) => {
+    const startDate = req.params.startDate;
+    const endDate = req.params.endDate;
+    const id_client = req.params.id_client;
+    PaiementClient.getAllOfClientUnvalidated(
+      startDate,
+      endDate,
+      id_client,
+      (error, paiementsClient) => {
+        if (error) {
+          return res.status(500).json({
+            error: "Erreur lors de la récupération des paiements du client",
+          });
+        }
+        return res.status(200).json(paiementsClient);
+      }
+    );
+  };
+
+  static getAllOfClientValidated = (req, res) => {
+    const startDate = req.params.startDate;
+    const endDate = req.params.endDate;
+    const id_client = req.params.id_client;
+    PaiementClient.getAllOfClientValidated(
+      startDate,
+      endDate,
+      id_client,
+      (error, paiementsClient) => {
+        if (error) {
+          return res.status(500).json({
+            error: "Erreur lors de la récupération des paiements du client",
+          });
+        }
+        return res.status(200).json(paiementsClient);
+      }
+    );
   };
 
   // Mettre à jour un paiement client par ID

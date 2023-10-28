@@ -112,34 +112,664 @@ function () {
     }
   }, {
     key: "getAll",
-    value: function getAll(callback) {
-      var query = "SELECT\n    clients.id AS id_client,\n    clients.nom,\n    clients.prenoms,\n    clients.numero_ifu,\n    clients.numero_telephone,\n    clients.email,\n    clients.date_ajout AS date_ajout_client,\n    paiement_client.id AS id,\n    paiement_client.montant AS montant,\n    paiement_client.banque,\n    paiement_client.reference,\n    paiement_client.categorie,\n    paiement_client.numero_bc,\n    paiement_client.bordereau,\n    paiement_client.est_valide,\n    paiement_client.id_client AS id_client,\n    paiement_client.date_paiement\nFROM\n    clients, paiement_client \nWHERE\nclients.id = paiement_client.id_client;\n";
-      connection.query(query, function (error, results) {
-        if (error) {
-          return callback(error, null);
-        }
+    value: function getAll(startDate, endDate, callback) {
+      if (startDate && endDate) {
+        var query = "SELECT\n      clients.id AS id_client,\n      clients.nom,\n      clients.prenoms,\n      clients.numero_ifu,\n      clients.numero_telephone,\n      clients.email,\n      clients.date_ajout AS date_ajout_client,\n      paiement_client.id AS id,\n      paiement_client.montant AS montant,\n      paiement_client.banque,\n      paiement_client.reference,\n      paiement_client.categorie,\n      paiement_client.numero_bc,\n      paiement_client.bordereau,\n      paiement_client.est_valide,\n      paiement_client.id_client AS id_client,\n      paiement_client.date_paiement\n      FROM\n      clients, paiement_client\n      WHERE\n      paiement_client.date_paiement BETWEEN ? AND ? AND\n      clients.id = paiement_client.id_client\n      ORDER BY paiement_client.id DESC;";
+        connection.query(query, [new Date(startDate), new Date(endDate)], function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
 
-        var paiementsList = results.map(function (paiementData) {
-          return new PaiementClient(paiementData.id, new Clients(paiementData.id_client, paiementData.nom, paiementData.prenoms, paiementData.numero_ifu, paiementData.numero_telephone, paiementData.email, paiementData.date_ajout), paiementData.montant, paiementData.banque, paiementData.reference, paiementData.categorie, paiementData.numero_bc, paiementData.bordereau, paiementData.est_valide, paiementData.id_client, paiementData.date_paiement);
+          var paiementsList = results.map(function (paiementData) {
+            return new PaiementClient(paiementData.id, new Clients(paiementData.id_client, paiementData.nom, paiementData.prenoms, paiementData.numero_ifu, paiementData.numero_telephone, paiementData.email, paiementData.date_ajout), paiementData.montant, paiementData.banque, paiementData.reference, paiementData.categorie, paiementData.numero_bc, paiementData.bordereau, paiementData.est_valide, paiementData.id_client, paiementData.date_paiement);
+          });
+          return callback(null, paiementsList);
         });
-        return callback(null, paiementsList);
-      });
+      } else {
+        var _query = "SELECT\n    clients.id AS id_client,\n    clients.nom,\n    clients.prenoms,\n    clients.numero_ifu,\n    clients.numero_telephone,\n    clients.email,\n    clients.date_ajout AS date_ajout_client,\n    paiement_client.id AS id,\n    paiement_client.montant AS montant,\n    paiement_client.banque,\n    paiement_client.reference,\n    paiement_client.categorie,\n    paiement_client.numero_bc,\n    paiement_client.bordereau,\n    paiement_client.est_valide,\n    paiement_client.id_client AS id_client,\n    paiement_client.date_paiement\n    FROM\n      clients, paiement_client\n      WHERE\n      clients.id = paiement_client.id_client\n      ORDER BY paiement_client.id DESC;";
+        connection.query(_query, function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var paiementsList = results.map(function (paiementData) {
+            return new PaiementClient(paiementData.id, new Clients(paiementData.id_client, paiementData.nom, paiementData.prenoms, paiementData.numero_ifu, paiementData.numero_telephone, paiementData.email, paiementData.date_ajout), paiementData.montant, paiementData.banque, paiementData.reference, paiementData.categorie, paiementData.numero_bc, paiementData.bordereau, paiementData.est_valide, paiementData.id_client, paiementData.date_paiement);
+          });
+          return callback(null, paiementsList);
+        });
+      }
     }
   }, {
-    key: "getAllOfClient",
-    value: function getAllOfClient(id_client, callback) {
-      var query = "SELECT * FROM paiement_client WHERE id_client = ?";
-      connection.query(query, [id_client], function (error, results) {
-        if (error) {
-          return callback(error, null);
-        }
+    key: "getAllFromNewToOld",
+    value: function getAllFromNewToOld(startDate, endDate, callback) {
+      if (startDate && endDate) {
+        var query = "SELECT\n      clients.id AS id_client,\n      clients.nom,\n      clients.prenoms,\n      clients.numero_ifu,\n      clients.numero_telephone,\n      clients.email,\n      clients.date_ajout AS date_ajout_client,\n      paiement_client.id AS id,\n      paiement_client.montant AS montant,\n      paiement_client.banque,\n      paiement_client.reference,\n      paiement_client.categorie,\n      paiement_client.numero_bc,\n      paiement_client.bordereau,\n      paiement_client.est_valide,\n      paiement_client.id_client AS id_client,\n      paiement_client.date_paiement\n      FROM\n      clients, paiement_client\n      WHERE\n      paiement_client.date_paiement BETWEEN ? AND ? AND\n      clients.id = paiement_client.id_client\n      ORDER BY paiement_client.id DESC;";
+        connection.query(query, [new Date(startDate), new Date(endDate)], function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
 
-        var paiementsList = results.map(function (paiementData) {
-          // console.log(typeof PaiementClientData.quantite_achetee);
-          return new PaiementClient(paiementData.id, undefined, paiementData.montant, paiementData.banque, paiementData.reference, paiementData.categorie, paiementData.numero_bc, paiementData.bordereau, paiementData.est_valide, paiementData.id_client, paiementData.date_paiement);
+          var paiementsList = results.map(function (paiementData) {
+            return new PaiementClient(paiementData.id, new Clients(paiementData.id_client, paiementData.nom, paiementData.prenoms, paiementData.numero_ifu, paiementData.numero_telephone, paiementData.email, paiementData.date_ajout), paiementData.montant, paiementData.banque, paiementData.reference, paiementData.categorie, paiementData.numero_bc, paiementData.bordereau, paiementData.est_valide, paiementData.id_client, paiementData.date_paiement);
+          });
+          return callback(null, paiementsList);
         });
-        return callback(null, paiementsList);
-      });
+      } else {
+        var _query2 = "SELECT\n    clients.id AS id_client,\n    clients.nom,\n    clients.prenoms,\n    clients.numero_ifu,\n    clients.numero_telephone,\n    clients.email,\n    clients.date_ajout AS date_ajout_client,\n    paiement_client.id AS id,\n    paiement_client.montant AS montant,\n    paiement_client.banque,\n    paiement_client.reference,\n    paiement_client.categorie,\n    paiement_client.numero_bc,\n    paiement_client.bordereau,\n    paiement_client.est_valide,\n    paiement_client.id_client AS id_client,\n    paiement_client.date_paiement\n    FROM\n      clients, paiement_client\n      WHERE\n      clients.id = paiement_client.id_client\n      ORDER BY paiement_client.id DESC;";
+        connection.query(_query2, function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var paiementsList = results.map(function (paiementData) {
+            return new PaiementClient(paiementData.id, new Clients(paiementData.id_client, paiementData.nom, paiementData.prenoms, paiementData.numero_ifu, paiementData.numero_telephone, paiementData.email, paiementData.date_ajout), paiementData.montant, paiementData.banque, paiementData.reference, paiementData.categorie, paiementData.numero_bc, paiementData.bordereau, paiementData.est_valide, paiementData.id_client, paiementData.date_paiement);
+          });
+          return callback(null, paiementsList);
+        });
+      }
+    }
+  }, {
+    key: "getAllFromOldToNew",
+    value: function getAllFromOldToNew(startDate, endDate, callback) {
+      if (startDate && endDate) {
+        var query = "SELECT\n      clients.id AS id_client,\n      clients.nom,\n      clients.prenoms,\n      clients.numero_ifu,\n      clients.numero_telephone,\n      clients.email,\n      clients.date_ajout AS date_ajout_client,\n      paiement_client.id AS id,\n      paiement_client.montant AS montant,\n      paiement_client.banque,\n      paiement_client.reference,\n      paiement_client.categorie,\n      paiement_client.numero_bc,\n      paiement_client.bordereau,\n      paiement_client.est_valide,\n      paiement_client.id_client AS id_client,\n      paiement_client.date_paiement\n      FROM\n      clients, paiement_client\n      WHERE\n      paiement_client.date_paiement BETWEEN ? AND ? AND\n      clients.id = paiement_client.id_client\n      ORDER BY paiement_client.id ASC;";
+        connection.query(query, [new Date(startDate), new Date(endDate)], function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var paiementsList = results.map(function (paiementData) {
+            return new PaiementClient(paiementData.id, new Clients(paiementData.id_client, paiementData.nom, paiementData.prenoms, paiementData.numero_ifu, paiementData.numero_telephone, paiementData.email, paiementData.date_ajout), paiementData.montant, paiementData.banque, paiementData.reference, paiementData.categorie, paiementData.numero_bc, paiementData.bordereau, paiementData.est_valide, paiementData.id_client, paiementData.date_paiement);
+          });
+          return callback(null, paiementsList);
+        });
+      } else {
+        var _query3 = "SELECT\n    clients.id AS id_client,\n    clients.nom,\n    clients.prenoms,\n    clients.numero_ifu,\n    clients.numero_telephone,\n    clients.email,\n    clients.date_ajout AS date_ajout_client,\n    paiement_client.id AS id,\n    paiement_client.montant AS montant,\n    paiement_client.banque,\n    paiement_client.reference,\n    paiement_client.categorie,\n    paiement_client.numero_bc,\n    paiement_client.bordereau,\n    paiement_client.est_valide,\n    paiement_client.id_client AS id_client,\n    paiement_client.date_paiement\n    FROM\n      clients, paiement_client\n      WHERE\n      clients.id = paiement_client.id_client\n      ORDER BY paiement_client.id ASC;";
+        connection.query(_query3, function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var paiementsList = results.map(function (paiementData) {
+            return new PaiementClient(paiementData.id, new Clients(paiementData.id_client, paiementData.nom, paiementData.prenoms, paiementData.numero_ifu, paiementData.numero_telephone, paiementData.email, paiementData.date_ajout), paiementData.montant, paiementData.banque, paiementData.reference, paiementData.categorie, paiementData.numero_bc, paiementData.bordereau, paiementData.est_valide, paiementData.id_client, paiementData.date_paiement);
+          });
+          return callback(null, paiementsList);
+        });
+      }
+    }
+  }, {
+    key: "getAllMostImportant",
+    value: function getAllMostImportant(startDate, endDate, callback) {
+      if (startDate && endDate) {
+        var query = "SELECT\n      clients.id AS id_client,\n      clients.nom,\n      clients.prenoms,\n      clients.numero_ifu,\n      clients.numero_telephone,\n      clients.email,\n      clients.date_ajout AS date_ajout_client,\n      paiement_client.id AS id,\n      paiement_client.montant AS montant,\n      paiement_client.banque,\n      paiement_client.reference,\n      paiement_client.categorie,\n      paiement_client.numero_bc,\n      paiement_client.bordereau,\n      paiement_client.est_valide,\n      paiement_client.id_client AS id_client,\n      paiement_client.date_paiement\n      FROM\n      clients, paiement_client\n      WHERE\n      paiement_client.date_paiement BETWEEN ? AND ? AND\n      clients.id = paiement_client.id_client\n      ORDER BY paiement_client.montant DESC;";
+        connection.query(query, [new Date(startDate), new Date(endDate)], function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var paiementsList = results.map(function (paiementData) {
+            return new PaiementClient(paiementData.id, new Clients(paiementData.id_client, paiementData.nom, paiementData.prenoms, paiementData.numero_ifu, paiementData.numero_telephone, paiementData.email, paiementData.date_ajout), paiementData.montant, paiementData.banque, paiementData.reference, paiementData.categorie, paiementData.numero_bc, paiementData.bordereau, paiementData.est_valide, paiementData.id_client, paiementData.date_paiement);
+          });
+          return callback(null, paiementsList);
+        });
+      } else {
+        var _query4 = "SELECT\n    clients.id AS id_client,\n    clients.nom,\n    clients.prenoms,\n    clients.numero_ifu,\n    clients.numero_telephone,\n    clients.email,\n    clients.date_ajout AS date_ajout_client,\n    paiement_client.id AS id,\n    paiement_client.montant AS montant,\n    paiement_client.banque,\n    paiement_client.reference,\n    paiement_client.categorie,\n    paiement_client.numero_bc,\n    paiement_client.bordereau,\n    paiement_client.est_valide,\n    paiement_client.id_client AS id_client,\n    paiement_client.date_paiement\n    FROM\n      clients, paiement_client\n      WHERE\n      clients.id = paiement_client.id_client\n      ORDER BY paiement_client.montant DESC;";
+        connection.query(_query4, function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var paiementsList = results.map(function (paiementData) {
+            return new PaiementClient(paiementData.id, new Clients(paiementData.id_client, paiementData.nom, paiementData.prenoms, paiementData.numero_ifu, paiementData.numero_telephone, paiementData.email, paiementData.date_ajout), paiementData.montant, paiementData.banque, paiementData.reference, paiementData.categorie, paiementData.numero_bc, paiementData.bordereau, paiementData.est_valide, paiementData.id_client, paiementData.date_paiement);
+          });
+          return callback(null, paiementsList);
+        });
+      }
+    }
+  }, {
+    key: "getAllLessImportant",
+    value: function getAllLessImportant(startDate, endDate, callback) {
+      if (startDate && endDate) {
+        var query = "SELECT\n      clients.id AS id_client,\n      clients.nom,\n      clients.prenoms,\n      clients.numero_ifu,\n      clients.numero_telephone,\n      clients.email,\n      clients.date_ajout AS date_ajout_client,\n      paiement_client.id AS id,\n      paiement_client.montant AS montant,\n      paiement_client.banque,\n      paiement_client.reference,\n      paiement_client.categorie,\n      paiement_client.numero_bc,\n      paiement_client.bordereau,\n      paiement_client.est_valide,\n      paiement_client.id_client AS id_client,\n      paiement_client.date_paiement\n      FROM\n      clients, paiement_client\n      WHERE\n      paiement_client.date_paiement BETWEEN ? AND ? AND\n      clients.id = paiement_client.id_client\n      ORDER BY paiement_client.montant ASC;";
+        connection.query(query, [new Date(startDate), new Date(endDate)], function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var paiementsList = results.map(function (paiementData) {
+            return new PaiementClient(paiementData.id, new Clients(paiementData.id_client, paiementData.nom, paiementData.prenoms, paiementData.numero_ifu, paiementData.numero_telephone, paiementData.email, paiementData.date_ajout), paiementData.montant, paiementData.banque, paiementData.reference, paiementData.categorie, paiementData.numero_bc, paiementData.bordereau, paiementData.est_valide, paiementData.id_client, paiementData.date_paiement);
+          });
+          return callback(null, paiementsList);
+        });
+      } else {
+        var _query5 = "SELECT\n    clients.id AS id_client,\n    clients.nom,\n    clients.prenoms,\n    clients.numero_ifu,\n    clients.numero_telephone,\n    clients.email,\n    clients.date_ajout AS date_ajout_client,\n    paiement_client.id AS id,\n    paiement_client.montant AS montant,\n    paiement_client.banque,\n    paiement_client.reference,\n    paiement_client.categorie,\n    paiement_client.numero_bc,\n    paiement_client.bordereau,\n    paiement_client.est_valide,\n    paiement_client.id_client AS id_client,\n    paiement_client.date_paiement\n    FROM\n      clients, paiement_client\n      WHERE\n      clients.id = paiement_client.id_client\n      ORDER BY paiement_client.montant ASC;";
+        connection.query(_query5, function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var paiementsList = results.map(function (paiementData) {
+            return new PaiementClient(paiementData.id, new Clients(paiementData.id_client, paiementData.nom, paiementData.prenoms, paiementData.numero_ifu, paiementData.numero_telephone, paiementData.email, paiementData.date_ajout), paiementData.montant, paiementData.banque, paiementData.reference, paiementData.categorie, paiementData.numero_bc, paiementData.bordereau, paiementData.est_valide, paiementData.id_client, paiementData.date_paiement);
+          });
+          return callback(null, paiementsList);
+        });
+      }
+    }
+  }, {
+    key: "getAllNOCIBEMostImportant",
+    value: function getAllNOCIBEMostImportant(startDate, endDate, callback) {
+      if (startDate && endDate) {
+        var query = "SELECT\n      clients.id AS id_client,\n      clients.nom,\n      clients.prenoms,\n      clients.numero_ifu,\n      clients.numero_telephone,\n      clients.email,\n      clients.date_ajout AS date_ajout_client,\n      paiement_client.id AS id,\n      paiement_client.montant AS montant,\n      paiement_client.banque,\n      paiement_client.reference,\n      paiement_client.categorie,\n      paiement_client.numero_bc,\n      paiement_client.bordereau,\n      paiement_client.est_valide,\n      paiement_client.id_client AS id_client,\n      paiement_client.date_paiement\n      FROM\n      clients, paiement_client\n      WHERE\n      paiement_client.date_paiement BETWEEN ? AND ? AND\n      clients.id = paiement_client.id_client AND\n      paiement_client.categorie = 'NOCIBE' AND\n      ORDER BY paiement_client.montant DESC;";
+        connection.query(query, [new Date(startDate), new Date(endDate)], function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var paiementsList = results.map(function (paiementData) {
+            return new PaiementClient(paiementData.id, new Clients(paiementData.id_client, paiementData.nom, paiementData.prenoms, paiementData.numero_ifu, paiementData.numero_telephone, paiementData.email, paiementData.date_ajout), paiementData.montant, paiementData.banque, paiementData.reference, paiementData.categorie, paiementData.numero_bc, paiementData.bordereau, paiementData.est_valide, paiementData.id_client, paiementData.date_paiement);
+          });
+          return callback(null, paiementsList);
+        });
+      } else {
+        var _query6 = "SELECT\n    clients.id AS id_client,\n    clients.nom,\n    clients.prenoms,\n    clients.numero_ifu,\n    clients.numero_telephone,\n    clients.email,\n    clients.date_ajout AS date_ajout_client,\n    paiement_client.id AS id,\n    paiement_client.montant AS montant,\n    paiement_client.banque,\n    paiement_client.reference,\n    paiement_client.categorie,\n    paiement_client.numero_bc,\n    paiement_client.bordereau,\n    paiement_client.est_valide,\n    paiement_client.id_client AS id_client,\n    paiement_client.date_paiement\n    FROM\n      clients, paiement_client\n      WHERE\n      clients.id = paiement_client.id_client AND\n      paiement_client.categorie = 'NOCIBE' AND\n      ORDER BY paiement_client.montant DESC;";
+        connection.query(_query6, function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var paiementsList = results.map(function (paiementData) {
+            return new PaiementClient(paiementData.id, new Clients(paiementData.id_client, paiementData.nom, paiementData.prenoms, paiementData.numero_ifu, paiementData.numero_telephone, paiementData.email, paiementData.date_ajout), paiementData.montant, paiementData.banque, paiementData.reference, paiementData.categorie, paiementData.numero_bc, paiementData.bordereau, paiementData.est_valide, paiementData.id_client, paiementData.date_paiement);
+          });
+          return callback(null, paiementsList);
+        });
+      }
+    }
+  }, {
+    key: "getAllNOCIBELessImportant",
+    value: function getAllNOCIBELessImportant(startDate, endDate, callback) {
+      if (startDate && endDate) {
+        var query = "SELECT\n      clients.id AS id_client,\n      clients.nom,\n      clients.prenoms,\n      clients.numero_ifu,\n      clients.numero_telephone,\n      clients.email,\n      clients.date_ajout AS date_ajout_client,\n      paiement_client.id AS id,\n      paiement_client.montant AS montant,\n      paiement_client.banque,\n      paiement_client.reference,\n      paiement_client.categorie,\n      paiement_client.numero_bc,\n      paiement_client.bordereau,\n      paiement_client.est_valide,\n      paiement_client.id_client AS id_client,\n      paiement_client.date_paiement\n      FROM\n      clients, paiement_client\n      WHERE\n      paiement_client.date_paiement BETWEEN ? AND ? AND\n      clients.id = paiement_client.id_client AND\n      paiement_client.categorie = 'NOCIBE' AND\n      ORDER BY paiement_client.montant ASC;";
+        connection.query(query, [new Date(startDate), new Date(endDate)], function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var paiementsList = results.map(function (paiementData) {
+            return new PaiementClient(paiementData.id, new Clients(paiementData.id_client, paiementData.nom, paiementData.prenoms, paiementData.numero_ifu, paiementData.numero_telephone, paiementData.email, paiementData.date_ajout), paiementData.montant, paiementData.banque, paiementData.reference, paiementData.categorie, paiementData.numero_bc, paiementData.bordereau, paiementData.est_valide, paiementData.id_client, paiementData.date_paiement);
+          });
+          return callback(null, paiementsList);
+        });
+      } else {
+        var _query7 = "SELECT\n    clients.id AS id_client,\n    clients.nom,\n    clients.prenoms,\n    clients.numero_ifu,\n    clients.numero_telephone,\n    clients.email,\n    clients.date_ajout AS date_ajout_client,\n    paiement_client.id AS id,\n    paiement_client.montant AS montant,\n    paiement_client.banque,\n    paiement_client.reference,\n    paiement_client.categorie,\n    paiement_client.numero_bc,\n    paiement_client.bordereau,\n    paiement_client.est_valide,\n    paiement_client.id_client AS id_client,\n    paiement_client.date_paiement\n    FROM\n      clients, paiement_client\n      WHERE\n      clients.id = paiement_client.id_client AND\n      paiement_client.categorie = 'NOCIBE' AND\n      ORDER BY paiement_client.montant ASC;";
+        connection.query(_query7, function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var paiementsList = results.map(function (paiementData) {
+            return new PaiementClient(paiementData.id, new Clients(paiementData.id_client, paiementData.nom, paiementData.prenoms, paiementData.numero_ifu, paiementData.numero_telephone, paiementData.email, paiementData.date_ajout), paiementData.montant, paiementData.banque, paiementData.reference, paiementData.categorie, paiementData.numero_bc, paiementData.bordereau, paiementData.est_valide, paiementData.id_client, paiementData.date_paiement);
+          });
+          return callback(null, paiementsList);
+        });
+      }
+    }
+  }, {
+    key: "getAllCIMBENINMostImportant",
+    value: function getAllCIMBENINMostImportant(startDate, endDate, callback) {
+      if (startDate && endDate) {
+        var query = "SELECT\n      clients.id AS id_client,\n      clients.nom,\n      clients.prenoms,\n      clients.numero_ifu,\n      clients.numero_telephone,\n      clients.email,\n      clients.date_ajout AS date_ajout_client,\n      paiement_client.id AS id,\n      paiement_client.montant AS montant,\n      paiement_client.banque,\n      paiement_client.reference,\n      paiement_client.categorie,\n      paiement_client.numero_bc,\n      paiement_client.bordereau,\n      paiement_client.est_valide,\n      paiement_client.id_client AS id_client,\n      paiement_client.date_paiement\n      FROM\n      clients, paiement_client\n      WHERE\n      paiement_client.date_paiement BETWEEN ? AND ? AND\n      clients.id = paiement_client.id_client AND\n      paiement_client.categorie = 'CIM BENIN' AND\n      ORDER BY paiement_client.montant DESC;";
+        connection.query(query, [new Date(startDate), new Date(endDate)], function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var paiementsList = results.map(function (paiementData) {
+            return new PaiementClient(paiementData.id, new Clients(paiementData.id_client, paiementData.nom, paiementData.prenoms, paiementData.numero_ifu, paiementData.numero_telephone, paiementData.email, paiementData.date_ajout), paiementData.montant, paiementData.banque, paiementData.reference, paiementData.categorie, paiementData.numero_bc, paiementData.bordereau, paiementData.est_valide, paiementData.id_client, paiementData.date_paiement);
+          });
+          return callback(null, paiementsList);
+        });
+      } else {
+        var _query8 = "SELECT\n    clients.id AS id_client,\n    clients.nom,\n    clients.prenoms,\n    clients.numero_ifu,\n    clients.numero_telephone,\n    clients.email,\n    clients.date_ajout AS date_ajout_client,\n    paiement_client.id AS id,\n    paiement_client.montant AS montant,\n    paiement_client.banque,\n    paiement_client.reference,\n    paiement_client.categorie,\n    paiement_client.numero_bc,\n    paiement_client.bordereau,\n    paiement_client.est_valide,\n    paiement_client.id_client AS id_client,\n    paiement_client.date_paiement\n    FROM\n      clients, paiement_client\n      WHERE\n      clients.id = paiement_client.id_client AND\n      paiement_client.categorie = 'CIM BENIN' AND\n      ORDER BY paiement_client.montant DESC";
+        connection.query(_query8, function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var paiementsList = results.map(function (paiementData) {
+            return new PaiementClient(paiementData.id, new Clients(paiementData.id_client, paiementData.nom, paiementData.prenoms, paiementData.numero_ifu, paiementData.numero_telephone, paiementData.email, paiementData.date_ajout), paiementData.montant, paiementData.banque, paiementData.reference, paiementData.categorie, paiementData.numero_bc, paiementData.bordereau, paiementData.est_valide, paiementData.id_client, paiementData.date_paiement);
+          });
+          return callback(null, paiementsList);
+        });
+      }
+    }
+  }, {
+    key: "getAllCIMBENINLessImportant",
+    value: function getAllCIMBENINLessImportant(startDate, endDate, callback) {
+      if (startDate && endDate) {
+        var query = "SELECT\n      clients.id AS id_client,\n      clients.nom,\n      clients.prenoms,\n      clients.numero_ifu,\n      clients.numero_telephone,\n      clients.email,\n      clients.date_ajout AS date_ajout_client,\n      paiement_client.id AS id,\n      paiement_client.montant AS montant,\n      paiement_client.banque,\n      paiement_client.reference,\n      paiement_client.categorie,\n      paiement_client.numero_bc,\n      paiement_client.bordereau,\n      paiement_client.est_valide,\n      paiement_client.id_client AS id_client,\n      paiement_client.date_paiement\n      FROM\n      clients, paiement_client\n      WHERE\n      paiement_client.date_paiement BETWEEN ? AND ? AND\n      clients.id = paiement_client.id_client AND\n      paiement_client.categorie = 'CIM BENIN' AND\n      ORDER BY paiement_client.montant ASC";
+        connection.query(query, [new Date(startDate), new Date(endDate)], function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var paiementsList = results.map(function (paiementData) {
+            return new PaiementClient(paiementData.id, new Clients(paiementData.id_client, paiementData.nom, paiementData.prenoms, paiementData.numero_ifu, paiementData.numero_telephone, paiementData.email, paiementData.date_ajout), paiementData.montant, paiementData.banque, paiementData.reference, paiementData.categorie, paiementData.numero_bc, paiementData.bordereau, paiementData.est_valide, paiementData.id_client, paiementData.date_paiement);
+          });
+          return callback(null, paiementsList);
+        });
+      } else {
+        var _query9 = "SELECT\n    clients.id AS id_client,\n    clients.nom,\n    clients.prenoms,\n    clients.numero_ifu,\n    clients.numero_telephone,\n    clients.email,\n    clients.date_ajout AS date_ajout_client,\n    paiement_client.id AS id,\n    paiement_client.montant AS montant,\n    paiement_client.banque,\n    paiement_client.reference,\n    paiement_client.categorie,\n    paiement_client.numero_bc,\n    paiement_client.bordereau,\n    paiement_client.est_valide,\n    paiement_client.id_client AS id_client,\n    paiement_client.date_paiement\n    FROM\n      clients, paiement_client\n      WHERE\n      clients.id = paiement_client.id_client AND\n      paiement_client.categorie = 'CIM BENIN' AND\n      ORDER BY paiement_client.montant ASC";
+        connection.query(_query9, function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var paiementsList = results.map(function (paiementData) {
+            return new PaiementClient(paiementData.id, new Clients(paiementData.id_client, paiementData.nom, paiementData.prenoms, paiementData.numero_ifu, paiementData.numero_telephone, paiementData.email, paiementData.date_ajout), paiementData.montant, paiementData.banque, paiementData.reference, paiementData.categorie, paiementData.numero_bc, paiementData.bordereau, paiementData.est_valide, paiementData.id_client, paiementData.date_paiement);
+          });
+          return callback(null, paiementsList);
+        });
+      }
+    }
+  }, {
+    key: "getAllValidated",
+    value: function getAllValidated(startDate, endDate, callback) {
+      if (startDate && endDate) {
+        var query = "SELECT\n      clients.id AS id_client,\n      clients.nom,\n      clients.prenoms,\n      clients.numero_ifu,\n      clients.numero_telephone,\n      clients.email,\n      clients.date_ajout AS date_ajout_client,\n      paiement_client.id AS id,\n      paiement_client.montant AS montant,\n      paiement_client.banque,\n      paiement_client.reference,\n      paiement_client.categorie,\n      paiement_client.numero_bc,\n      paiement_client.bordereau,\n      paiement_client.est_valide,\n      paiement_client.id_client AS id_client,\n      paiement_client.date_paiement\n      FROM\n      clients, paiement_client\n      WHERE\n      paiement_client.date_paiement BETWEEN ? AND ? AND\n      clients.id = paiement_client.id_client AND\n      paiement_client.est_valide = 1 \n      ORDER BY paiement_client.id DESC;";
+        connection.query(query, [new Date(startDate), new Date(endDate)], function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var paiementsList = results.map(function (paiementData) {
+            return new PaiementClient(paiementData.id, new Clients(paiementData.id_client, paiementData.nom, paiementData.prenoms, paiementData.numero_ifu, paiementData.numero_telephone, paiementData.email, paiementData.date_ajout), paiementData.montant, paiementData.banque, paiementData.reference, paiementData.categorie, paiementData.numero_bc, paiementData.bordereau, paiementData.est_valide, paiementData.id_client, paiementData.date_paiement);
+          });
+          return callback(null, paiementsList);
+        });
+      } else {
+        var _query10 = "SELECT\n    clients.id AS id_client,\n    clients.nom,\n    clients.prenoms,\n    clients.numero_ifu,\n    clients.numero_telephone,\n    clients.email,\n    clients.date_ajout AS date_ajout_client,\n    paiement_client.id AS id,\n    paiement_client.montant AS montant,\n    paiement_client.banque,\n    paiement_client.reference,\n    paiement_client.categorie,\n    paiement_client.numero_bc,\n    paiement_client.bordereau,\n    paiement_client.est_valide,\n    paiement_client.id_client AS id_client,\n    paiement_client.date_paiement\n    FROM\n      clients, paiement_client\n      WHERE\n      clients.id = paiement_client.id_client AND\n      paiement_client.est_valide = 1 \n      ORDER BY paiement_client.id DESC;";
+        connection.query(_query10, function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var paiementsList = results.map(function (paiementData) {
+            return new PaiementClient(paiementData.id, new Clients(paiementData.id_client, paiementData.nom, paiementData.prenoms, paiementData.numero_ifu, paiementData.numero_telephone, paiementData.email, paiementData.date_ajout), paiementData.montant, paiementData.banque, paiementData.reference, paiementData.categorie, paiementData.numero_bc, paiementData.bordereau, paiementData.est_valide, paiementData.id_client, paiementData.date_paiement);
+          });
+          return callback(null, paiementsList);
+        });
+      }
+    }
+  }, {
+    key: "getAllUnValidated",
+    value: function getAllUnValidated(startDate, endDate, callback) {
+      if (startDate && endDate) {
+        var query = "SELECT\n      clients.id AS id_client,\n      clients.nom,\n      clients.prenoms,\n      clients.numero_ifu,\n      clients.numero_telephone,\n      clients.email,\n      clients.date_ajout AS date_ajout_client,\n      paiement_client.id AS id,\n      paiement_client.montant AS montant,\n      paiement_client.banque,\n      paiement_client.reference,\n      paiement_client.categorie,\n      paiement_client.numero_bc,\n      paiement_client.bordereau,\n      paiement_client.est_valide,\n      paiement_client.id_client AS id_client,\n      paiement_client.date_paiement\n      FROM\n      clients, paiement_client\n      WHERE\n      paiement_client.date_paiement BETWEEN ? AND ? AND\n      clients.id = paiement_client.id_client AND\n      paiement_client.est_valide = 0\n      ORDER BY paiement_client.id DESC;";
+        connection.query(query, [new Date(startDate), new Date(endDate)], function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var paiementsList = results.map(function (paiementData) {
+            return new PaiementClient(paiementData.id, new Clients(paiementData.id_client, paiementData.nom, paiementData.prenoms, paiementData.numero_ifu, paiementData.numero_telephone, paiementData.email, paiementData.date_ajout), paiementData.montant, paiementData.banque, paiementData.reference, paiementData.categorie, paiementData.numero_bc, paiementData.bordereau, paiementData.est_valide, paiementData.id_client, paiementData.date_paiement);
+          });
+          return callback(null, paiementsList);
+        });
+      } else {
+        var _query11 = "SELECT\n    clients.id AS id_client,\n    clients.nom,\n    clients.prenoms,\n    clients.numero_ifu,\n    clients.numero_telephone,\n    clients.email,\n    clients.date_ajout AS date_ajout_client,\n    paiement_client.id AS id,\n    paiement_client.montant AS montant,\n    paiement_client.banque,\n    paiement_client.reference,\n    paiement_client.categorie,\n    paiement_client.numero_bc,\n    paiement_client.bordereau,\n    paiement_client.est_valide,\n    paiement_client.id_client AS id_client,\n    paiement_client.date_paiement\n    FROM\n      clients, paiement_client\n      WHERE\n      clients.id = paiement_client.id_client AND\n      paiement_client.est_valide = 0\n      ORDER BY paiement_client.id DESC;";
+        connection.query(_query11, function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var paiementsList = results.map(function (paiementData) {
+            return new PaiementClient(paiementData.id, new Clients(paiementData.id_client, paiementData.nom, paiementData.prenoms, paiementData.numero_ifu, paiementData.numero_telephone, paiementData.email, paiementData.date_ajout), paiementData.montant, paiementData.banque, paiementData.reference, paiementData.categorie, paiementData.numero_bc, paiementData.bordereau, paiementData.est_valide, paiementData.id_client, paiementData.date_paiement);
+          });
+          return callback(null, paiementsList);
+        });
+      }
+    } // Selected Client
+
+  }, {
+    key: "getAllOfClient",
+    value: function getAllOfClient(startDate, endDate, id_client, callback) {
+      if (startDate && endDate) {
+        var query = "SELECT * FROM paiement_client WHERE date_paiement BETWEEN ? AND ? AND id_client = ? ORDER BY id DESC";
+        connection.query(query, [new Date(startDate), new Date(endDate), id_client], function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var paiementsList = results.map(function (paiementData) {
+            // console.log(typeof PaiementClientData.quantite_achetee);
+            return new PaiementClient(paiementData.id, undefined, paiementData.montant, paiementData.banque, paiementData.reference, paiementData.categorie, paiementData.numero_bc, paiementData.bordereau, paiementData.est_valide, paiementData.id_client, paiementData.date_paiement);
+          });
+          return callback(null, paiementsList);
+        });
+      } else {
+        var _query12 = "SELECT * FROM paiement_client WHERE id_client = ? ORDER BY id DESC";
+        connection.query(_query12, [id_client], function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var paiementsList = results.map(function (paiementData) {
+            // console.log(typeof PaiementClientData.quantite_achetee);
+            return new PaiementClient(paiementData.id, undefined, paiementData.montant, paiementData.banque, paiementData.reference, paiementData.categorie, paiementData.numero_bc, paiementData.bordereau, paiementData.est_valide, paiementData.id_client, paiementData.date_paiement);
+          });
+          return callback(null, paiementsList);
+        });
+      }
+    }
+  }, {
+    key: "getAllOfClientFromNewToOld",
+    value: function getAllOfClientFromNewToOld(startDate, endDate, id_client, callback) {
+      if (startDate && endDate) {
+        var query = "SELECT * FROM paiement_client WHERE date_paiement BETWEEN ? AND ? AND id_client = ? ORDER BY id DESC";
+        connection.query(query, [new Date(startDate), new Date(endDate), id_client], function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var paiementsList = results.map(function (paiementData) {
+            // console.log(typeof PaiementClientData.quantite_achetee);
+            return new PaiementClient(paiementData.id, undefined, paiementData.montant, paiementData.banque, paiementData.reference, paiementData.categorie, paiementData.numero_bc, paiementData.bordereau, paiementData.est_valide, paiementData.id_client, paiementData.date_paiement);
+          });
+          return callback(null, paiementsList);
+        });
+      } else {
+        var _query13 = "SELECT * FROM paiement_client WHERE id_client = ? ORDER BY id DESC";
+        connection.query(_query13, [id_client], function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var paiementsList = results.map(function (paiementData) {
+            // console.log(typeof PaiementClientData.quantite_achetee);
+            return new PaiementClient(paiementData.id, undefined, paiementData.montant, paiementData.banque, paiementData.reference, paiementData.categorie, paiementData.numero_bc, paiementData.bordereau, paiementData.est_valide, paiementData.id_client, paiementData.date_paiement);
+          });
+          return callback(null, paiementsList);
+        });
+      }
+    }
+  }, {
+    key: "getAllOfClientFromOldToNew",
+    value: function getAllOfClientFromOldToNew(startDate, endDate, id_client, callback) {
+      if (startDate && endDate) {
+        var query = "SELECT * FROM paiement_client WHERE date_paiement BETWEEN ? AND ? AND id_client = ? ORDER BY id ASC";
+        connection.query(query, [new Date(startDate), new Date(endDate), id_client], function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var paiementsList = results.map(function (paiementData) {
+            // console.log(typeof PaiementClientData.quantite_achetee);
+            return new PaiementClient(paiementData.id, undefined, paiementData.montant, paiementData.banque, paiementData.reference, paiementData.categorie, paiementData.numero_bc, paiementData.bordereau, paiementData.est_valide, paiementData.id_client, paiementData.date_paiement);
+          });
+          return callback(null, paiementsList);
+        });
+      } else {
+        var _query14 = "SELECT * FROM paiement_client WHERE id_client = ? ORDER BY id ASC";
+        connection.query(_query14, [id_client], function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var paiementsList = results.map(function (paiementData) {
+            // console.log(typeof PaiementClientData.quantite_achetee);
+            return new PaiementClient(paiementData.id, undefined, paiementData.montant, paiementData.banque, paiementData.reference, paiementData.categorie, paiementData.numero_bc, paiementData.bordereau, paiementData.est_valide, paiementData.id_client, paiementData.date_paiement);
+          });
+          return callback(null, paiementsList);
+        });
+      }
+    }
+  }, {
+    key: "getAllOfClientMostImportant",
+    value: function getAllOfClientMostImportant(startDate, endDate, id_client, callback) {
+      if (startDate && endDate) {
+        var query = "SELECT * FROM paiement_client WHERE date_paiement BETWEEN ? AND ? AND id_client = ? ORDER BY montant DESC";
+        connection.query(query, [new Date(startDate), new Date(endDate), id_client], function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var paiementsList = results.map(function (paiementData) {
+            // console.log(typeof PaiementClientData.quantite_achetee);
+            return new PaiementClient(paiementData.id, undefined, paiementData.montant, paiementData.banque, paiementData.reference, paiementData.categorie, paiementData.numero_bc, paiementData.bordereau, paiementData.est_valide, paiementData.id_client, paiementData.date_paiement);
+          });
+          return callback(null, paiementsList);
+        });
+      } else {
+        var _query15 = "SELECT * FROM paiement_client WHERE id_client = ? ORDER BY montant DESC";
+        connection.query(_query15, [id_client], function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var paiementsList = results.map(function (paiementData) {
+            // console.log(typeof PaiementClientData.quantite_achetee);
+            return new PaiementClient(paiementData.id, undefined, paiementData.montant, paiementData.banque, paiementData.reference, paiementData.categorie, paiementData.numero_bc, paiementData.bordereau, paiementData.est_valide, paiementData.id_client, paiementData.date_paiement);
+          });
+          return callback(null, paiementsList);
+        });
+      }
+    }
+  }, {
+    key: "getAllOfClientLessImportant",
+    value: function getAllOfClientLessImportant(startDate, endDate, id_client, callback) {
+      if (startDate && endDate) {
+        var query = "SELECT * FROM paiement_client WHERE date_paiement BETWEEN ? AND ? AND id_client = ? ORDER BY montant ASC";
+        connection.query(query, [new Date(startDate), new Date(endDate), id_client], function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var paiementsList = results.map(function (paiementData) {
+            // console.log(typeof PaiementClientData.quantite_achetee);
+            return new PaiementClient(paiementData.id, undefined, paiementData.montant, paiementData.banque, paiementData.reference, paiementData.categorie, paiementData.numero_bc, paiementData.bordereau, paiementData.est_valide, paiementData.id_client, paiementData.date_paiement);
+          });
+          return callback(null, paiementsList);
+        });
+      } else {
+        var _query16 = "SELECT * FROM paiement_client WHERE id_client = ? ORDER BY montant ASC";
+        connection.query(_query16, [id_client], function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var paiementsList = results.map(function (paiementData) {
+            // console.log(typeof PaiementClientData.quantite_achetee);
+            return new PaiementClient(paiementData.id, undefined, paiementData.montant, paiementData.banque, paiementData.reference, paiementData.categorie, paiementData.numero_bc, paiementData.bordereau, paiementData.est_valide, paiementData.id_client, paiementData.date_paiement);
+          });
+          return callback(null, paiementsList);
+        });
+      }
+    }
+  }, {
+    key: "getAllOfClientCIMBENINMostImportant",
+    value: function getAllOfClientCIMBENINMostImportant(startDate, endDate, id_client, callback) {
+      if (startDate && endDate) {
+        var query = "SELECT * FROM paiement_client WHERE date_paiement BETWEEN ? AND ? AND id_client = ? AND categorie = 'CIM BENIN' ORDER BY montant DESC";
+        connection.query(query, [new Date(startDate), new Date(endDate), id_client], function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var paiementsList = results.map(function (paiementData) {
+            // console.log(typeof PaiementClientData.quantite_achetee);
+            return new PaiementClient(paiementData.id, undefined, paiementData.montant, paiementData.banque, paiementData.reference, paiementData.categorie, paiementData.numero_bc, paiementData.bordereau, paiementData.est_valide, paiementData.id_client, paiementData.date_paiement);
+          });
+          return callback(null, paiementsList);
+        });
+      } else {
+        var _query17 = "SELECT * FROM paiement_client WHERE id_client = ? AND categorie = 'CIM BENIN' ORDER BY montant DESC";
+        connection.query(_query17, [id_client], function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var paiementsList = results.map(function (paiementData) {
+            // console.log(typeof PaiementClientData.quantite_achetee);
+            return new PaiementClient(paiementData.id, undefined, paiementData.montant, paiementData.banque, paiementData.reference, paiementData.categorie, paiementData.numero_bc, paiementData.bordereau, paiementData.est_valide, paiementData.id_client, paiementData.date_paiement);
+          });
+          return callback(null, paiementsList);
+        });
+      }
+    }
+  }, {
+    key: "getAllOfClientCIMBENINLessImportant",
+    value: function getAllOfClientCIMBENINLessImportant(startDate, endDate, id_client, callback) {
+      if (startDate && endDate) {
+        var query = "SELECT * FROM paiement_client WHERE date_paiement BETWEEN ? AND ? AND id_client = ? AND categorie = 'CIM BENIN' ORDER BY montant ASC";
+        connection.query(query, [new Date(startDate), new Date(endDate), id_client], function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var paiementsList = results.map(function (paiementData) {
+            // console.log(typeof PaiementClientData.quantite_achetee);
+            return new PaiementClient(paiementData.id, undefined, paiementData.montant, paiementData.banque, paiementData.reference, paiementData.categorie, paiementData.numero_bc, paiementData.bordereau, paiementData.est_valide, paiementData.id_client, paiementData.date_paiement);
+          });
+          return callback(null, paiementsList);
+        });
+      } else {
+        var _query18 = "SELECT * FROM paiement_client WHERE id_client = ? AND categorie = 'CIM BENIN' ORDER BY montant ASC";
+        connection.query(_query18, [id_client], function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var paiementsList = results.map(function (paiementData) {
+            // console.log(typeof PaiementClientData.quantite_achetee);
+            return new PaiementClient(paiementData.id, undefined, paiementData.montant, paiementData.banque, paiementData.reference, paiementData.categorie, paiementData.numero_bc, paiementData.bordereau, paiementData.est_valide, paiementData.id_client, paiementData.date_paiement);
+          });
+          return callback(null, paiementsList);
+        });
+      }
+    }
+  }, {
+    key: "getAllOfClientNOCIBEMostImportant",
+    value: function getAllOfClientNOCIBEMostImportant(startDate, endDate, id_client, callback) {
+      if (startDate && endDate) {
+        var query = "SELECT * FROM paiement_client WHERE date_paiement BETWEEN ? AND ? AND id_client = ? AND categorie = 'NOCIBE' ORDER BY montant DESC";
+        connection.query(query, [new Date(startDate), new Date(endDate), id_client], function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var paiementsList = results.map(function (paiementData) {
+            // console.log(typeof PaiementClientData.quantite_achetee);
+            return new PaiementClient(paiementData.id, undefined, paiementData.montant, paiementData.banque, paiementData.reference, paiementData.categorie, paiementData.numero_bc, paiementData.bordereau, paiementData.est_valide, paiementData.id_client, paiementData.date_paiement);
+          });
+          return callback(null, paiementsList);
+        });
+      } else {
+        var _query19 = "SELECT * FROM paiement_client WHERE id_client = ? AND categorie = 'NOCIBE' ORDER BY montant DESC";
+        connection.query(_query19, [id_client], function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var paiementsList = results.map(function (paiementData) {
+            // console.log(typeof PaiementClientData.quantite_achetee);
+            return new PaiementClient(paiementData.id, undefined, paiementData.montant, paiementData.banque, paiementData.reference, paiementData.categorie, paiementData.numero_bc, paiementData.bordereau, paiementData.est_valide, paiementData.id_client, paiementData.date_paiement);
+          });
+          return callback(null, paiementsList);
+        });
+      }
+    }
+  }, {
+    key: "getAllOfClientNOCIBELessImportant",
+    value: function getAllOfClientNOCIBELessImportant(startDate, endDate, id_client, callback) {
+      if (startDate && endDate) {
+        var query = "SELECT * FROM paiement_client WHERE date_paiement BETWEEN ? AND ? AND id_client = ? AND categorie = 'NOCIBE' ORDER BY montant ASC";
+        connection.query(query, [new Date(startDate), new Date(endDate), id_client], function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var paiementsList = results.map(function (paiementData) {
+            // console.log(typeof PaiementClientData.quantite_achetee);
+            return new PaiementClient(paiementData.id, undefined, paiementData.montant, paiementData.banque, paiementData.reference, paiementData.categorie, paiementData.numero_bc, paiementData.bordereau, paiementData.est_valide, paiementData.id_client, paiementData.date_paiement);
+          });
+          return callback(null, paiementsList);
+        });
+      } else {
+        var _query20 = "SELECT * FROM paiement_client WHERE id_client = ? AND categorie = 'NOCIBE' ORDER BY montant ASC";
+        connection.query(_query20, [id_client], function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var paiementsList = results.map(function (paiementData) {
+            // console.log(typeof PaiementClientData.quantite_achetee);
+            return new PaiementClient(paiementData.id, undefined, paiementData.montant, paiementData.banque, paiementData.reference, paiementData.categorie, paiementData.numero_bc, paiementData.bordereau, paiementData.est_valide, paiementData.id_client, paiementData.date_paiement);
+          });
+          return callback(null, paiementsList);
+        });
+      }
+    }
+  }, {
+    key: "getAllOfClientUnvalidated",
+    value: function getAllOfClientUnvalidated(startDate, endDate, id_client, callback) {
+      if (startDate && endDate) {
+        var query = "SELECT * FROM paiement_client WHERE date_paiement BETWEEN ? AND ? AND id_client = ? AND est_valide = 0 ORDER BY id DESC";
+        connection.query(query, [new Date(startDate), new Date(endDate), id_client], function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var paiementsList = results.map(function (paiementData) {
+            // console.log(typeof PaiementClientData.quantite_achetee);
+            return new PaiementClient(paiementData.id, undefined, paiementData.montant, paiementData.banque, paiementData.reference, paiementData.categorie, paiementData.numero_bc, paiementData.bordereau, paiementData.est_valide, paiementData.id_client, paiementData.date_paiement);
+          });
+          return callback(null, paiementsList);
+        });
+      } else {
+        var _query21 = "SELECT * FROM paiement_client WHERE id_client = ? AND est_valide = 0 ORDER BY id DESC";
+        connection.query(_query21, [id_client], function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var paiementsList = results.map(function (paiementData) {
+            // console.log(typeof PaiementClientData.quantite_achetee);
+            return new PaiementClient(paiementData.id, undefined, paiementData.montant, paiementData.banque, paiementData.reference, paiementData.categorie, paiementData.numero_bc, paiementData.bordereau, paiementData.est_valide, paiementData.id_client, paiementData.date_paiement);
+          });
+          return callback(null, paiementsList);
+        });
+      }
+    }
+  }, {
+    key: "getAllOfClientValidated",
+    value: function getAllOfClientValidated(startDate, endDate, id_client, callback) {
+      if (startDate && endDate) {
+        var query = "SELECT * FROM paiement_client WHERE date_paiement BETWEEN ? AND ? AND id_client = ? AND est_valide = 1 ORDER BY id DESC";
+        connection.query(query, [new Date(startDate), new Date(endDate), id_client], function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var paiementsList = results.map(function (paiementData) {
+            // console.log(typeof PaiementClientData.quantite_achetee);
+            return new PaiementClient(paiementData.id, undefined, paiementData.montant, paiementData.banque, paiementData.reference, paiementData.categorie, paiementData.numero_bc, paiementData.bordereau, paiementData.est_valide, paiementData.id_client, paiementData.date_paiement);
+          });
+          return callback(null, paiementsList);
+        });
+      } else {
+        var _query22 = "SELECT * FROM paiement_client WHERE id_client = ? AND est_valide = 1 ORDER BY id DESC";
+        connection.query(_query22, [id_client], function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var paiementsList = results.map(function (paiementData) {
+            // console.log(typeof PaiementClientData.quantite_achetee);
+            return new PaiementClient(paiementData.id, undefined, paiementData.montant, paiementData.banque, paiementData.reference, paiementData.categorie, paiementData.numero_bc, paiementData.bordereau, paiementData.est_valide, paiementData.id_client, paiementData.date_paiement);
+          });
+          return callback(null, paiementsList);
+        });
+      }
     }
   }]);
 
