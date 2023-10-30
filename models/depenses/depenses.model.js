@@ -61,24 +61,321 @@ class Depenses {
     });
   }
 
-  static getAll(callback) {
-    const query = "SELECT * FROM depenses";
-    connection.query(query, (error, results) => {
-      if (error) {
-        return callback(error, null);
-      }
-      const depensesList = results.map((depenseData) => {
-        return new Depenses(
-          depenseData.id,
-          depenseData.description,
-          depenseData.montant,
-          depenseData.piece,
-          depenseData.est_validee,
-          depenseData.date_depense
-        );
+  static getAll(startDate, endDate, callback) {
+    if (startDate && endDate) {
+      const query =
+        "SELECT * FROM depenses WHERE date_depense BETWEEN ? AND ? ORDER BY id DESC";
+      connection.query(
+        query,
+        [new Date(startDate), new Date(endDate)],
+        (error, results) => {
+          if (error) {
+            return callback(error, null);
+          }
+          const depensesList = results.map((depenseData) => {
+            return new Depenses(
+              depenseData.id,
+              depenseData.description,
+              depenseData.montant,
+              depenseData.piece,
+              depenseData.est_validee,
+              depenseData.date_depense
+            );
+          });
+          return callback(null, depensesList);
+        }
+      );
+    } else {
+      const query = "SELECT * FROM depenses ORDER BY id DESC";
+      connection.query(query, (error, results) => {
+        if (error) {
+          return callback(error, null);
+        }
+        const depensesList = results.map((depenseData) => {
+          return new Depenses(
+            depenseData.id,
+            depenseData.description,
+            depenseData.montant,
+            depenseData.piece,
+            depenseData.est_validee,
+            depenseData.date_depense
+          );
+        });
+        return callback(null, depensesList);
       });
-      return callback(null, depensesList);
-    });
+    }
+  }
+
+  static getAllFromNewToOld(startDate, endDate, callback) {
+    if (startDate && endDate) {
+      const query =
+        "SELECT * FROM depenses WHERE date_depense BETWEEN ? AND ? ORDER BY id DESC";
+      connection.query(
+        query,
+        [new Date(startDate), new Date(endDate)],
+        (error, results) => {
+          if (error) {
+            return callback(error, null);
+          }
+          const depensesList = results.map((depenseData) => {
+            return new Depenses(
+              depenseData.id,
+              depenseData.description,
+              depenseData.montant,
+              depenseData.piece,
+              depenseData.est_validee,
+              depenseData.date_depense
+            );
+          });
+          return callback(null, depensesList);
+        }
+      );
+    } else {
+      const query = "SELECT * FROM depenses ORDER BY id DESC";
+      connection.query(query, (error, results) => {
+        if (error) {
+          return callback(error, null);
+        }
+        const depensesList = results.map((depenseData) => {
+          return new Depenses(
+            depenseData.id,
+            depenseData.description,
+            depenseData.montant,
+            depenseData.piece,
+            depenseData.est_validee,
+            depenseData.date_depense
+          );
+        });
+        return callback(null, depensesList);
+      });
+    }
+  }
+
+  static getAllFromOldToNew(startDate, endDate, callback) {
+    if (startDate && endDate) {
+      const query =
+        "SELECT * FROM depenses WHERE date_depense BETWEEN ? AND ? ORDER BY id ASC";
+      connection.query(
+        query,
+        [new Date(startDate), new Date(endDate)],
+        (error, results) => {
+          if (error) {
+            return callback(error, null);
+          }
+          const depensesList = results.map((depenseData) => {
+            return new Depenses(
+              depenseData.id,
+              depenseData.description,
+              depenseData.montant,
+              depenseData.piece,
+              depenseData.est_validee,
+              depenseData.date_depense
+            );
+          });
+          return callback(null, depensesList);
+        }
+      );
+    } else {
+      const query = "SELECT * FROM depenses ORDER BY id ASC";
+      connection.query(query, (error, results) => {
+        if (error) {
+          return callback(error, null);
+        }
+        const depensesList = results.map((depenseData) => {
+          return new Depenses(
+            depenseData.id,
+            depenseData.description,
+            depenseData.montant,
+            depenseData.piece,
+            depenseData.est_validee,
+            depenseData.date_depense
+          );
+        });
+        return callback(null, depensesList);
+      });
+    }
+  }
+
+  static getAllMostImportant(startDate, endDate, callback) {
+    if (startDate && endDate) {
+      const query =
+        "SELECT * FROM depenses WHERE date_depense BETWEEN ? AND ? ORDER BY montant DESC";
+      connection.query(
+        query,
+        [new Date(startDate), new Date(endDate)],
+        (error, results) => {
+          if (error) {
+            return callback(error, null);
+          }
+          const depensesList = results.map((depenseData) => {
+            return new Depenses(
+              depenseData.id,
+              depenseData.description,
+              depenseData.montant,
+              depenseData.piece,
+              depenseData.est_validee,
+              depenseData.date_depense
+            );
+          });
+          return callback(null, depensesList);
+        }
+      );
+    } else {
+      const query = "SELECT * FROM depenses ORDER BY montant DESC";
+      connection.query(query, (error, results) => {
+        if (error) {
+          return callback(error, null);
+        }
+        const depensesList = results.map((depenseData) => {
+          return new Depenses(
+            depenseData.id,
+            depenseData.description,
+            depenseData.montant,
+            depenseData.piece,
+            depenseData.est_validee,
+            depenseData.date_depense
+          );
+        });
+        return callback(null, depensesList);
+      });
+    }
+  }
+
+  static getAllLessImportant(startDate, endDate, callback) {
+    if (startDate && endDate) {
+      const query =
+        "SELECT * FROM depenses WHERE date_depense BETWEEN ? AND ? ORDER BY montant ASC";
+      connection.query(
+        query,
+        [new Date(startDate), new Date(endDate)],
+        (error, results) => {
+          if (error) {
+            return callback(error, null);
+          }
+          const depensesList = results.map((depenseData) => {
+            return new Depenses(
+              depenseData.id,
+              depenseData.description,
+              depenseData.montant,
+              depenseData.piece,
+              depenseData.est_validee,
+              depenseData.date_depense
+            );
+          });
+          return callback(null, depensesList);
+        }
+      );
+    } else {
+      const query = "SELECT * FROM depenses ORDER BY montant ASC";
+      connection.query(query, (error, results) => {
+        if (error) {
+          return callback(error, null);
+        }
+        const depensesList = results.map((depenseData) => {
+          return new Depenses(
+            depenseData.id,
+            depenseData.description,
+            depenseData.montant,
+            depenseData.piece,
+            depenseData.est_validee,
+            depenseData.date_depense
+          );
+        });
+        return callback(null, depensesList);
+      });
+    }
+  }
+
+  static getAllValidated(startDate, endDate, callback) {
+    if (startDate && endDate) {
+      const query =
+        "SELECT * FROM depenses WHERE date_depense BETWEEN ? AND ? AND est_validee = 1 ORDER BY id DESC";
+      connection.query(
+        query,
+        [new Date(startDate), new Date(endDate)],
+        (error, results) => {
+          if (error) {
+            return callback(error, null);
+          }
+          const depensesList = results.map((depenseData) => {
+            return new Depenses(
+              depenseData.id,
+              depenseData.description,
+              depenseData.montant,
+              depenseData.piece,
+              depenseData.est_validee,
+              depenseData.date_depense
+            );
+          });
+          return callback(null, depensesList);
+        }
+      );
+    } else {
+      const query =
+        "SELECT * FROM depenses WHERE est_validee = 1 ORDER BY id DESC";
+      connection.query(query, (error, results) => {
+        if (error) {
+          return callback(error, null);
+        }
+        const depensesList = results.map((depenseData) => {
+          return new Depenses(
+            depenseData.id,
+            depenseData.description,
+            depenseData.montant,
+            depenseData.piece,
+            depenseData.est_validee,
+            depenseData.date_depense
+          );
+        });
+        return callback(null, depensesList);
+      });
+    }
+  }
+
+  static getAllUnvalidated(startDate, endDate, callback) {
+    if (startDate && endDate) {
+      const query =
+        "SELECT * FROM depenses WHERE date_depense BETWEEN ? AND ? AND est_validee = 0 ORDER BY id DESC";
+      connection.query(
+        query,
+        [new Date(startDate), new Date(endDate)],
+        (error, results) => {
+          if (error) {
+            return callback(error, null);
+          }
+          const depensesList = results.map((depenseData) => {
+            return new Depenses(
+              depenseData.id,
+              depenseData.description,
+              depenseData.montant,
+              depenseData.piece,
+              depenseData.est_validee,
+              depenseData.date_depense
+            );
+          });
+          return callback(null, depensesList);
+        }
+      );
+    } else {
+      const query =
+        "SELECT * FROM depenses WHERE est_validee = 0 ORDER BY id DESC";
+      connection.query(query, (error, results) => {
+        if (error) {
+          return callback(error, null);
+        }
+        const depensesList = results.map((depenseData) => {
+          return new Depenses(
+            depenseData.id,
+            depenseData.description,
+            depenseData.montant,
+            depenseData.piece,
+            depenseData.est_validee,
+            depenseData.date_depense
+          );
+        });
+        return callback(null, depensesList);
+      });
+    }
   }
 
   update(callback) {

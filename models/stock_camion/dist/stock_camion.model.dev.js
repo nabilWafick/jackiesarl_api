@@ -106,18 +106,32 @@ function () {
     }
   }, {
     key: "getAll",
-    value: function getAll(callback) {
-      var query = "SELECT * FROM stock_camion";
-      connection.query(query, function (error, results) {
-        if (error) {
-          return callback(error, null);
-        }
+    value: function getAll(startDate, endDate, callback) {
+      if (startDate && endDate) {
+        var query = "SELECT * FROM stock_camion WHERE date_approvisionnement BETWEEN ? AND ? ORDER BY id DESC";
+        connection.query(query, [new Date(startDate), new Date(endDate)], function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
 
-        var stocksList = results.map(function (stockData) {
-          return new StockCamion(stockData.id, stockData.numero_camion, stockData.categorie, stockData.numero_chauffeur, stockData.numero_bc, stockData.quantite, stockData.date_approvisionnement);
+          var stocksList = results.map(function (stockData) {
+            return new StockCamion(stockData.id, stockData.numero_camion, stockData.categorie, stockData.numero_chauffeur, stockData.numero_bc, stockData.quantite, stockData.date_approvisionnement);
+          });
+          return callback(null, stocksList);
         });
-        return callback(null, stocksList);
-      });
+      } else {
+        var _query = "SELECT * FROM stock_camion ORDER BY id DESC";
+        connection.query(_query, function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var stocksList = results.map(function (stockData) {
+            return new StockCamion(stockData.id, stockData.numero_camion, stockData.categorie, stockData.numero_chauffeur, stockData.numero_bc, stockData.quantite, stockData.date_approvisionnement);
+          });
+          return callback(null, stocksList);
+        });
+      }
     }
   }]);
 

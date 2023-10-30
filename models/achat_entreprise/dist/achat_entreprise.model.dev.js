@@ -107,18 +107,32 @@ function () {
     }
   }, {
     key: "getAll",
-    value: function getAll(callback) {
-      var query = "SELECT * FROM achat_entreprise";
-      connection.query(query, function (error, results) {
-        if (error) {
-          return callback(error, null);
-        }
+    value: function getAll(startDate, endDate, callback) {
+      if (startDate && endDate) {
+        var query = "SELECT * FROM achat_entreprise WHERE date_achat BETWEEN ? AND ? ORDER BY bon_commande DESC";
+        connection.query(query, [new Date(startDate), new Date(endDate)], function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
 
-        var achatsEntreprise = results.map(function (achatEntrepriseData) {
-          return new AchatEntreprise(achatEntrepriseData.bon_commande, achatEntrepriseData.categorie, achatEntrepriseData.quantite_achetee, achatEntrepriseData.montant, achatEntrepriseData.banque, achatEntrepriseData.cheque, achatEntrepriseData.bordereau, new Date(achatEntrepriseData.date_achat));
+          var achatsEntreprise = results.map(function (achatEntrepriseData) {
+            return new AchatEntreprise(achatEntrepriseData.bon_commande, achatEntrepriseData.categorie, achatEntrepriseData.quantite_achetee, achatEntrepriseData.montant, achatEntrepriseData.banque, achatEntrepriseData.cheque, achatEntrepriseData.bordereau, new Date(achatEntrepriseData.date_achat));
+          });
+          return callback(null, achatsEntreprise);
         });
-        return callback(null, achatsEntreprise);
-      });
+      } else {
+        var _query = "SELECT * FROM achat_entreprise ORDER BY bon_commande DESC";
+        connection.query(_query, function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var achatsEntreprise = results.map(function (achatEntrepriseData) {
+            return new AchatEntreprise(achatEntrepriseData.bon_commande, achatEntrepriseData.categorie, achatEntrepriseData.quantite_achetee, achatEntrepriseData.montant, achatEntrepriseData.banque, achatEntrepriseData.cheque, achatEntrepriseData.bordereau, new Date(achatEntrepriseData.date_achat));
+          });
+          return callback(null, achatsEntreprise);
+        });
+      }
     }
   }]);
 

@@ -51,8 +51,292 @@ class RemiseChequeClientController {
   };
 
   static getAllOfClient = (req, res) => {
+    const startDate = req.params.startDate;
+    const endDate = req.params.endDate;
     const id_client = req.params.id_client;
     RemiseChequeClient.getAllOfClient(
+      startDate,
+      endDate,
+      id_client,
+      (error, remisesChequesClient) => {
+        if (error) {
+          return res.status(500).json({
+            error:
+              "Erreur lors de la récupération des remises de cheques du client",
+          });
+        }
+        return res.status(200).json(remisesChequesClient);
+      }
+    );
+  };
+
+  static getAllOfClientFromOldToNew = (req, res) => {
+    const startDate = req.params.startDate;
+    const endDate = req.params.endDate;
+    const id_client = req.params.id_client;
+    RemiseChequeClient.getAllOfClientFromOldToNew(
+      startDate,
+      endDate,
+      id_client,
+      (error, remisesChequesClient) => {
+        if (error) {
+          return res.status(500).json({
+            error:
+              "Erreur lors de la récupération des remises de cheques du client",
+          });
+        }
+        return res.status(200).json(remisesChequesClient);
+      }
+    );
+  };
+
+  static getAllOfClientFromNewToOld = (req, res) => {
+    const startDate = req.params.startDate;
+    const endDate = req.params.endDate;
+    const id_client = req.params.id_client;
+    RemiseChequeClient.getAllOfClientFromNewToOld(
+      startDate,
+      endDate,
+      id_client,
+      (error, remisesChequesClient) => {
+        if (error) {
+          return res.status(500).json({
+            error:
+              "Erreur lors de la récupération des remises de cheques du client",
+          });
+        }
+        return res.status(200).json(remisesChequesClient);
+      }
+    );
+  };
+
+  static getAllOfClientMoreImportant = (req, res) => {
+    const startDate = req.params.startDate;
+    const endDate = req.params.endDate;
+    const id_client = req.params.id_client;
+    RemiseChequeClient.getAllOfClientMoreImportant(
+      startDate,
+      endDate,
+      id_client,
+      (error, remisesChequesClient) => {
+        if (error) {
+          return res.status(500).json({
+            error:
+              "Erreur lors de la récupération des remises de cheques du client",
+          });
+        }
+        return res.status(200).json(remisesChequesClient);
+      }
+    );
+  };
+
+  static getAllOfClientLessImportant = (req, res) => {
+    const startDate = req.params.startDate;
+    const endDate = req.params.endDate;
+    const id_client = req.params.id_client;
+    RemiseChequeClient.getAllOfClientLessImportant(
+      startDate,
+      endDate,
+      id_client,
+      (error, remisesChequesClient) => {
+        if (error) {
+          return res.status(500).json({
+            error:
+              "Erreur lors de la récupération des remises de cheques du client",
+          });
+        }
+        return res.status(200).json(remisesChequesClient);
+      }
+    );
+  };
+
+  static getAllOfClientValidated = (req, res) => {
+    const startDate = req.params.startDate;
+    const endDate = req.params.endDate;
+    const id_client = req.params.id_client;
+    RemiseChequeClient.getAllOfClientValidated(
+      startDate,
+      endDate,
+      id_client,
+      (error, remisesChequesClient) => {
+        if (error) {
+          return res.status(500).json({
+            error:
+              "Erreur lors de la récupération des remises de cheques du client",
+          });
+        }
+        return res.status(200).json(remisesChequesClient);
+      }
+    );
+  };
+
+  static getAllOfClientUnvalidated = (req, res) => {
+    const startDate = req.params.startDate;
+    const endDate = req.params.endDate;
+    const id_client = req.params.id_client;
+    RemiseChequeClient.getAllOfClientUnvalidated(
+      startDate,
+      endDate,
+      id_client,
+      (error, remisesChequesClient) => {
+        if (error) {
+          return res.status(500).json({
+            error:
+              "Erreur lors de la récupération des remises de cheques du client",
+          });
+        }
+        return res.status(200).json(remisesChequesClient);
+      }
+    );
+  };
+
+  static getAllOfClientRestLessImportant = (req, res) => {
+    const startDate = req.params.startDate;
+    const endDate = req.params.endDate;
+    const id_client = req.params.id_client;
+    RemiseChequeClient.getAllOfClientRestLessImportant(
+      startDate,
+      endDate,
+      id_client,
+      (error, remisesChequesClient) => {
+        if (error) {
+          return res.status(500).json({
+            error:
+              "Erreur lors de la récupération des remises de cheques du client",
+          });
+        }
+        return res.status(200).json(remisesChequesClient);
+      }
+    );
+  };
+
+  static getAllOfClientRestMoreImportant = (req, res) => {
+    const startDate = req.params.startDate;
+    const endDate = req.params.endDate;
+    const id_client = req.params.id_client;
+    RemiseChequeClient.getAllOfClientRestMoreImportant(
+      startDate,
+      endDate,
+      id_client,
+      (error, remisesChequesClient) => {
+        if (error) {
+          return res.status(500).json({
+            error:
+              "Erreur lors de la récupération des remises de cheques du client",
+          });
+        }
+        return res.status(200).json(remisesChequesClient);
+      }
+    );
+  };
+
+  static getAllOfClientBOABank = (req, res) => {
+    const startDate = req.params.startDate;
+    const endDate = req.params.endDate;
+    const id_client = req.params.id_client;
+    RemiseChequeClient.getAllOfClientBOABank(
+      startDate,
+      endDate,
+      id_client,
+      (error, remisesChequesClient) => {
+        if (error) {
+          return res.status(500).json({
+            error:
+              "Erreur lors de la récupération des remises de cheques du client",
+          });
+        }
+        return res.status(200).json(remisesChequesClient);
+      }
+    );
+  };
+
+  static getAllOfClientUBABank = (req, res) => {
+    const startDate = req.params.startDate;
+    const endDate = req.params.endDate;
+    const id_client = req.params.id_client;
+    RemiseChequeClient.getAllOfClientUBABank(
+      startDate,
+      endDate,
+      id_client,
+      (error, remisesChequesClient) => {
+        if (error) {
+          return res.status(500).json({
+            error:
+              "Erreur lors de la récupération des remises de cheques du client",
+          });
+        }
+        return res.status(200).json(remisesChequesClient);
+      }
+    );
+  };
+
+  static getAllOfClientNSIABank = (req, res) => {
+    const startDate = req.params.startDate;
+    const endDate = req.params.endDate;
+    const id_client = req.params.id_client;
+    RemiseChequeClient.getAllOfClientNSIABank(
+      startDate,
+      endDate,
+      id_client,
+      (error, remisesChequesClient) => {
+        if (error) {
+          return res.status(500).json({
+            error:
+              "Erreur lors de la récupération des remises de cheques du client",
+          });
+        }
+        return res.status(200).json(remisesChequesClient);
+      }
+    );
+  };
+
+  static getAllOfClientBGFIBank = (req, res) => {
+    const startDate = req.params.startDate;
+    const endDate = req.params.endDate;
+    const id_client = req.params.id_client;
+    RemiseChequeClient.getAllOfClientBGFIBank(
+      startDate,
+      endDate,
+      id_client,
+      (error, remisesChequesClient) => {
+        if (error) {
+          return res.status(500).json({
+            error:
+              "Erreur lors de la récupération des remises de cheques du client",
+          });
+        }
+        return res.status(200).json(remisesChequesClient);
+      }
+    );
+  };
+
+  static getAllOfClientSGBBank = (req, res) => {
+    const startDate = req.params.startDate;
+    const endDate = req.params.endDate;
+    const id_client = req.params.id_client;
+    RemiseChequeClient.getAllOfClientSGBBank(
+      startDate,
+      endDate,
+      id_client,
+      (error, remisesChequesClient) => {
+        if (error) {
+          return res.status(500).json({
+            error:
+              "Erreur lors de la récupération des remises de cheques du client",
+          });
+        }
+        return res.status(200).json(remisesChequesClient);
+      }
+    );
+  };
+
+  static getAllOfClientEcobankBank = (req, res) => {
+    const startDate = req.params.startDate;
+    const endDate = req.params.endDate;
+    const id_client = req.params.id_client;
+    RemiseChequeClient.getAllOfClientEcobankBank(
+      startDate,
+      endDate,
       id_client,
       (error, remisesChequesClient) => {
         if (error) {

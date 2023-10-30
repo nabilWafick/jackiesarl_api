@@ -32,7 +32,9 @@ class StockCamionController {
   };
 
   static getAll = (req, res) => {
-    StockCamion.getAll((error, stockCamions) => {
+    const startDate = req.params.startDate;
+    const endDate = req.params.endDate;
+    StockCamion.getAll(startDate, endDate, (error, stockCamions) => {
       if (error) {
         return res.status(500).json({
           error: "Erreur lors de la récupération des stocks de camion",
@@ -48,12 +50,10 @@ class StockCamionController {
     const updatedData = req.body;
     StockCamion.getById(id, (getError, existingStockCamion) => {
       if (getError) {
-        return res
-          .status(500)
-          .json({
-            status: 500,
-            error: "Erreur lors de la récupération du stock camion",
-          });
+        return res.status(500).json({
+          status: 500,
+          error: "Erreur lors de la récupération du stock camion",
+        });
       }
       if (!existingStockCamion) {
         return res
@@ -72,12 +72,10 @@ class StockCamionController {
       );
       existingStockCamion.update((updateError) => {
         if (updateError) {
-          return res
-            .status(500)
-            .json({
-              status: 500,
-              error: "Erreur lors de la mise à jour du stock camion",
-            });
+          return res.status(500).json({
+            status: 500,
+            error: "Erreur lors de la mise à jour du stock camion",
+          });
         }
         return res.status(200).json({ status: 200, existingStockCamion });
       });
@@ -89,12 +87,10 @@ class StockCamionController {
     const id = req.params.id;
     StockCamion.getById(id, (getError, existingStockCamion) => {
       if (getError) {
-        return res
-          .status(500)
-          .json({
-            status: 500,
-            error: "Erreur lors de la récupération du stock camion",
-          });
+        return res.status(500).json({
+          status: 500,
+          error: "Erreur lors de la récupération du stock camion",
+        });
       }
       if (!existingStockCamion) {
         return res

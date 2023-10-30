@@ -50,7 +50,87 @@ class DepensesController {
   };
 
   static getAll = (req, res) => {
-    Depenses.getAll((error, depenses) => {
+    const startDate = req.params.startDate;
+    const endDate = req.params.endDate;
+    Depenses.getAll(startDate, endDate, (error, depenses) => {
+      if (error) {
+        return res
+          .status(500)
+          .json({ error: "Erreur lors de la récupération des dépenses" });
+      }
+      return res.status(200).json(depenses);
+    });
+  };
+
+  static getAllFromNewToOld = (req, res) => {
+    const startDate = req.params.startDate;
+    const endDate = req.params.endDate;
+    Depenses.getAllFromNewToOld(startDate, endDate, (error, depenses) => {
+      if (error) {
+        return res
+          .status(500)
+          .json({ error: "Erreur lors de la récupération des dépenses" });
+      }
+      return res.status(200).json(depenses);
+    });
+  };
+
+  static getAllFromOldToNew = (req, res) => {
+    const startDate = req.params.startDate;
+    const endDate = req.params.endDate;
+    Depenses.getAll(startDate, endDate, (error, depenses) => {
+      if (error) {
+        return res
+          .status(500)
+          .json({ error: "Erreur lors de la récupération des dépenses" });
+      }
+      return res.status(200).json(depenses);
+    });
+  };
+
+  static getAllMostImportant = (req, res) => {
+    const startDate = req.params.startDate;
+    const endDate = req.params.endDate;
+    Depenses.getAllMostImportant(startDate, endDate, (error, depenses) => {
+      if (error) {
+        return res
+          .status(500)
+          .json({ error: "Erreur lors de la récupération des dépenses" });
+      }
+      return res.status(200).json(depenses);
+    });
+  };
+
+  static getAllLessImportant = (req, res) => {
+    const startDate = req.params.startDate;
+    const endDate = req.params.endDate;
+    Depenses.getAllLessImportant(startDate, endDate, (error, depenses) => {
+      if (error) {
+        return res
+          .status(500)
+          .json({ error: "Erreur lors de la récupération des dépenses" });
+      }
+      return res.status(200).json(depenses);
+    });
+  };
+
+  static getAllValidated = (req, res) => {
+    const startDate = req.params.startDate;
+    const endDate = req.params.endDate;
+    Depenses.getAllValidated(startDate, endDate, (error, depenses) => {
+      if (error) {
+        return res
+          .status(500)
+          .json({ error: "Erreur lors de la récupération des dépenses" });
+      }
+      return res.status(200).json(depenses);
+    });
+  };
+
+  static getAllUnvalidated = (req, res) => {
+    const startDate = req.params.startDate;
+    const endDate = req.params.endDate;
+    Depenses.getAllUnvalidated(startDate, endDate, (error, depenses) => {
       if (error) {
         return res
           .status(500)

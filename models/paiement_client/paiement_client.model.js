@@ -686,7 +686,7 @@ class PaiementClient {
       WHERE
       paiement_client.date_paiement BETWEEN ? AND ? AND
       clients.id = paiement_client.id_client AND
-      paiement_client.categorie = 'NOCIBE' AND
+      paiement_client.categorie = 'NOCIBE'
       ORDER BY paiement_client.montant DESC;`;
       connection.query(
         query,
@@ -744,7 +744,7 @@ class PaiementClient {
       clients, paiement_client
       WHERE
       clients.id = paiement_client.id_client AND
-      paiement_client.categorie = 'NOCIBE' AND
+      paiement_client.categorie = 'NOCIBE'
       ORDER BY paiement_client.montant DESC;`;
       connection.query(query, (error, results) => {
         if (error) {
@@ -803,7 +803,7 @@ class PaiementClient {
       WHERE
       paiement_client.date_paiement BETWEEN ? AND ? AND
       clients.id = paiement_client.id_client AND
-      paiement_client.categorie = 'NOCIBE' AND
+      paiement_client.categorie = 'NOCIBE'
       ORDER BY paiement_client.montant ASC;`;
       connection.query(
         query,
@@ -861,7 +861,7 @@ class PaiementClient {
       clients, paiement_client
       WHERE
       clients.id = paiement_client.id_client AND
-      paiement_client.categorie = 'NOCIBE' AND
+      paiement_client.categorie = 'NOCIBE'
       ORDER BY paiement_client.montant ASC;`;
       connection.query(query, (error, results) => {
         if (error) {
@@ -920,7 +920,7 @@ class PaiementClient {
       WHERE
       paiement_client.date_paiement BETWEEN ? AND ? AND
       clients.id = paiement_client.id_client AND
-      paiement_client.categorie = 'CIM BENIN' AND
+      paiement_client.categorie = 'CIM BENIN'
       ORDER BY paiement_client.montant DESC;`;
       connection.query(
         query,
@@ -978,7 +978,7 @@ class PaiementClient {
       clients, paiement_client
       WHERE
       clients.id = paiement_client.id_client AND
-      paiement_client.categorie = 'CIM BENIN' AND
+      paiement_client.categorie = 'CIM BENIN'
       ORDER BY paiement_client.montant DESC`;
       connection.query(query, (error, results) => {
         if (error) {
@@ -1037,7 +1037,7 @@ class PaiementClient {
       WHERE
       paiement_client.date_paiement BETWEEN ? AND ? AND
       clients.id = paiement_client.id_client AND
-      paiement_client.categorie = 'CIM BENIN' AND
+      paiement_client.categorie = 'CIM BENIN'
       ORDER BY paiement_client.montant ASC`;
       connection.query(
         query,
@@ -1095,7 +1095,7 @@ class PaiementClient {
       clients, paiement_client
       WHERE
       clients.id = paiement_client.id_client AND
-      paiement_client.categorie = 'CIM BENIN' AND
+      paiement_client.categorie = 'CIM BENIN'
       ORDER BY paiement_client.montant ASC`;
       connection.query(query, (error, results) => {
         if (error) {

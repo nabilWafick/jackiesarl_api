@@ -105,18 +105,206 @@ function () {
     }
   }, {
     key: "getAll",
-    value: function getAll(callback) {
-      var query = "SELECT * FROM depenses";
-      connection.query(query, function (error, results) {
-        if (error) {
-          return callback(error, null);
-        }
+    value: function getAll(startDate, endDate, callback) {
+      if (startDate && endDate) {
+        var query = "SELECT * FROM depenses WHERE date_depense BETWEEN ? AND ? ORDER BY id DESC";
+        connection.query(query, [new Date(startDate), new Date(endDate)], function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
 
-        var depensesList = results.map(function (depenseData) {
-          return new Depenses(depenseData.id, depenseData.description, depenseData.montant, depenseData.piece, depenseData.est_validee, depenseData.date_depense);
+          var depensesList = results.map(function (depenseData) {
+            return new Depenses(depenseData.id, depenseData.description, depenseData.montant, depenseData.piece, depenseData.est_validee, depenseData.date_depense);
+          });
+          return callback(null, depensesList);
         });
-        return callback(null, depensesList);
-      });
+      } else {
+        var _query = "SELECT * FROM depenses ORDER BY id DESC";
+        connection.query(_query, function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var depensesList = results.map(function (depenseData) {
+            return new Depenses(depenseData.id, depenseData.description, depenseData.montant, depenseData.piece, depenseData.est_validee, depenseData.date_depense);
+          });
+          return callback(null, depensesList);
+        });
+      }
+    }
+  }, {
+    key: "getAllFromNewToOld",
+    value: function getAllFromNewToOld(startDate, endDate, callback) {
+      if (startDate && endDate) {
+        var query = "SELECT * FROM depenses WHERE date_depense BETWEEN ? AND ? ORDER BY id DESC";
+        connection.query(query, [new Date(startDate), new Date(endDate)], function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var depensesList = results.map(function (depenseData) {
+            return new Depenses(depenseData.id, depenseData.description, depenseData.montant, depenseData.piece, depenseData.est_validee, depenseData.date_depense);
+          });
+          return callback(null, depensesList);
+        });
+      } else {
+        var _query2 = "SELECT * FROM depenses ORDER BY id DESC";
+        connection.query(_query2, function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var depensesList = results.map(function (depenseData) {
+            return new Depenses(depenseData.id, depenseData.description, depenseData.montant, depenseData.piece, depenseData.est_validee, depenseData.date_depense);
+          });
+          return callback(null, depensesList);
+        });
+      }
+    }
+  }, {
+    key: "getAllFromOldToNew",
+    value: function getAllFromOldToNew(startDate, endDate, callback) {
+      if (startDate && endDate) {
+        var query = "SELECT * FROM depenses WHERE date_depense BETWEEN ? AND ? ORDER BY id ASC";
+        connection.query(query, [new Date(startDate), new Date(endDate)], function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var depensesList = results.map(function (depenseData) {
+            return new Depenses(depenseData.id, depenseData.description, depenseData.montant, depenseData.piece, depenseData.est_validee, depenseData.date_depense);
+          });
+          return callback(null, depensesList);
+        });
+      } else {
+        var _query3 = "SELECT * FROM depenses ORDER BY id ASC";
+        connection.query(_query3, function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var depensesList = results.map(function (depenseData) {
+            return new Depenses(depenseData.id, depenseData.description, depenseData.montant, depenseData.piece, depenseData.est_validee, depenseData.date_depense);
+          });
+          return callback(null, depensesList);
+        });
+      }
+    }
+  }, {
+    key: "getAllMostImportant",
+    value: function getAllMostImportant(startDate, endDate, callback) {
+      if (startDate && endDate) {
+        var query = "SELECT * FROM depenses WHERE date_depense BETWEEN ? AND ? ORDER BY montant DESC";
+        connection.query(query, [new Date(startDate), new Date(endDate)], function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var depensesList = results.map(function (depenseData) {
+            return new Depenses(depenseData.id, depenseData.description, depenseData.montant, depenseData.piece, depenseData.est_validee, depenseData.date_depense);
+          });
+          return callback(null, depensesList);
+        });
+      } else {
+        var _query4 = "SELECT * FROM depenses ORDER BY montant DESC";
+        connection.query(_query4, function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var depensesList = results.map(function (depenseData) {
+            return new Depenses(depenseData.id, depenseData.description, depenseData.montant, depenseData.piece, depenseData.est_validee, depenseData.date_depense);
+          });
+          return callback(null, depensesList);
+        });
+      }
+    }
+  }, {
+    key: "getAllLessImportant",
+    value: function getAllLessImportant(startDate, endDate, callback) {
+      if (startDate && endDate) {
+        var query = "SELECT * FROM depenses WHERE date_depense BETWEEN ? AND ? ORDER BY montant ASC";
+        connection.query(query, [new Date(startDate), new Date(endDate)], function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var depensesList = results.map(function (depenseData) {
+            return new Depenses(depenseData.id, depenseData.description, depenseData.montant, depenseData.piece, depenseData.est_validee, depenseData.date_depense);
+          });
+          return callback(null, depensesList);
+        });
+      } else {
+        var _query5 = "SELECT * FROM depenses ORDER BY montant ASC";
+        connection.query(_query5, function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var depensesList = results.map(function (depenseData) {
+            return new Depenses(depenseData.id, depenseData.description, depenseData.montant, depenseData.piece, depenseData.est_validee, depenseData.date_depense);
+          });
+          return callback(null, depensesList);
+        });
+      }
+    }
+  }, {
+    key: "getAllValidated",
+    value: function getAllValidated(startDate, endDate, callback) {
+      if (startDate && endDate) {
+        var query = "SELECT * FROM depenses WHERE date_depense BETWEEN ? AND ? AND est_validee = 1 ORDER BY id DESC";
+        connection.query(query, [new Date(startDate), new Date(endDate)], function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var depensesList = results.map(function (depenseData) {
+            return new Depenses(depenseData.id, depenseData.description, depenseData.montant, depenseData.piece, depenseData.est_validee, depenseData.date_depense);
+          });
+          return callback(null, depensesList);
+        });
+      } else {
+        var _query6 = "SELECT * FROM depenses WHERE est_validee = 1 ORDER BY id DESC";
+        connection.query(_query6, function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var depensesList = results.map(function (depenseData) {
+            return new Depenses(depenseData.id, depenseData.description, depenseData.montant, depenseData.piece, depenseData.est_validee, depenseData.date_depense);
+          });
+          return callback(null, depensesList);
+        });
+      }
+    }
+  }, {
+    key: "getAllUnvalidated",
+    value: function getAllUnvalidated(startDate, endDate, callback) {
+      if (startDate && endDate) {
+        var query = "SELECT * FROM depenses WHERE date_depense BETWEEN ? AND ? AND est_validee = 0 ORDER BY id DESC";
+        connection.query(query, [new Date(startDate), new Date(endDate)], function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var depensesList = results.map(function (depenseData) {
+            return new Depenses(depenseData.id, depenseData.description, depenseData.montant, depenseData.piece, depenseData.est_validee, depenseData.date_depense);
+          });
+          return callback(null, depensesList);
+        });
+      } else {
+        var _query7 = "SELECT * FROM depenses WHERE est_validee = 0 ORDER BY id DESC";
+        connection.query(_query7, function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var depensesList = results.map(function (depenseData) {
+            return new Depenses(depenseData.id, depenseData.description, depenseData.montant, depenseData.piece, depenseData.est_validee, depenseData.date_depense);
+          });
+          return callback(null, depensesList);
+        });
+      }
     }
   }]);
 

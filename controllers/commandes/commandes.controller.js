@@ -32,7 +32,172 @@ class CommandesController {
   };
 
   static getAll = (req, res) => {
-    Commandes.getAll((error, commandes) => {
+    const startDate = req.params.startDate;
+    const endDate = req.params.endDate;
+    Commandes.getAll(startDate, endDate, (error, commandes) => {
+      if (error) {
+        return res
+          .status(500)
+          .json({ error: "Erreur lors de la récupération des commandes" });
+      }
+      return res.status(200).json(commandes);
+    });
+  };
+
+  static getAllFromNewToOld = (req, res) => {
+    const startDate = req.params.startDate;
+    const endDate = req.params.endDate;
+    Commandes.getAllFromNewToOld(startDate, endDate, (error, commandes) => {
+      if (error) {
+        return res
+          .status(500)
+          .json({ error: "Erreur lors de la récupération des commandes" });
+      }
+      return res.status(200).json(commandes);
+    });
+  };
+
+  static getAllFromOldToNew = (req, res) => {
+    const startDate = req.params.startDate;
+    const endDate = req.params.endDate;
+    Commandes.getAllFromOldToNew(startDate, endDate, (error, commandes) => {
+      if (error) {
+        return res
+          .status(500)
+          .json({ error: "Erreur lors de la récupération des commandes" });
+      }
+      return res.status(200).json(commandes);
+    });
+  };
+
+  static getAllMoreImportant = (req, res) => {
+    const startDate = req.params.startDate;
+    const endDate = req.params.endDate;
+    Commandes.getAllMoreImportant(startDate, endDate, (error, commandes) => {
+      if (error) {
+        return res
+          .status(500)
+          .json({ error: "Erreur lors de la récupération des commandes" });
+      }
+      return res.status(200).json(commandes);
+    });
+  };
+
+  static getAllLessImportant = (req, res) => {
+    const startDate = req.params.startDate;
+    const endDate = req.params.endDate;
+    Commandes.getAllLessImportant(startDate, endDate, (error, commandes) => {
+      if (error) {
+        return res
+          .status(500)
+          .json({ error: "Erreur lors de la récupération des commandes" });
+      }
+      return res.status(200).json(commandes);
+    });
+  };
+
+  static getAllNOCIBEMoreImportant = (req, res) => {
+    const startDate = req.params.startDate;
+    const endDate = req.params.endDate;
+    Commandes.getAllNOCIBEMoreImportant(
+      startDate,
+      endDate,
+      (error, commandes) => {
+        if (error) {
+          return res
+            .status(500)
+            .json({ error: "Erreur lors de la récupération des commandes" });
+        }
+        return res.status(200).json(commandes);
+      }
+    );
+  };
+
+  static getAllNOCIBELessImportant = (req, res) => {
+    const startDate = req.params.startDate;
+    const endDate = req.params.endDate;
+    Commandes.getAllNOCIBELessImportant(
+      startDate,
+      endDate,
+      (error, commandes) => {
+        if (error) {
+          return res
+            .status(500)
+            .json({ error: "Erreur lors de la récupération des commandes" });
+        }
+        return res.status(200).json(commandes);
+      }
+    );
+  };
+
+  static getAllCIMBENINMoreImportant = (req, res) => {
+    const startDate = req.params.startDate;
+    const endDate = req.params.endDate;
+    Commandes.getAllCIMBENINMoreImportant(
+      startDate,
+      endDate,
+      (error, commandes) => {
+        if (error) {
+          return res
+            .status(500)
+            .json({ error: "Erreur lors de la récupération des commandes" });
+        }
+        return res.status(200).json(commandes);
+      }
+    );
+  };
+
+  static getAllCIMBENINLessImportant = (req, res) => {
+    const startDate = req.params.startDate;
+    const endDate = req.params.endDate;
+    Commandes.getAllCIMBENINLessImportant(
+      startDate,
+      endDate,
+      (error, commandes) => {
+        if (error) {
+          return res
+            .status(500)
+            .json({ error: "Erreur lors de la récupération des commandes" });
+        }
+        return res.status(200).json(commandes);
+      }
+    );
+  };
+
+  static getAllGroupByDestination = (req, res) => {
+    const startDate = req.params.startDate;
+    const endDate = req.params.endDate;
+    Commandes.getAllGroupByDestination(
+      startDate,
+      endDate,
+      (error, commandes) => {
+        if (error) {
+          return res
+            .status(500)
+            .json({ error: "Erreur lors de la récupération des commandes" });
+        }
+        return res.status(200).json(commandes);
+      }
+    );
+  };
+
+  static getAllDelivered = (req, res) => {
+    const startDate = req.params.startDate;
+    const endDate = req.params.endDate;
+    Commandes.getAllDelivered(startDate, endDate, (error, commandes) => {
+      if (error) {
+        return res
+          .status(500)
+          .json({ error: "Erreur lors de la récupération des commandes" });
+      }
+      return res.status(200).json(commandes);
+    });
+  };
+
+  static getAllUnDelivered = (req, res) => {
+    const startDate = req.params.startDate;
+    const endDate = req.params.endDate;
+    Commandes.getAllUnDelivered(startDate, endDate, (error, commandes) => {
       if (error) {
         return res
           .status(500)

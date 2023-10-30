@@ -33,7 +33,9 @@ class BrouillardController {
   };
 
   static getAll = (req, res) => {
-    Brouillard.getAll((error, brouillards) => {
+    const startDate = req.params.startDate;
+    const endDate = req.params.endDate;
+    Brouillard.getAll(startDate, endDate, (error, brouillards) => {
       if (error) {
         return res
           .status(500)

@@ -24,24 +24,25 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
-var connection = require('../_db/database');
+var connection = require("../_db/database");
 
 var Modifications =
 /*#__PURE__*/
 function () {
-  function Modifications(id, modification, id_employe, date_modification) {
+  function Modifications(id, modification, date_modification, nom_employe, prenoms_employe) {
     _classCallCheck(this, Modifications);
 
     this.id = id;
     this.modification = modification;
-    this.id_employe = id_employe;
+    this.nom_employe = nom_employe;
+    this.prenoms_employe = prenoms_employe;
     this.date_modification = date_modification;
   }
 
   _createClass(Modifications, [{
     key: "update",
     value: function update(callback) {
-      var query = 'UPDATE modifications SET modification = ?, id_employe = ?, date_modification = ? WHERE id = ?';
+      var query = "UPDATE modifications SET modification = ?, id_employe = ?, date_modification = ? WHERE id = ?";
 
       var id = this.id,
           updatedData = _objectWithoutProperties(this, ["id"]);
@@ -57,7 +58,7 @@ function () {
   }], [{
     key: "create",
     value: function create(modificationData, callback) {
-      var query = 'INSERT INTO modifications (id, modification, id_employe, date_modification) VALUES (NULL, ?, ?, ?)';
+      var query = "INSERT INTO modifications (id, modification, id_employe, date_modification) VALUES (NULL, ?, ?, ?)";
       var currentDate = new Date();
       connection.query(query, [modificationData.modification, modificationData.id_employe, currentDate], function (error, results) {
         if (error) {
@@ -72,7 +73,7 @@ function () {
   }, {
     key: "getById",
     value: function getById(id, callback) {
-      var query = 'SELECT * FROM modifications WHERE id = ?';
+      var query = "SELECT * FROM modifications WHERE id = ?";
       connection.query(query, [id], function (error, results) {
         if (error) {
           return callback(error, null);
@@ -83,29 +84,44 @@ function () {
         }
 
         var modificationData = results[0];
-        var modification = new Modifications(modificationData.id, modificationData.modification, modificationData.id_employe, modificationData.date_modification);
+        var modification = new Modifications(modificationData.id, modificationData.modification, modificationData.date_modification, modificationData.nom, modificationData.prenoms);
         return callback(null, modification);
       });
     }
   }, {
     key: "getAll",
-    value: function getAll(callback) {
-      var query = 'SELECT * FROM modifications';
-      connection.query(query, function (error, results) {
-        if (error) {
-          return callback(error, null);
-        }
+    value: function getAll(startDate, endDate, callback) {
+      if (startDate && endDate) {
+        var query = "SELECT modifications.id, modification, date_modification, nom, prenoms  FROM modifications, employes WHERE modifications.id = employes.id AND date_modification BETWEEN ? AND ? ORDER BY id DESC";
+        connection.query(query, [new Date(startDate), new Date(endDate)], function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
 
-        var modificationsList = results.map(function (modificationData) {
-          return new Modifications(modificationData.id, modificationData.modification, modificationData.id_employe, modificationData.date_modification);
+          var modificationsList = results.map(function (modificationData) {
+            return new Modifications(modificationData.id, modificationData.modification, modificationData.date_modification, modificationData.nom, modificationData.prenoms);
+          });
+          return callback(null, modificationsList);
         });
-        return callback(null, modificationsList);
-      });
+      } else {
+        var _query = "SELECT modifications.id, modification, date_modification, nom, prenoms  FROM modifications, employes WHERE modifications.id = employes.id ORDER BY id DESC";
+        connection.query(_query, function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var modificationsList = results.map(function (modificationData) {
+            console.log(modificationData);
+            return new Modifications(modificationData.id, modificationData.modification, modificationData.date_modification, modificationData.nom, modificationData.prenoms);
+          });
+          return callback(null, modificationsList);
+        });
+      }
     }
   }, {
     key: "delete",
     value: function _delete(id, callback) {
-      var query = 'DELETE FROM modifications WHERE id = ?';
+      var query = "DELETE FROM modifications WHERE id = ?";
       connection.query(query, [id], function (error, results) {
         if (error) {
           return callback(error);

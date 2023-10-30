@@ -77,15 +77,22 @@ class ActivitesDepotController {
   };
 
   static getAllByDepotID = (req, res) => {
+    const startDate = req.params.startDate;
+    const endDate = req.params.endDate;
     const id_depot = req.params.id_depot;
-    ActivitesDepot.getAllByDepotID(id_depot, (error, activitesDepot) => {
-      if (error) {
-        return res.status(500).json({
-          error: "Erreur lors de la récupération des activités depot",
-        });
+    ActivitesDepot.getAllByDepotID(
+      startDate,
+      endDate,
+      id_depot,
+      (error, activitesDepot) => {
+        if (error) {
+          return res.status(500).json({
+            error: "Erreur lors de la récupération des activités depot",
+          });
+        }
+        return res.status(200).json(activitesDepot);
       }
-      return res.status(200).json(activitesDepot);
-    });
+    );
   };
 
   // Mettre à jour une activité dépôt par ID

@@ -4,6 +4,8 @@ var express = require("express");
 
 var bodyParser = require("body-parser");
 
+var cookieParser = require("cookie-parser");
+
 var cors = require("cors");
 
 var app = express();
@@ -13,7 +15,8 @@ var routes = require("./routes/routes");
 var config = require("./configurations/config");
 
 var port = process.env.PORT;
-app.use(cors()); // Middleware pour analyser le corps des requêtes au format JSON
+app.use(cors());
+app.use(cookieParser()); // Middleware pour analyser le corps des requêtes au format JSON
 
 app.use(bodyParser.json()); // Utiliser les routes
 

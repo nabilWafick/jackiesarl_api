@@ -72,25 +72,51 @@ class StockCamion {
     });
   }
 
-  static getAll(callback) {
-    const query = "SELECT * FROM stock_camion";
-    connection.query(query, (error, results) => {
-      if (error) {
-        return callback(error, null);
-      }
-      const stocksList = results.map((stockData) => {
-        return new StockCamion(
-          stockData.id,
-          stockData.numero_camion,
-          stockData.categorie,
-          stockData.numero_chauffeur,
-          stockData.numero_bc,
-          stockData.quantite,
-          stockData.date_approvisionnement
-        );
+  static getAll(startDate, endDate, callback) {
+    if (startDate && endDate) {
+      const query =
+        "SELECT * FROM stock_camion WHERE date_approvisionnement BETWEEN ? AND ? ORDER BY id DESC";
+      connection.query(
+        query,
+        [new Date(startDate), new Date(endDate)],
+        (error, results) => {
+          if (error) {
+            return callback(error, null);
+          }
+          const stocksList = results.map((stockData) => {
+            return new StockCamion(
+              stockData.id,
+              stockData.numero_camion,
+              stockData.categorie,
+              stockData.numero_chauffeur,
+              stockData.numero_bc,
+              stockData.quantite,
+              stockData.date_approvisionnement
+            );
+          });
+          return callback(null, stocksList);
+        }
+      );
+    } else {
+      const query = "SELECT * FROM stock_camion ORDER BY id DESC";
+      connection.query(query, (error, results) => {
+        if (error) {
+          return callback(error, null);
+        }
+        const stocksList = results.map((stockData) => {
+          return new StockCamion(
+            stockData.id,
+            stockData.numero_camion,
+            stockData.categorie,
+            stockData.numero_chauffeur,
+            stockData.numero_bc,
+            stockData.quantite,
+            stockData.date_approvisionnement
+          );
+        });
+        return callback(null, stocksList);
       });
-      return callback(null, stocksList);
-    });
+    }
   }
 
   update(callback) {

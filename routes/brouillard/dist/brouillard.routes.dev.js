@@ -9,7 +9,7 @@ var BrouillardController = require("../../controllers/brouillard/brouillard.cont
 
 router.post("/brouillard", BrouillardController.create);
 router.get("/brouillard/:id", BrouillardController.getById);
-router.get("/brouillard/", BrouillardController.getAll);
+router.get("/brouillards-default/:startDate?/:endDate?", BrouillardController.getAll);
 router.put("/brouillard/:id/:is_current_stock_increasing", BrouillardController.update);
 router["delete"]("/brouillard/:id", BrouillardController["delete"]);
 module.exports = router;

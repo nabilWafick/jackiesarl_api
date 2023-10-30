@@ -26,8 +26,14 @@ var upload = multer({
 }); // Routes pour la table `depenses`
 
 router.post("/depenses", upload.single("piece"), DepensesController.create);
-router.get("/depenses/:id", DepensesController.getById);
-router.get("/depenses/", DepensesController.getAll);
+router.get("/depense/:id", DepensesController.getById);
+router.get("/depenses-default/:startDate?/:endDate?", DepensesController.getAll);
+router.get("/depenses/new-to-old/:startDate?/:endDate?", DepensesController.getAllFromNewToOld);
+router.get("/depenses/old-to-new/:startDate?/:endDate?", DepensesController.getAllFromOldToNew);
+router.get("/depenses/most-important/:startDate?/:endDate?", DepensesController.getAllMostImportant);
+router.get("/depenses/less-important/:startDate?/:endDate?", DepensesController.getAllLessImportant);
+router.get("/depenses/unvalidated/:startDate?/:endDate?", DepensesController.getAllUnvalidated);
+router.get("/depenses/validated/:startDate?/:endDate?", DepensesController.getAllValidated);
 router.put("/depenses/:id", upload.single("piece"), DepensesController.update);
 router["delete"]("/depenses/:id", DepensesController["delete"]);
 module.exports = router;

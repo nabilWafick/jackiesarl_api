@@ -122,18 +122,438 @@ function () {
     }
   }, {
     key: "getAllOfClient",
-    value: function getAllOfClient(id_client, callback) {
-      var query = "SELECT * FROM remise_cheque_client WHERE id_client = ?";
-      connection.query(query, [id_client], function (error, results) {
-        if (error) {
-          return callback(error, null);
-        }
+    value: function getAllOfClient(startDate, endDate, id_client, callback) {
+      if (startDate && endDate) {
+        var query = "SELECT * FROM remise_cheque_client WHERE date_remise BETWEEN ? AND ? AND id_client = ? ORDER BY id DESC";
+        connection.query(query, [new Date(startDate), new Date(endDate), id_client], function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
 
-        var remisesList = results.map(function (remiseData) {
-          return new RemiseChequeClient(remiseData.id, remiseData.description, remiseData.banque, remiseData.montant, remiseData.reste, remiseData.est_validee, remiseData.id_client, remiseData.date_remise);
+          var remisesList = results.map(function (remiseData) {
+            return new RemiseChequeClient(remiseData.id, remiseData.description, remiseData.banque, remiseData.montant, remiseData.reste, remiseData.est_validee, remiseData.id_client, remiseData.date_remise);
+          });
+          return callback(null, remisesList);
         });
-        return callback(null, remisesList);
-      });
+      } else {
+        var _query = "SELECT * FROM remise_cheque_client WHERE id_client = ? ORDER BY id DESC";
+        connection.query(_query, [id_client], function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var remisesList = results.map(function (remiseData) {
+            return new RemiseChequeClient(remiseData.id, remiseData.description, remiseData.banque, remiseData.montant, remiseData.reste, remiseData.est_validee, remiseData.id_client, remiseData.date_remise);
+          });
+          return callback(null, remisesList);
+        });
+      }
+    }
+  }, {
+    key: "getAllOfClientFromOldToNew",
+    value: function getAllOfClientFromOldToNew(startDate, endDate, id_client, callback) {
+      if (startDate && endDate) {
+        var query = "SELECT * FROM remise_cheque_client WHERE date_remise BETWEEN ? AND ? AND id_client = ? ORDER BY id ASC";
+        connection.query(query, [new Date(startDate), new Date(endDate), id_client], function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var remisesList = results.map(function (remiseData) {
+            return new RemiseChequeClient(remiseData.id, remiseData.description, remiseData.banque, remiseData.montant, remiseData.reste, remiseData.est_validee, remiseData.id_client, remiseData.date_remise);
+          });
+          return callback(null, remisesList);
+        });
+      } else {
+        var _query2 = "SELECT * FROM remise_cheque_client WHERE id_client = ? ORDER BY id ASC";
+        connection.query(_query2, [id_client], function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var remisesList = results.map(function (remiseData) {
+            return new RemiseChequeClient(remiseData.id, remiseData.description, remiseData.banque, remiseData.montant, remiseData.reste, remiseData.est_validee, remiseData.id_client, remiseData.date_remise);
+          });
+          return callback(null, remisesList);
+        });
+      }
+    }
+  }, {
+    key: "getAllOfClientFromNewToOld",
+    value: function getAllOfClientFromNewToOld(startDate, endDate, id_client, callback) {
+      if (startDate && endDate) {
+        var query = "SELECT * FROM remise_cheque_client WHERE date_remise BETWEEN ? AND ? AND id_client = ? ORDER BY id DESC";
+        connection.query(query, [new Date(startDate), new Date(endDate), id_client], function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var remisesList = results.map(function (remiseData) {
+            return new RemiseChequeClient(remiseData.id, remiseData.description, remiseData.banque, remiseData.montant, remiseData.reste, remiseData.est_validee, remiseData.id_client, remiseData.date_remise);
+          });
+          return callback(null, remisesList);
+        });
+      } else {
+        var _query3 = "SELECT * FROM remise_cheque_client WHERE id_client = ? ORDER BY id DESC";
+        connection.query(_query3, [id_client], function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var remisesList = results.map(function (remiseData) {
+            return new RemiseChequeClient(remiseData.id, remiseData.description, remiseData.banque, remiseData.montant, remiseData.reste, remiseData.est_validee, remiseData.id_client, remiseData.date_remise);
+          });
+          return callback(null, remisesList);
+        });
+      }
+    }
+  }, {
+    key: "getAllOfClientMoreImportant",
+    value: function getAllOfClientMoreImportant(startDate, endDate, id_client, callback) {
+      if (startDate && endDate) {
+        var query = "SELECT * FROM remise_cheque_client WHERE date_remise BETWEEN ? AND ? AND id_client = ? ORDER BY montant DESC";
+        connection.query(query, [new Date(startDate), new Date(endDate), id_client], function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var remisesList = results.map(function (remiseData) {
+            return new RemiseChequeClient(remiseData.id, remiseData.description, remiseData.banque, remiseData.montant, remiseData.reste, remiseData.est_validee, remiseData.id_client, remiseData.date_remise);
+          });
+          return callback(null, remisesList);
+        });
+      } else {
+        var _query4 = "SELECT * FROM remise_cheque_client WHERE id_client = ? ORDER BY montant DESC";
+        connection.query(_query4, [id_client], function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var remisesList = results.map(function (remiseData) {
+            return new RemiseChequeClient(remiseData.id, remiseData.description, remiseData.banque, remiseData.montant, remiseData.reste, remiseData.est_validee, remiseData.id_client, remiseData.date_remise);
+          });
+          return callback(null, remisesList);
+        });
+      }
+    }
+  }, {
+    key: "getAllOfClientLessImportant",
+    value: function getAllOfClientLessImportant(startDate, endDate, id_client, callback) {
+      if (startDate && endDate) {
+        var query = "SELECT * FROM remise_cheque_client WHERE date_remise BETWEEN ? AND ? AND id_client = ? ORDER BY montant ASC";
+        connection.query(query, [new Date(startDate), new Date(endDate), id_client], function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var remisesList = results.map(function (remiseData) {
+            return new RemiseChequeClient(remiseData.id, remiseData.description, remiseData.banque, remiseData.montant, remiseData.reste, remiseData.est_validee, remiseData.id_client, remiseData.date_remise);
+          });
+          return callback(null, remisesList);
+        });
+      } else {
+        var _query5 = "SELECT * FROM remise_cheque_client WHERE id_client = ? ORDER BY montant ASC";
+        connection.query(_query5, [id_client], function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var remisesList = results.map(function (remiseData) {
+            return new RemiseChequeClient(remiseData.id, remiseData.description, remiseData.banque, remiseData.montant, remiseData.reste, remiseData.est_validee, remiseData.id_client, remiseData.date_remise);
+          });
+          return callback(null, remisesList);
+        });
+      }
+    }
+  }, {
+    key: "getAllOfClientValidated",
+    value: function getAllOfClientValidated(startDate, endDate, id_client, callback) {
+      if (startDate && endDate) {
+        var query = "SELECT * FROM remise_cheque_client WHERE date_remise BETWEEN ? AND ? AND id_client = ? AND est_validee = 1 ORDER BY id DESC";
+        connection.query(query, [new Date(startDate), new Date(endDate), id_client], function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var remisesList = results.map(function (remiseData) {
+            return new RemiseChequeClient(remiseData.id, remiseData.description, remiseData.banque, remiseData.montant, remiseData.reste, remiseData.est_validee, remiseData.id_client, remiseData.date_remise);
+          });
+          return callback(null, remisesList);
+        });
+      } else {
+        var _query6 = "SELECT * FROM remise_cheque_client WHERE id_client = ? AND est_validee = 1 ORDER BY id DESC";
+        connection.query(_query6, [id_client], function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var remisesList = results.map(function (remiseData) {
+            return new RemiseChequeClient(remiseData.id, remiseData.description, remiseData.banque, remiseData.montant, remiseData.reste, remiseData.est_validee, remiseData.id_client, remiseData.date_remise);
+          });
+          return callback(null, remisesList);
+        });
+      }
+    }
+  }, {
+    key: "getAllOfClientUnvalidated",
+    value: function getAllOfClientUnvalidated(startDate, endDate, id_client, callback) {
+      if (startDate && endDate) {
+        var query = "SELECT * FROM remise_cheque_client WHERE date_remise BETWEEN ? AND ? AND id_client = ? AND est_validee = 0 ORDER BY id DESC";
+        connection.query(query, [new Date(startDate), new Date(endDate), id_client], function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var remisesList = results.map(function (remiseData) {
+            return new RemiseChequeClient(remiseData.id, remiseData.description, remiseData.banque, remiseData.montant, remiseData.reste, remiseData.est_validee, remiseData.id_client, remiseData.date_remise);
+          });
+          return callback(null, remisesList);
+        });
+      } else {
+        var _query7 = "SELECT * FROM remise_cheque_client WHERE id_client = ? AND est_validee = 0 ORDER BY id DESC";
+        connection.query(_query7, [id_client], function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var remisesList = results.map(function (remiseData) {
+            return new RemiseChequeClient(remiseData.id, remiseData.description, remiseData.banque, remiseData.montant, remiseData.reste, remiseData.est_validee, remiseData.id_client, remiseData.date_remise);
+          });
+          return callback(null, remisesList);
+        });
+      }
+    }
+  }, {
+    key: "getAllOfClientRestLessImportant",
+    value: function getAllOfClientRestLessImportant(startDate, endDate, id_client, callback) {
+      if (startDate && endDate) {
+        var query = "SELECT * FROM remise_cheque_client WHERE date_remise BETWEEN ? AND ? AND id_client = ? ORDER BY reste ASC";
+        connection.query(query, [new Date(startDate), new Date(endDate), id_client], function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var remisesList = results.map(function (remiseData) {
+            return new RemiseChequeClient(remiseData.id, remiseData.description, remiseData.banque, remiseData.montant, remiseData.reste, remiseData.est_validee, remiseData.id_client, remiseData.date_remise);
+          });
+          return callback(null, remisesList);
+        });
+      } else {
+        var _query8 = "SELECT * FROM remise_cheque_client WHERE id_client = ? ORDER BY reste ASC";
+        connection.query(_query8, [id_client], function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var remisesList = results.map(function (remiseData) {
+            return new RemiseChequeClient(remiseData.id, remiseData.description, remiseData.banque, remiseData.montant, remiseData.reste, remiseData.est_validee, remiseData.id_client, remiseData.date_remise);
+          });
+          return callback(null, remisesList);
+        });
+      }
+    }
+  }, {
+    key: "getAllOfClientRestMoreImportant",
+    value: function getAllOfClientRestMoreImportant(startDate, endDate, id_client, callback) {
+      if (startDate && endDate) {
+        var query = "SELECT * FROM remise_cheque_client WHERE date_remise BETWEEN ? AND ? AND id_client = ? ORDER BY reste DESC";
+        connection.query(query, [new Date(startDate), new Date(endDate), id_client], function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var remisesList = results.map(function (remiseData) {
+            return new RemiseChequeClient(remiseData.id, remiseData.description, remiseData.banque, remiseData.montant, remiseData.reste, remiseData.est_validee, remiseData.id_client, remiseData.date_remise);
+          });
+          return callback(null, remisesList);
+        });
+      } else {
+        var _query9 = "SELECT * FROM remise_cheque_client WHERE id_client = ? ORDER BY reste DESC";
+        connection.query(_query9, [id_client], function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var remisesList = results.map(function (remiseData) {
+            return new RemiseChequeClient(remiseData.id, remiseData.description, remiseData.banque, remiseData.montant, remiseData.reste, remiseData.est_validee, remiseData.id_client, remiseData.date_remise);
+          });
+          return callback(null, remisesList);
+        });
+      }
+    }
+  }, {
+    key: "getAllOfClientBOABank",
+    value: function getAllOfClientBOABank(startDate, endDate, id_client, callback) {
+      if (startDate && endDate) {
+        var query = "SELECT * FROM remise_cheque_client WHERE date_remise BETWEEN ? AND ? AND id_client = ? AND banque = 'BOA' ORDER BY id DESC";
+        connection.query(query, [new Date(startDate), new Date(endDate), id_client], function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var remisesList = results.map(function (remiseData) {
+            return new RemiseChequeClient(remiseData.id, remiseData.description, remiseData.banque, remiseData.montant, remiseData.reste, remiseData.est_validee, remiseData.id_client, remiseData.date_remise);
+          });
+          return callback(null, remisesList);
+        });
+      } else {
+        var _query10 = "SELECT * FROM remise_cheque_client WHERE id_client = ? AND banque = 'BOA' ORDER BY id DESC";
+        connection.query(_query10, [id_client], function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var remisesList = results.map(function (remiseData) {
+            return new RemiseChequeClient(remiseData.id, remiseData.description, remiseData.banque, remiseData.montant, remiseData.reste, remiseData.est_validee, remiseData.id_client, remiseData.date_remise);
+          });
+          return callback(null, remisesList);
+        });
+      }
+    }
+  }, {
+    key: "getAllOfClientUBABank",
+    value: function getAllOfClientUBABank(startDate, endDate, id_client, callback) {
+      if (startDate && endDate) {
+        var query = "SELECT * FROM remise_cheque_client WHERE date_remise BETWEEN ? AND ? AND id_client = ? AND banque = 'UBA' ORDER BY id DESC";
+        connection.query(query, [new Date(startDate), new Date(endDate), id_client], function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var remisesList = results.map(function (remiseData) {
+            return new RemiseChequeClient(remiseData.id, remiseData.description, remiseData.banque, remiseData.montant, remiseData.reste, remiseData.est_validee, remiseData.id_client, remiseData.date_remise);
+          });
+          return callback(null, remisesList);
+        });
+      } else {
+        var _query11 = "SELECT * FROM remise_cheque_client WHERE id_client = ? AND banque = 'UBA' ORDER BY id DESC";
+        connection.query(_query11, [id_client], function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var remisesList = results.map(function (remiseData) {
+            return new RemiseChequeClient(remiseData.id, remiseData.description, remiseData.banque, remiseData.montant, remiseData.reste, remiseData.est_validee, remiseData.id_client, remiseData.date_remise);
+          });
+          return callback(null, remisesList);
+        });
+      }
+    }
+  }, {
+    key: "getAllOfClientNSIABank",
+    value: function getAllOfClientNSIABank(startDate, endDate, id_client, callback) {
+      if (startDate && endDate) {
+        var query = "SELECT * FROM remise_cheque_client WHERE date_remise BETWEEN ? AND ? AND id_client = ? AND banque = 'NSIA' ORDER BY id DESC";
+        connection.query(query, [new Date(startDate), new Date(endDate), id_client], function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var remisesList = results.map(function (remiseData) {
+            return new RemiseChequeClient(remiseData.id, remiseData.description, remiseData.banque, remiseData.montant, remiseData.reste, remiseData.est_validee, remiseData.id_client, remiseData.date_remise);
+          });
+          return callback(null, remisesList);
+        });
+      } else {
+        var _query12 = "SELECT * FROM remise_cheque_client WHERE id_client = ? AND banque = 'NSIA' ORDER BY id DESC";
+        connection.query(_query12, [id_client], function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var remisesList = results.map(function (remiseData) {
+            return new RemiseChequeClient(remiseData.id, remiseData.description, remiseData.banque, remiseData.montant, remiseData.reste, remiseData.est_validee, remiseData.id_client, remiseData.date_remise);
+          });
+          return callback(null, remisesList);
+        });
+      }
+    }
+  }, {
+    key: "getAllOfClientBGFIBank",
+    value: function getAllOfClientBGFIBank(startDate, endDate, id_client, callback) {
+      if (startDate && endDate) {
+        var query = "SELECT * FROM remise_cheque_client WHERE date_remise BETWEEN ? AND ? AND id_client = ? AND banque = 'BGFI' ORDER BY id DESC";
+        connection.query(query, [new Date(startDate), new Date(endDate), id_client], function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var remisesList = results.map(function (remiseData) {
+            return new RemiseChequeClient(remiseData.id, remiseData.description, remiseData.banque, remiseData.montant, remiseData.reste, remiseData.est_validee, remiseData.id_client, remiseData.date_remise);
+          });
+          return callback(null, remisesList);
+        });
+      } else {
+        var _query13 = "SELECT * FROM remise_cheque_client WHERE id_client = ? AND banque = 'BGFI' ORDER BY id DESC";
+        connection.query(_query13, [id_client], function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var remisesList = results.map(function (remiseData) {
+            return new RemiseChequeClient(remiseData.id, remiseData.description, remiseData.banque, remiseData.montant, remiseData.reste, remiseData.est_validee, remiseData.id_client, remiseData.date_remise);
+          });
+          return callback(null, remisesList);
+        });
+      }
+    }
+  }, {
+    key: "getAllOfClientSGBBank",
+    value: function getAllOfClientSGBBank(startDate, endDate, id_client, callback) {
+      if (startDate && endDate) {
+        var query = "SELECT * FROM remise_cheque_client WHERE date_remise BETWEEN ? AND ? AND id_client = ? AND banque = 'SGB' ORDER BY id DESC";
+        connection.query(query, [new Date(startDate), new Date(endDate), id_client], function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var remisesList = results.map(function (remiseData) {
+            return new RemiseChequeClient(remiseData.id, remiseData.description, remiseData.banque, remiseData.montant, remiseData.reste, remiseData.est_validee, remiseData.id_client, remiseData.date_remise);
+          });
+          return callback(null, remisesList);
+        });
+      } else {
+        var _query14 = "SELECT * FROM remise_cheque_client WHERE id_client = ? AND banque = 'SGB' ORDER BY id DESC";
+        connection.query(_query14, [id_client], function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var remisesList = results.map(function (remiseData) {
+            return new RemiseChequeClient(remiseData.id, remiseData.description, remiseData.banque, remiseData.montant, remiseData.reste, remiseData.est_validee, remiseData.id_client, remiseData.date_remise);
+          });
+          return callback(null, remisesList);
+        });
+      }
+    }
+  }, {
+    key: "getAllOfClientEcobankBank",
+    value: function getAllOfClientEcobankBank(startDate, endDate, id_client, callback) {
+      if (startDate && endDate) {
+        var query = "SELECT * FROM remise_cheque_client WHERE date_remise BETWEEN ? AND ? AND id_client = ? AND banque = 'Ecobank' ORDER BY id DESC";
+        connection.query(query, [new Date(startDate), new Date(endDate), id_client], function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var remisesList = results.map(function (remiseData) {
+            return new RemiseChequeClient(remiseData.id, remiseData.description, remiseData.banque, remiseData.montant, remiseData.reste, remiseData.est_validee, remiseData.id_client, remiseData.date_remise);
+          });
+          return callback(null, remisesList);
+        });
+      } else {
+        var _query15 = "SELECT * FROM remise_cheque_client WHERE id_client = ? AND banque = 'Ecobank' ORDER BY id DESC";
+        connection.query(_query15, [id_client], function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var remisesList = results.map(function (remiseData) {
+            return new RemiseChequeClient(remiseData.id, remiseData.description, remiseData.banque, remiseData.montant, remiseData.reste, remiseData.est_validee, remiseData.id_client, remiseData.date_remise);
+          });
+          return callback(null, remisesList);
+        });
+      }
     }
   }]);
 

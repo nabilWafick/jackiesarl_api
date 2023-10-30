@@ -90,18 +90,32 @@ function () {
     }
   }, {
     key: "getAll",
-    value: function getAll(callback) {
-      var query = "SELECT * FROM brouillard";
-      connection.query(query, function (error, results) {
-        if (error) {
-          return callback(error, null);
-        }
+    value: function getAll(startDate, endDate, callback) {
+      if (startDate && endDate) {
+        var query = "SELECT * FROM brouillard WHERE date_ajout BETWEEN ? AND ? ORDER BY id DESC";
+        connection.query(query, [new Date(startDate), new Date(endDate)], function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
 
-        var brouillardList = results.map(function (brouillardData) {
-          return new Brouillard(brouillardData.id, brouillardData.depot, brouillardData.stock_actuel, brouillardData.nom_gerant, brouillardData.numero_gerant, new Date(brouillardData.date_ajout));
+          var brouillardList = results.map(function (brouillardData) {
+            return new Brouillard(brouillardData.id, brouillardData.depot, brouillardData.stock_actuel, brouillardData.nom_gerant, brouillardData.numero_gerant, new Date(brouillardData.date_ajout));
+          });
+          return callback(null, brouillardList);
         });
-        return callback(null, brouillardList);
-      });
+      } else {
+        var _query = "SELECT * FROM brouillard ORDER BY id DESC";
+        connection.query(_query, function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var brouillardList = results.map(function (brouillardData) {
+            return new Brouillard(brouillardData.id, brouillardData.depot, brouillardData.stock_actuel, brouillardData.nom_gerant, brouillardData.numero_gerant, new Date(brouillardData.date_ajout));
+          });
+          return callback(null, brouillardList);
+        });
+      }
     }
   }]);
 

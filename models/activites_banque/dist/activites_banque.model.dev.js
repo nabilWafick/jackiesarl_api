@@ -122,7 +122,7 @@ function () {
   }, {
     key: "getAllByBanqueID",
     value: function getAllByBanqueID(id_banque, callback) {
-      var query = "SELECT * FROM activites_banque WHERE id_banque = ?";
+      var query = "SELECT * FROM activites_banque WHERE id_banque = ? ORDER BY id DESC";
       connection.query(query, [id_banque], function (error, results) {
         if (error) {
           return callback(error, null);

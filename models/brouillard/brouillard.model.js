@@ -62,24 +62,49 @@ class Brouillard {
     });
   }
 
-  static getAll(callback) {
-    const query = "SELECT * FROM brouillard";
-    connection.query(query, (error, results) => {
-      if (error) {
-        return callback(error, null);
-      }
-      const brouillardList = results.map((brouillardData) => {
-        return new Brouillard(
-          brouillardData.id,
-          brouillardData.depot,
-          brouillardData.stock_actuel,
-          brouillardData.nom_gerant,
-          brouillardData.numero_gerant,
-          new Date(brouillardData.date_ajout)
-        );
+  static getAll(startDate, endDate, callback) {
+    if (startDate && endDate) {
+      const query =
+        "SELECT * FROM brouillard WHERE date_ajout BETWEEN ? AND ? ORDER BY id DESC";
+      connection.query(
+        query,
+        [new Date(startDate), new Date(endDate)],
+        (error, results) => {
+          if (error) {
+            return callback(error, null);
+          }
+          const brouillardList = results.map((brouillardData) => {
+            return new Brouillard(
+              brouillardData.id,
+              brouillardData.depot,
+              brouillardData.stock_actuel,
+              brouillardData.nom_gerant,
+              brouillardData.numero_gerant,
+              new Date(brouillardData.date_ajout)
+            );
+          });
+          return callback(null, brouillardList);
+        }
+      );
+    } else {
+      const query = "SELECT * FROM brouillard ORDER BY id DESC";
+      connection.query(query, (error, results) => {
+        if (error) {
+          return callback(error, null);
+        }
+        const brouillardList = results.map((brouillardData) => {
+          return new Brouillard(
+            brouillardData.id,
+            brouillardData.depot,
+            brouillardData.stock_actuel,
+            brouillardData.nom_gerant,
+            brouillardData.numero_gerant,
+            new Date(brouillardData.date_ajout)
+          );
+        });
+        return callback(null, brouillardList);
       });
-      return callback(null, brouillardList);
-    });
+    }
   }
 
   update(callback) {

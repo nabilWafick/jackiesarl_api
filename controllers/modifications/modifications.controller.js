@@ -31,7 +31,9 @@ class ModificationsController {
   };
 
   static getAll = (req, res) => {
-    Modifications.getAll((error, modifications) => {
+    const startDate = req.params.startDate;
+    const endDate = req.params.endDate;
+    Modifications.getAll(startDate, endDate, (error, modifications) => {
       if (error) {
         return res
           .status(500)
@@ -57,11 +59,9 @@ class ModificationsController {
       existingModification = { ...existingModification, ...updatedData };
       existingModification.update((updateError) => {
         if (updateError) {
-          return res
-            .status(500)
-            .json({
-              error: "Erreur lors de la mise à jour de la modification",
-            });
+          return res.status(500).json({
+            error: "Erreur lors de la mise à jour de la modification",
+          });
         }
         return res.status(200).json(existingModification);
       });
@@ -82,11 +82,9 @@ class ModificationsController {
       }
       existingModification.delete((deleteError) => {
         if (deleteError) {
-          return res
-            .status(500)
-            .json({
-              error: "Erreur lors de la suppression de la modification",
-            });
+          return res.status(500).json({
+            error: "Erreur lors de la suppression de la modification",
+          });
         }
         return res.status(204).json();
       });

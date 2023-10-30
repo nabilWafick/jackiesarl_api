@@ -29,7 +29,10 @@ router.get(
   "/achat-entreprise/:bon_commande",
   AchatEntrepriseController.getByBonCommande
 );
-router.get("/achat-entreprise/", AchatEntrepriseController.getAll);
+router.get(
+  "/achats-entreprise-default/:startDate?/:endDate?",
+  AchatEntrepriseController.getAll
+);
 router.put(
   "/achat-entreprise/:bon_commande",
   upload.single("bordereau"),

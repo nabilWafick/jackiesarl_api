@@ -74,26 +74,53 @@ class AchatEntreprise {
     });
   }
 
-  static getAll(callback) {
-    const query = "SELECT * FROM achat_entreprise";
-    connection.query(query, (error, results) => {
-      if (error) {
-        return callback(error, null);
-      }
-      const achatsEntreprise = results.map((achatEntrepriseData) => {
-        return new AchatEntreprise(
-          achatEntrepriseData.bon_commande,
-          achatEntrepriseData.categorie,
-          achatEntrepriseData.quantite_achetee,
-          achatEntrepriseData.montant,
-          achatEntrepriseData.banque,
-          achatEntrepriseData.cheque,
-          achatEntrepriseData.bordereau,
-          new Date(achatEntrepriseData.date_achat)
-        );
+  static getAll(startDate, endDate, callback) {
+    if (startDate && endDate) {
+      const query =
+        "SELECT * FROM achat_entreprise WHERE date_achat BETWEEN ? AND ? ORDER BY bon_commande DESC";
+      connection.query(
+        query,
+        [new Date(startDate), new Date(endDate)],
+        (error, results) => {
+          if (error) {
+            return callback(error, null);
+          }
+          const achatsEntreprise = results.map((achatEntrepriseData) => {
+            return new AchatEntreprise(
+              achatEntrepriseData.bon_commande,
+              achatEntrepriseData.categorie,
+              achatEntrepriseData.quantite_achetee,
+              achatEntrepriseData.montant,
+              achatEntrepriseData.banque,
+              achatEntrepriseData.cheque,
+              achatEntrepriseData.bordereau,
+              new Date(achatEntrepriseData.date_achat)
+            );
+          });
+          return callback(null, achatsEntreprise);
+        }
+      );
+    } else {
+      const query = "SELECT * FROM achat_entreprise ORDER BY bon_commande DESC";
+      connection.query(query, (error, results) => {
+        if (error) {
+          return callback(error, null);
+        }
+        const achatsEntreprise = results.map((achatEntrepriseData) => {
+          return new AchatEntreprise(
+            achatEntrepriseData.bon_commande,
+            achatEntrepriseData.categorie,
+            achatEntrepriseData.quantite_achetee,
+            achatEntrepriseData.montant,
+            achatEntrepriseData.banque,
+            achatEntrepriseData.cheque,
+            achatEntrepriseData.bordereau,
+            new Date(achatEntrepriseData.date_achat)
+          );
+        });
+        return callback(null, achatsEntreprise);
       });
-      return callback(null, achatsEntreprise);
-    });
+    }
   }
 
   update(callback) {

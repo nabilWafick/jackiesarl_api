@@ -54,7 +54,9 @@ class AchatEntrepriseController {
   };
 
   static getAll = (req, res) => {
-    AchatEntreprise.getAll((error, achatsEntreprise) => {
+    const startDate = req.params.startDate;
+    const endDate = req.params.endDate;
+    AchatEntreprise.getAll(startDate, endDate, (error, achatsEntreprise) => {
       if (error) {
         return res.status(500).json({
           status: 500,

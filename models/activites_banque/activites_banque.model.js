@@ -91,7 +91,8 @@ class ActivitesBanque {
   }
 
   static getAllByBanqueID(id_banque, callback) {
-    const query = "SELECT * FROM activites_banque WHERE id_banque = ?";
+    const query =
+      "SELECT * FROM activites_banque WHERE id_banque = ? ORDER BY id DESC";
     connection.query(query, [id_banque], (error, results) => {
       if (error) {
         return callback(error, null);

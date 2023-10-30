@@ -104,7 +104,7 @@ class ActivitesDepot {
   }
 
   static getAll(callback) {
-    const query = "SELECT * FROM activites_depot";
+    const query = "SELECT * FROM activites_depot ORDER BY id DESC";
     connection.query(query, (error, results) => {
       if (error) {
         return callback(error, null);
@@ -126,28 +126,58 @@ class ActivitesDepot {
     });
   }
 
-  static getAllByDepotID(id_depot, callback) {
-    const query = "SELECT * FROM activites_depot WHERE id_depot = ? ";
-    connection.query(query, [id_depot], (error, results) => {
-      if (error) {
-        return callback(error, null);
-      }
-      const activitesDepotList = results.map((activitesDepotData) => {
-        return new ActivitesDepot(
-          activitesDepotData.id,
-          activitesDepotData.id_depot,
-          activitesDepotData.quantite_avant_vente,
-          activitesDepotData.vente,
-          activitesDepotData.quantite_apres_vente,
-          activitesDepotData.versement,
-          activitesDepotData.depense,
-          activitesDepotData.observation,
-          new Date(activitesDepotData.date_remplissage)
-        );
+  static getAllByDepotID(startDate, endDate, id_depot, callback) {
+    if (startDate && endDate) {
+      const query =
+        "SELECT * FROM activites_depot WHERE date_remplissage BETWEEN ? AND ? AND id_depot = ? ORDER BY id DESC";
+      connection.query(
+        query,
+        [new Date(startDate), new Date(endDate), id_depot],
+        (error, results) => {
+          if (error) {
+            return callback(error, null);
+          }
+          const activitesDepotList = results.map((activitesDepotData) => {
+            return new ActivitesDepot(
+              activitesDepotData.id,
+              activitesDepotData.id_depot,
+              activitesDepotData.quantite_avant_vente,
+              activitesDepotData.vente,
+              activitesDepotData.quantite_apres_vente,
+              activitesDepotData.versement,
+              activitesDepotData.depense,
+              activitesDepotData.observation,
+              new Date(activitesDepotData.date_remplissage)
+            );
+          });
+          //console.log(activitesDepotList.length);
+          return callback(null, activitesDepotList);
+        }
+      );
+    } else {
+      const query =
+        "SELECT * FROM activites_depot WHERE id_depot = ? ORDER BY id DESC";
+      connection.query(query, [id_depot], (error, results) => {
+        if (error) {
+          return callback(error, null);
+        }
+        const activitesDepotList = results.map((activitesDepotData) => {
+          return new ActivitesDepot(
+            activitesDepotData.id,
+            activitesDepotData.id_depot,
+            activitesDepotData.quantite_avant_vente,
+            activitesDepotData.vente,
+            activitesDepotData.quantite_apres_vente,
+            activitesDepotData.versement,
+            activitesDepotData.depense,
+            activitesDepotData.observation,
+            new Date(activitesDepotData.date_remplissage)
+          );
+        });
+        //console.log(activitesDepotList.length);
+        return callback(null, activitesDepotList);
       });
-      //console.log(activitesDepotList.length);
-      return callback(null, activitesDepotList);
-    });
+    }
   }
 
   update(callback) {

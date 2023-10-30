@@ -111,18 +111,351 @@ function () {
     }
   }, {
     key: "getAll",
-    value: function getAll(callback) {
-      var query = "SELECT\n    clients.id AS id_client,\n    clients.nom,\n    clients.prenoms,\n    clients.numero_ifu,\n    clients.numero_telephone,\n    clients.email,\n    clients.date_ajout AS date_ajout_client,\n    commandes.id AS id_commande,\n    commandes.categorie,\n    commandes.quantite_achetee,\n    commandes.destination,\n    commandes.date_commande,\n    commandes.date_livraison,\n    commandes.est_traitee,\n    commandes.id_client,\n    commandes.date_ajout\nFROM\n    clients, commandes \nWHERE\n    clients.id = commandes.id_client;";
-      connection.query(query, function (error, results) {
-        if (error) {
-          return callback(error, null);
-        }
+    value: function getAll(startDate, endDate, callback) {
+      if (startDate && endDate) {
+        var query = "SELECT\n    clients.id AS id_client,\n    clients.nom,\n    clients.prenoms,\n    clients.numero_ifu,\n    clients.numero_telephone,\n    clients.email,\n    clients.date_ajout AS date_ajout_client,\n    commandes.id AS id_commande,\n    commandes.categorie,\n    commandes.quantite_achetee,\n    commandes.destination,\n    commandes.date_commande,\n    commandes.date_livraison,\n    commandes.est_traitee,\n    commandes.id_client,\n    commandes.date_ajout\nFROM\n    clients, commandes \nWHERE\n    clients.id = commandes.id_client AND commandes.date_ajout BETWEEN ? AND ? ORDER BY commandes.id DESC ;";
+        connection.query(query, [new Date(startDate), new Date(endDate)], function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
 
-        var commandes = results.map(function (commandeData) {
-          return new Commandes(commandeData.id_commande, new Clients(commandeData.id_client, commandeData.nom, commandeData.prenoms, commandeData.numero_ifu, commandeData.numero_telephone, commandeData.email, commandeData.date_ajout_client), commandeData.categorie, commandeData.quantite_achetee, commandeData.destination, commandeData.date_commande, commandeData.date_livraison, commandeData.est_traitee, commandeData.id_client, commandeData.date_ajout);
+          var commandes = results.map(function (commandeData) {
+            return new Commandes(commandeData.id_commande, new Clients(commandeData.id_client, commandeData.nom, commandeData.prenoms, commandeData.numero_ifu, commandeData.numero_telephone, commandeData.email, commandeData.date_ajout_client), commandeData.categorie, commandeData.quantite_achetee, commandeData.destination, commandeData.date_commande, commandeData.date_livraison, commandeData.est_traitee, commandeData.id_client, commandeData.date_ajout);
+          });
+          return callback(null, commandes);
         });
-        return callback(null, commandes);
-      });
+      } else {
+        var _query = "SELECT\n      clients.id AS id_client,\n      clients.nom,\n      clients.prenoms,\n      clients.numero_ifu,\n      clients.numero_telephone,\n      clients.email,\n      clients.date_ajout AS date_ajout_client,\n      commandes.id AS id_commande,\n      commandes.categorie,\n      commandes.quantite_achetee,\n      commandes.destination,\n      commandes.date_commande,\n      commandes.date_livraison,\n      commandes.est_traitee,\n      commandes.id_client,\n      commandes.date_ajout\n  FROM\n      clients, commandes \n  WHERE\n      clients.id = commandes.id_client ORDER BY commandes.id DESC ;";
+        connection.query(_query, function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var commandes = results.map(function (commandeData) {
+            return new Commandes(commandeData.id_commande, new Clients(commandeData.id_client, commandeData.nom, commandeData.prenoms, commandeData.numero_ifu, commandeData.numero_telephone, commandeData.email, commandeData.date_ajout_client), commandeData.categorie, commandeData.quantite_achetee, commandeData.destination, commandeData.date_commande, commandeData.date_livraison, commandeData.est_traitee, commandeData.id_client, commandeData.date_ajout);
+          });
+          return callback(null, commandes);
+        });
+      }
+    }
+  }, {
+    key: "getAllFromNewToOld",
+    value: function getAllFromNewToOld(startDate, endDate, callback) {
+      if (startDate && endDate) {
+        var query = "SELECT\n    clients.id AS id_client,\n    clients.nom,\n    clients.prenoms,\n    clients.numero_ifu,\n    clients.numero_telephone,\n    clients.email,\n    clients.date_ajout AS date_ajout_client,\n    commandes.id AS id_commande,\n    commandes.categorie,\n    commandes.quantite_achetee,\n    commandes.destination,\n    commandes.date_commande,\n    commandes.date_livraison,\n    commandes.est_traitee,\n    commandes.id_client,\n    commandes.date_ajout\nFROM\n    clients, commandes \nWHERE\n    clients.id = commandes.id_client AND commandes.date_ajout BETWEEN ? AND ? ORDER BY commandes.id DESC ;";
+        connection.query(query, [new Date(startDate), new Date(endDate)], function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var commandes = results.map(function (commandeData) {
+            return new Commandes(commandeData.id_commande, new Clients(commandeData.id_client, commandeData.nom, commandeData.prenoms, commandeData.numero_ifu, commandeData.numero_telephone, commandeData.email, commandeData.date_ajout_client), commandeData.categorie, commandeData.quantite_achetee, commandeData.destination, commandeData.date_commande, commandeData.date_livraison, commandeData.est_traitee, commandeData.id_client, commandeData.date_ajout);
+          });
+          return callback(null, commandes);
+        });
+      } else {
+        var _query2 = "SELECT\n      clients.id AS id_client,\n      clients.nom,\n      clients.prenoms,\n      clients.numero_ifu,\n      clients.numero_telephone,\n      clients.email,\n      clients.date_ajout AS date_ajout_client,\n      commandes.id AS id_commande,\n      commandes.categorie,\n      commandes.quantite_achetee,\n      commandes.destination,\n      commandes.date_commande,\n      commandes.date_livraison,\n      commandes.est_traitee,\n      commandes.id_client,\n      commandes.date_ajout\n  FROM\n      clients, commandes \n  WHERE\n      clients.id = commandes.id_client ORDER BY commandes.id DESC ;";
+        connection.query(_query2, function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var commandes = results.map(function (commandeData) {
+            return new Commandes(commandeData.id_commande, new Clients(commandeData.id_client, commandeData.nom, commandeData.prenoms, commandeData.numero_ifu, commandeData.numero_telephone, commandeData.email, commandeData.date_ajout_client), commandeData.categorie, commandeData.quantite_achetee, commandeData.destination, commandeData.date_commande, commandeData.date_livraison, commandeData.est_traitee, commandeData.id_client, commandeData.date_ajout);
+          });
+          return callback(null, commandes);
+        });
+      }
+    }
+  }, {
+    key: "getAllFromOldToNew",
+    value: function getAllFromOldToNew(startDate, endDate, callback) {
+      if (startDate && endDate) {
+        var query = "SELECT\n    clients.id AS id_client,\n    clients.nom,\n    clients.prenoms,\n    clients.numero_ifu,\n    clients.numero_telephone,\n    clients.email,\n    clients.date_ajout AS date_ajout_client,\n    commandes.id AS id_commande,\n    commandes.categorie,\n    commandes.quantite_achetee,\n    commandes.destination,\n    commandes.date_commande,\n    commandes.date_livraison,\n    commandes.est_traitee,\n    commandes.id_client,\n    commandes.date_ajout\nFROM\n    clients, commandes \nWHERE\n    clients.id = commandes.id_client AND commandes.date_ajout BETWEEN ? AND ? ORDER BY commandes.id ASC ;";
+        connection.query(query, [new Date(startDate), new Date(endDate)], function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var commandes = results.map(function (commandeData) {
+            return new Commandes(commandeData.id_commande, new Clients(commandeData.id_client, commandeData.nom, commandeData.prenoms, commandeData.numero_ifu, commandeData.numero_telephone, commandeData.email, commandeData.date_ajout_client), commandeData.categorie, commandeData.quantite_achetee, commandeData.destination, commandeData.date_commande, commandeData.date_livraison, commandeData.est_traitee, commandeData.id_client, commandeData.date_ajout);
+          });
+          return callback(null, commandes);
+        });
+      } else {
+        var _query3 = "SELECT\n      clients.id AS id_client,\n      clients.nom,\n      clients.prenoms,\n      clients.numero_ifu,\n      clients.numero_telephone,\n      clients.email,\n      clients.date_ajout AS date_ajout_client,\n      commandes.id AS id_commande,\n      commandes.categorie,\n      commandes.quantite_achetee,\n      commandes.destination,\n      commandes.date_commande,\n      commandes.date_livraison,\n      commandes.est_traitee,\n      commandes.id_client,\n      commandes.date_ajout\n  FROM\n      clients, commandes \n  WHERE\n      clients.id = commandes.id_client ORDER BY commandes.id ASC ;";
+        connection.query(_query3, function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var commandes = results.map(function (commandeData) {
+            return new Commandes(commandeData.id_commande, new Clients(commandeData.id_client, commandeData.nom, commandeData.prenoms, commandeData.numero_ifu, commandeData.numero_telephone, commandeData.email, commandeData.date_ajout_client), commandeData.categorie, commandeData.quantite_achetee, commandeData.destination, commandeData.date_commande, commandeData.date_livraison, commandeData.est_traitee, commandeData.id_client, commandeData.date_ajout);
+          });
+          return callback(null, commandes);
+        });
+      }
+    }
+  }, {
+    key: "getAllMoreImportant",
+    value: function getAllMoreImportant(startDate, endDate, callback) {
+      if (startDate && endDate) {
+        var query = "SELECT\n    clients.id AS id_client,\n    clients.nom,\n    clients.prenoms,\n    clients.numero_ifu,\n    clients.numero_telephone,\n    clients.email,\n    clients.date_ajout AS date_ajout_client,\n    commandes.id AS id_commande,\n    commandes.categorie,\n    commandes.quantite_achetee,\n    commandes.destination,\n    commandes.date_commande,\n    commandes.date_livraison,\n    commandes.est_traitee,\n    commandes.id_client,\n    commandes.date_ajout\nFROM\n    clients, commandes \nWHERE\n    clients.id = commandes.id_client AND commandes.date_ajout BETWEEN ? AND ? ORDER BY commandes.quantite_achetee DESC ;";
+        connection.query(query, [new Date(startDate), new Date(endDate)], function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var commandes = results.map(function (commandeData) {
+            return new Commandes(commandeData.id_commande, new Clients(commandeData.id_client, commandeData.nom, commandeData.prenoms, commandeData.numero_ifu, commandeData.numero_telephone, commandeData.email, commandeData.date_ajout_client), commandeData.categorie, commandeData.quantite_achetee, commandeData.destination, commandeData.date_commande, commandeData.date_livraison, commandeData.est_traitee, commandeData.id_client, commandeData.date_ajout);
+          });
+          return callback(null, commandes);
+        });
+      } else {
+        var _query4 = "SELECT\n      clients.id AS id_client,\n      clients.nom,\n      clients.prenoms,\n      clients.numero_ifu,\n      clients.numero_telephone,\n      clients.email,\n      clients.date_ajout AS date_ajout_client,\n      commandes.id AS id_commande,\n      commandes.categorie,\n      commandes.quantite_achetee,\n      commandes.destination,\n      commandes.date_commande,\n      commandes.date_livraison,\n      commandes.est_traitee,\n      commandes.id_client,\n      commandes.date_ajout\n  FROM\n      clients, commandes \n  WHERE\n      clients.id = commandes.id_client ORDER BY commandes.quantite_achetee DESC ;";
+        connection.query(_query4, function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var commandes = results.map(function (commandeData) {
+            return new Commandes(commandeData.id_commande, new Clients(commandeData.id_client, commandeData.nom, commandeData.prenoms, commandeData.numero_ifu, commandeData.numero_telephone, commandeData.email, commandeData.date_ajout_client), commandeData.categorie, commandeData.quantite_achetee, commandeData.destination, commandeData.date_commande, commandeData.date_livraison, commandeData.est_traitee, commandeData.id_client, commandeData.date_ajout);
+          });
+          return callback(null, commandes);
+        });
+      }
+    }
+  }, {
+    key: "getAllLessImportant",
+    value: function getAllLessImportant(startDate, endDate, callback) {
+      if (startDate && endDate) {
+        var query = "SELECT\n    clients.id AS id_client,\n    clients.nom,\n    clients.prenoms,\n    clients.numero_ifu,\n    clients.numero_telephone,\n    clients.email,\n    clients.date_ajout AS date_ajout_client,\n    commandes.id AS id_commande,\n    commandes.categorie,\n    commandes.quantite_achetee,\n    commandes.destination,\n    commandes.date_commande,\n    commandes.date_livraison,\n    commandes.est_traitee,\n    commandes.id_client,\n    commandes.date_ajout\nFROM\n    clients, commandes \nWHERE\n    clients.id = commandes.id_client AND commandes.date_ajout BETWEEN ? AND ? ORDER BY commandes.quantite_achetee ASC ;";
+        connection.query(query, [new Date(startDate), new Date(endDate)], function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var commandes = results.map(function (commandeData) {
+            return new Commandes(commandeData.id_commande, new Clients(commandeData.id_client, commandeData.nom, commandeData.prenoms, commandeData.numero_ifu, commandeData.numero_telephone, commandeData.email, commandeData.date_ajout_client), commandeData.categorie, commandeData.quantite_achetee, commandeData.destination, commandeData.date_commande, commandeData.date_livraison, commandeData.est_traitee, commandeData.id_client, commandeData.date_ajout);
+          });
+          return callback(null, commandes);
+        });
+      } else {
+        var _query5 = "SELECT\n      clients.id AS id_client,\n      clients.nom,\n      clients.prenoms,\n      clients.numero_ifu,\n      clients.numero_telephone,\n      clients.email,\n      clients.date_ajout AS date_ajout_client,\n      commandes.id AS id_commande,\n      commandes.categorie,\n      commandes.quantite_achetee,\n      commandes.destination,\n      commandes.date_commande,\n      commandes.date_livraison,\n      commandes.est_traitee,\n      commandes.id_client,\n      commandes.date_ajout\n  FROM\n      clients, commandes \n  WHERE\n      clients.id = commandes.id_client ORDER BY commandes.quantite_achetee ASC ;";
+        connection.query(_query5, function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var commandes = results.map(function (commandeData) {
+            return new Commandes(commandeData.id_commande, new Clients(commandeData.id_client, commandeData.nom, commandeData.prenoms, commandeData.numero_ifu, commandeData.numero_telephone, commandeData.email, commandeData.date_ajout_client), commandeData.categorie, commandeData.quantite_achetee, commandeData.destination, commandeData.date_commande, commandeData.date_livraison, commandeData.est_traitee, commandeData.id_client, commandeData.date_ajout);
+          });
+          return callback(null, commandes);
+        });
+      }
+    }
+  }, {
+    key: "getAllNOCIBEMoreImportant",
+    value: function getAllNOCIBEMoreImportant(startDate, endDate, callback) {
+      if (startDate && endDate) {
+        var query = "SELECT\n    clients.id AS id_client,\n    clients.nom,\n    clients.prenoms,\n    clients.numero_ifu,\n    clients.numero_telephone,\n    clients.email,\n    clients.date_ajout AS date_ajout_client,\n    commandes.id AS id_commande,\n    commandes.categorie,\n    commandes.quantite_achetee,\n    commandes.destination,\n    commandes.date_commande,\n    commandes.date_livraison,\n    commandes.est_traitee,\n    commandes.id_client,\n    commandes.date_ajout\nFROM\n    clients, commandes \nWHERE\n    clients.id = commandes.id_client AND commandes.date_ajout BETWEEN ? AND ? AND commandes.categorie = 'NOCIBE' ORDER BY commandes.quantite_achetee DESC ;";
+        connection.query(query, [new Date(startDate), new Date(endDate)], function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var commandes = results.map(function (commandeData) {
+            return new Commandes(commandeData.id_commande, new Clients(commandeData.id_client, commandeData.nom, commandeData.prenoms, commandeData.numero_ifu, commandeData.numero_telephone, commandeData.email, commandeData.date_ajout_client), commandeData.categorie, commandeData.quantite_achetee, commandeData.destination, commandeData.date_commande, commandeData.date_livraison, commandeData.est_traitee, commandeData.id_client, commandeData.date_ajout);
+          });
+          return callback(null, commandes);
+        });
+      } else {
+        var _query6 = "SELECT\n      clients.id AS id_client,\n      clients.nom,\n      clients.prenoms,\n      clients.numero_ifu,\n      clients.numero_telephone,\n      clients.email,\n      clients.date_ajout AS date_ajout_client,\n      commandes.id AS id_commande,\n      commandes.categorie,\n      commandes.quantite_achetee,\n      commandes.destination,\n      commandes.date_commande,\n      commandes.date_livraison,\n      commandes.est_traitee,\n      commandes.id_client,\n      commandes.date_ajout\n  FROM\n      clients, commandes \n  WHERE\n      clients.id = commandes.id_client AND commandes.categorie = 'NOCIBE' ORDER BY commandes.quantite_achetee DESC ;";
+        connection.query(_query6, function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var commandes = results.map(function (commandeData) {
+            return new Commandes(commandeData.id_commande, new Clients(commandeData.id_client, commandeData.nom, commandeData.prenoms, commandeData.numero_ifu, commandeData.numero_telephone, commandeData.email, commandeData.date_ajout_client), commandeData.categorie, commandeData.quantite_achetee, commandeData.destination, commandeData.date_commande, commandeData.date_livraison, commandeData.est_traitee, commandeData.id_client, commandeData.date_ajout);
+          });
+          return callback(null, commandes);
+        });
+      }
+    }
+  }, {
+    key: "getAllNOCIBELessImportant",
+    value: function getAllNOCIBELessImportant(startDate, endDate, callback) {
+      if (startDate && endDate) {
+        var query = "SELECT\n    clients.id AS id_client,\n    clients.nom,\n    clients.prenoms,\n    clients.numero_ifu,\n    clients.numero_telephone,\n    clients.email,\n    clients.date_ajout AS date_ajout_client,\n    commandes.id AS id_commande,\n    commandes.categorie,\n    commandes.quantite_achetee,\n    commandes.destination,\n    commandes.date_commande,\n    commandes.date_livraison,\n    commandes.est_traitee,\n    commandes.id_client,\n    commandes.date_ajout\nFROM\n    clients, commandes \nWHERE\n    clients.id = commandes.id_client AND commandes.date_ajout BETWEEN ? AND ? AND commandes.categorie = 'NOCIBE' ORDER BY commandes.quantite_achetee  ASC ;";
+        connection.query(query, [new Date(startDate), new Date(endDate)], function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var commandes = results.map(function (commandeData) {
+            return new Commandes(commandeData.id_commande, new Clients(commandeData.id_client, commandeData.nom, commandeData.prenoms, commandeData.numero_ifu, commandeData.numero_telephone, commandeData.email, commandeData.date_ajout_client), commandeData.categorie, commandeData.quantite_achetee, commandeData.destination, commandeData.date_commande, commandeData.date_livraison, commandeData.est_traitee, commandeData.id_client, commandeData.date_ajout);
+          });
+          return callback(null, commandes);
+        });
+      } else {
+        var _query7 = "SELECT\n      clients.id AS id_client,\n      clients.nom,\n      clients.prenoms,\n      clients.numero_ifu,\n      clients.numero_telephone,\n      clients.email,\n      clients.date_ajout AS date_ajout_client,\n      commandes.id AS id_commande,\n      commandes.categorie,\n      commandes.quantite_achetee,\n      commandes.destination,\n      commandes.date_commande,\n      commandes.date_livraison,\n      commandes.est_traitee,\n      commandes.id_client,\n      commandes.date_ajout\n  FROM\n      clients, commandes \n  WHERE\n      clients.id = commandes.id_client AND commandes.categorie = 'NOCIBE' ORDER BY commandes.quantite_achetee ASC ;";
+        connection.query(_query7, function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var commandes = results.map(function (commandeData) {
+            return new Commandes(commandeData.id_commande, new Clients(commandeData.id_client, commandeData.nom, commandeData.prenoms, commandeData.numero_ifu, commandeData.numero_telephone, commandeData.email, commandeData.date_ajout_client), commandeData.categorie, commandeData.quantite_achetee, commandeData.destination, commandeData.date_commande, commandeData.date_livraison, commandeData.est_traitee, commandeData.id_client, commandeData.date_ajout);
+          });
+          return callback(null, commandes);
+        });
+      }
+    }
+  }, {
+    key: "getAllCIMBENINMoreImportant",
+    value: function getAllCIMBENINMoreImportant(startDate, endDate, callback) {
+      if (startDate && endDate) {
+        var query = "SELECT\n    clients.id AS id_client,\n    clients.nom,\n    clients.prenoms,\n    clients.numero_ifu,\n    clients.numero_telephone,\n    clients.email,\n    clients.date_ajout AS date_ajout_client,\n    commandes.id AS id_commande,\n    commandes.categorie,\n    commandes.quantite_achetee,\n    commandes.destination,\n    commandes.date_commande,\n    commandes.date_livraison,\n    commandes.est_traitee,\n    commandes.id_client,\n    commandes.date_ajout\nFROM\n    clients, commandes \nWHERE\n    clients.id = commandes.id_client AND commandes.date_ajout BETWEEN ? AND ? AND commandes.categorie = 'CIM BENIN' ORDER BY commandes.quantite_achetee  DESC ;";
+        connection.query(query, [new Date(startDate), new Date(endDate)], function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var commandes = results.map(function (commandeData) {
+            return new Commandes(commandeData.id_commande, new Clients(commandeData.id_client, commandeData.nom, commandeData.prenoms, commandeData.numero_ifu, commandeData.numero_telephone, commandeData.email, commandeData.date_ajout_client), commandeData.categorie, commandeData.quantite_achetee, commandeData.destination, commandeData.date_commande, commandeData.date_livraison, commandeData.est_traitee, commandeData.id_client, commandeData.date_ajout);
+          });
+          return callback(null, commandes);
+        });
+      } else {
+        var _query8 = "SELECT\n      clients.id AS id_client,\n      clients.nom,\n      clients.prenoms,\n      clients.numero_ifu,\n      clients.numero_telephone,\n      clients.email,\n      clients.date_ajout AS date_ajout_client,\n      commandes.id AS id_commande,\n      commandes.categorie,\n      commandes.quantite_achetee,\n      commandes.destination,\n      commandes.date_commande,\n      commandes.date_livraison,\n      commandes.est_traitee,\n      commandes.id_client,\n      commandes.date_ajout\n  FROM\n      clients, commandes \n  WHERE\n      clients.id = commandes.id_client AND commandes.categorie = 'CIM BENIN' ORDER BY commandes.quantite_achetee DESC ;";
+        connection.query(_query8, function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var commandes = results.map(function (commandeData) {
+            return new Commandes(commandeData.id_commande, new Clients(commandeData.id_client, commandeData.nom, commandeData.prenoms, commandeData.numero_ifu, commandeData.numero_telephone, commandeData.email, commandeData.date_ajout_client), commandeData.categorie, commandeData.quantite_achetee, commandeData.destination, commandeData.date_commande, commandeData.date_livraison, commandeData.est_traitee, commandeData.id_client, commandeData.date_ajout);
+          });
+          return callback(null, commandes);
+        });
+      }
+    }
+  }, {
+    key: "getAllCIMBENINLessImportant",
+    value: function getAllCIMBENINLessImportant(startDate, endDate, callback) {
+      if (startDate && endDate) {
+        var query = "SELECT\n    clients.id AS id_client,\n    clients.nom,\n    clients.prenoms,\n    clients.numero_ifu,\n    clients.numero_telephone,\n    clients.email,\n    clients.date_ajout AS date_ajout_client,\n    commandes.id AS id_commande,\n    commandes.categorie,\n    commandes.quantite_achetee,\n    commandes.destination,\n    commandes.date_commande,\n    commandes.date_livraison,\n    commandes.est_traitee,\n    commandes.id_client,\n    commandes.date_ajout\n    FROM\n    clients, commandes \n    WHERE\n    clients.id = commandes.id_client AND commandes.date_ajout BETWEEN ? AND ? AND commandes.categorie = 'CIM BENIN' ORDER BY commandes.quantite_achetee ASC ;";
+        connection.query(query, [new Date(startDate), new Date(endDate)], function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var commandes = results.map(function (commandeData) {
+            return new Commandes(commandeData.id_commande, new Clients(commandeData.id_client, commandeData.nom, commandeData.prenoms, commandeData.numero_ifu, commandeData.numero_telephone, commandeData.email, commandeData.date_ajout_client), commandeData.categorie, commandeData.quantite_achetee, commandeData.destination, commandeData.date_commande, commandeData.date_livraison, commandeData.est_traitee, commandeData.id_client, commandeData.date_ajout);
+          });
+          return callback(null, commandes);
+        });
+      } else {
+        var _query9 = "SELECT\n      clients.id AS id_client,\n      clients.nom,\n      clients.prenoms,\n      clients.numero_ifu,\n      clients.numero_telephone,\n      clients.email,\n      clients.date_ajout AS date_ajout_client,\n      commandes.id AS id_commande,\n      commandes.categorie,\n      commandes.quantite_achetee,\n      commandes.destination,\n      commandes.date_commande,\n      commandes.date_livraison,\n      commandes.est_traitee,\n      commandes.id_client,\n      commandes.date_ajout\n  FROM\n      clients, commandes \n  WHERE\n      clients.id = commandes.id_client AND commandes.categorie = 'CIM BENIN' ORDER BY commandes.quantite_achetee  ASC ;";
+        connection.query(_query9, function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var commandes = results.map(function (commandeData) {
+            return new Commandes(commandeData.id_commande, new Clients(commandeData.id_client, commandeData.nom, commandeData.prenoms, commandeData.numero_ifu, commandeData.numero_telephone, commandeData.email, commandeData.date_ajout_client), commandeData.categorie, commandeData.quantite_achetee, commandeData.destination, commandeData.date_commande, commandeData.date_livraison, commandeData.est_traitee, commandeData.id_client, commandeData.date_ajout);
+          });
+          return callback(null, commandes);
+        });
+      }
+    }
+  }, {
+    key: "getAllGroupByDestination",
+    value: function getAllGroupByDestination(startDate, endDate, callback) {
+      if (startDate && endDate) {
+        var query = "SELECT\n    clients.id AS id_client,\n    clients.nom,\n    clients.prenoms,\n    clients.numero_ifu,\n    clients.numero_telephone,\n    clients.email,\n    clients.date_ajout AS date_ajout_client,\n    commandes.id AS id_commande,\n    commandes.categorie,\n    commandes.quantite_achetee,\n    commandes.destination,\n    commandes.date_commande,\n    commandes.date_livraison,\n    commandes.est_traitee,\n    commandes.id_client,\n    commandes.date_ajout\nFROM\n    clients, commandes \nWHERE\n    clients.id = commandes.id_client AND commandes.date_ajout BETWEEN ? AND ? GROUP BY commandes.destination ORDER BY commandes.id DESC ;";
+        connection.query(query, [new Date(startDate), new Date(endDate)], function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var commandes = results.map(function (commandeData) {
+            return new Commandes(commandeData.id_commande, new Clients(commandeData.id_client, commandeData.nom, commandeData.prenoms, commandeData.numero_ifu, commandeData.numero_telephone, commandeData.email, commandeData.date_ajout_client), commandeData.categorie, commandeData.quantite_achetee, commandeData.destination, commandeData.date_commande, commandeData.date_livraison, commandeData.est_traitee, commandeData.id_client, commandeData.date_ajout);
+          });
+          return callback(null, commandes);
+        });
+      } else {
+        var _query10 = "SELECT\n      clients.id AS id_client,\n      clients.nom,\n      clients.prenoms,\n      clients.numero_ifu,\n      clients.numero_telephone,\n      clients.email,\n      clients.date_ajout AS date_ajout_client,\n      commandes.id AS id_commande,\n      commandes.categorie,\n      commandes.quantite_achetee,\n      commandes.destination,\n      commandes.date_commande,\n      commandes.date_livraison,\n      commandes.est_traitee,\n      commandes.id_client,\n      commandes.date_ajout\n  FROM\n      clients, commandes \n  WHERE\n      clients.id = commandes.id_client GROUP BY commandes.destination ORDER BY commandes.id DESC ;";
+        connection.query(_query10, function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var commandes = results.map(function (commandeData) {
+            return new Commandes(commandeData.id_commande, new Clients(commandeData.id_client, commandeData.nom, commandeData.prenoms, commandeData.numero_ifu, commandeData.numero_telephone, commandeData.email, commandeData.date_ajout_client), commandeData.categorie, commandeData.quantite_achetee, commandeData.destination, commandeData.date_commande, commandeData.date_livraison, commandeData.est_traitee, commandeData.id_client, commandeData.date_ajout);
+          });
+          return callback(null, commandes);
+        });
+      }
+    }
+  }, {
+    key: "getAllDelivered",
+    value: function getAllDelivered(startDate, endDate, callback) {
+      if (startDate && endDate) {
+        var query = "SELECT\n    clients.id AS id_client,\n    clients.nom,\n    clients.prenoms,\n    clients.numero_ifu,\n    clients.numero_telephone,\n    clients.email,\n    clients.date_ajout AS date_ajout_client,\n    commandes.id AS id_commande,\n    commandes.categorie,\n    commandes.quantite_achetee,\n    commandes.destination,\n    commandes.date_commande,\n    commandes.date_livraison,\n    commandes.est_traitee,\n    commandes.id_client,\n    commandes.date_ajout\nFROM\n    clients, commandes \nWHERE\n    clients.id = commandes.id_client AND commandes.date_ajout BETWEEN ? AND ? AND commandes.est_traitee = 1 ORDER BY commandes.id DESC ;";
+        connection.query(query, [new Date(startDate), new Date(endDate)], function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var commandes = results.map(function (commandeData) {
+            return new Commandes(commandeData.id_commande, new Clients(commandeData.id_client, commandeData.nom, commandeData.prenoms, commandeData.numero_ifu, commandeData.numero_telephone, commandeData.email, commandeData.date_ajout_client), commandeData.categorie, commandeData.quantite_achetee, commandeData.destination, commandeData.date_commande, commandeData.date_livraison, commandeData.est_traitee, commandeData.id_client, commandeData.date_ajout);
+          });
+          return callback(null, commandes);
+        });
+      } else {
+        var _query11 = "SELECT\n      clients.id AS id_client,\n      clients.nom,\n      clients.prenoms,\n      clients.numero_ifu,\n      clients.numero_telephone,\n      clients.email,\n      clients.date_ajout AS date_ajout_client,\n      commandes.id AS id_commande,\n      commandes.categorie,\n      commandes.quantite_achetee,\n      commandes.destination,\n      commandes.date_commande,\n      commandes.date_livraison,\n      commandes.est_traitee,\n      commandes.id_client,\n      commandes.date_ajout\n  FROM\n      clients, commandes \n  WHERE\n      clients.id = commandes.id_client AND commandes.est_traitee = 1 ORDER BY commandes.id DESC ;";
+        connection.query(_query11, function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var commandes = results.map(function (commandeData) {
+            return new Commandes(commandeData.id_commande, new Clients(commandeData.id_client, commandeData.nom, commandeData.prenoms, commandeData.numero_ifu, commandeData.numero_telephone, commandeData.email, commandeData.date_ajout_client), commandeData.categorie, commandeData.quantite_achetee, commandeData.destination, commandeData.date_commande, commandeData.date_livraison, commandeData.est_traitee, commandeData.id_client, commandeData.date_ajout);
+          });
+          return callback(null, commandes);
+        });
+      }
+    }
+  }, {
+    key: "getAllUnDelivered",
+    value: function getAllUnDelivered(startDate, endDate, callback) {
+      if (startDate && endDate) {
+        var query = "SELECT\n    clients.id AS id_client,\n    clients.nom,\n    clients.prenoms,\n    clients.numero_ifu,\n    clients.numero_telephone,\n    clients.email,\n    clients.date_ajout AS date_ajout_client,\n    commandes.id AS id_commande,\n    commandes.categorie,\n    commandes.quantite_achetee,\n    commandes.destination,\n    commandes.date_commande,\n    commandes.date_livraison,\n    commandes.est_traitee,\n    commandes.id_client,\n    commandes.date_ajout\nFROM\n    clients, commandes \nWHERE\n    clients.id = commandes.id_client AND commandes.date_ajout BETWEEN ? AND ?  AND commandes.est_traitee = 0 ORDER BY commandes.id DESC ;";
+        connection.query(query, [new Date(startDate), new Date(endDate)], function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var commandes = results.map(function (commandeData) {
+            return new Commandes(commandeData.id_commande, new Clients(commandeData.id_client, commandeData.nom, commandeData.prenoms, commandeData.numero_ifu, commandeData.numero_telephone, commandeData.email, commandeData.date_ajout_client), commandeData.categorie, commandeData.quantite_achetee, commandeData.destination, commandeData.date_commande, commandeData.date_livraison, commandeData.est_traitee, commandeData.id_client, commandeData.date_ajout);
+          });
+          return callback(null, commandes);
+        });
+      } else {
+        var _query12 = "SELECT\n      clients.id AS id_client,\n      clients.nom,\n      clients.prenoms,\n      clients.numero_ifu,\n      clients.numero_telephone,\n      clients.email,\n      clients.date_ajout AS date_ajout_client,\n      commandes.id AS id_commande,\n      commandes.categorie,\n      commandes.quantite_achetee,\n      commandes.destination,\n      commandes.date_commande,\n      commandes.date_livraison,\n      commandes.est_traitee,\n      commandes.id_client,\n      commandes.date_ajout\n  FROM\n      clients, commandes \n  WHERE\n      clients.id = commandes.id_client AND commandes.est_traitee = 0 ORDER BY commandes.id DESC ;";
+        connection.query(_query12, function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var commandes = results.map(function (commandeData) {
+            return new Commandes(commandeData.id_commande, new Clients(commandeData.id_client, commandeData.nom, commandeData.prenoms, commandeData.numero_ifu, commandeData.numero_telephone, commandeData.email, commandeData.date_ajout_client), commandeData.categorie, commandeData.quantite_achetee, commandeData.destination, commandeData.date_commande, commandeData.date_livraison, commandeData.est_traitee, commandeData.id_client, commandeData.date_ajout);
+          });
+          return callback(null, commandes);
+        });
+      }
     }
   }]);
 

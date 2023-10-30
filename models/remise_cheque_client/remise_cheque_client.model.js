@@ -96,26 +96,764 @@ class RemiseChequeClient {
     });
   }
 
-  static getAllOfClient(id_client, callback) {
-    const query = "SELECT * FROM remise_cheque_client WHERE id_client = ?";
-    connection.query(query, [id_client], (error, results) => {
-      if (error) {
-        return callback(error, null);
-      }
-      const remisesList = results.map((remiseData) => {
-        return new RemiseChequeClient(
-          remiseData.id,
-          remiseData.description,
-          remiseData.banque,
-          remiseData.montant,
-          remiseData.reste,
-          remiseData.est_validee,
-          remiseData.id_client,
-          remiseData.date_remise
-        );
+  static getAllOfClient(startDate, endDate, id_client, callback) {
+    if (startDate && endDate) {
+      const query =
+        "SELECT * FROM remise_cheque_client WHERE date_remise BETWEEN ? AND ? AND id_client = ? ORDER BY id DESC";
+      connection.query(
+        query,
+        [new Date(startDate), new Date(endDate), id_client],
+        (error, results) => {
+          if (error) {
+            return callback(error, null);
+          }
+          const remisesList = results.map((remiseData) => {
+            return new RemiseChequeClient(
+              remiseData.id,
+              remiseData.description,
+              remiseData.banque,
+              remiseData.montant,
+              remiseData.reste,
+              remiseData.est_validee,
+              remiseData.id_client,
+              remiseData.date_remise
+            );
+          });
+          return callback(null, remisesList);
+        }
+      );
+    } else {
+      const query =
+        "SELECT * FROM remise_cheque_client WHERE id_client = ? ORDER BY id DESC";
+      connection.query(query, [id_client], (error, results) => {
+        if (error) {
+          return callback(error, null);
+        }
+        const remisesList = results.map((remiseData) => {
+          return new RemiseChequeClient(
+            remiseData.id,
+            remiseData.description,
+            remiseData.banque,
+            remiseData.montant,
+            remiseData.reste,
+            remiseData.est_validee,
+            remiseData.id_client,
+            remiseData.date_remise
+          );
+        });
+        return callback(null, remisesList);
       });
-      return callback(null, remisesList);
-    });
+    }
+  }
+
+  static getAllOfClientFromOldToNew(startDate, endDate, id_client, callback) {
+    if (startDate && endDate) {
+      const query =
+        "SELECT * FROM remise_cheque_client WHERE date_remise BETWEEN ? AND ? AND id_client = ? ORDER BY id ASC";
+      connection.query(
+        query,
+        [new Date(startDate), new Date(endDate), id_client],
+        (error, results) => {
+          if (error) {
+            return callback(error, null);
+          }
+          const remisesList = results.map((remiseData) => {
+            return new RemiseChequeClient(
+              remiseData.id,
+              remiseData.description,
+              remiseData.banque,
+              remiseData.montant,
+              remiseData.reste,
+              remiseData.est_validee,
+              remiseData.id_client,
+              remiseData.date_remise
+            );
+          });
+          return callback(null, remisesList);
+        }
+      );
+    } else {
+      const query =
+        "SELECT * FROM remise_cheque_client WHERE id_client = ? ORDER BY id ASC";
+      connection.query(query, [id_client], (error, results) => {
+        if (error) {
+          return callback(error, null);
+        }
+        const remisesList = results.map((remiseData) => {
+          return new RemiseChequeClient(
+            remiseData.id,
+            remiseData.description,
+            remiseData.banque,
+            remiseData.montant,
+            remiseData.reste,
+            remiseData.est_validee,
+            remiseData.id_client,
+            remiseData.date_remise
+          );
+        });
+        return callback(null, remisesList);
+      });
+    }
+  }
+
+  static getAllOfClientFromNewToOld(startDate, endDate, id_client, callback) {
+    if (startDate && endDate) {
+      const query =
+        "SELECT * FROM remise_cheque_client WHERE date_remise BETWEEN ? AND ? AND id_client = ? ORDER BY id DESC";
+      connection.query(
+        query,
+        [new Date(startDate), new Date(endDate), id_client],
+        (error, results) => {
+          if (error) {
+            return callback(error, null);
+          }
+          const remisesList = results.map((remiseData) => {
+            return new RemiseChequeClient(
+              remiseData.id,
+              remiseData.description,
+              remiseData.banque,
+              remiseData.montant,
+              remiseData.reste,
+              remiseData.est_validee,
+              remiseData.id_client,
+              remiseData.date_remise
+            );
+          });
+          return callback(null, remisesList);
+        }
+      );
+    } else {
+      const query =
+        "SELECT * FROM remise_cheque_client WHERE id_client = ? ORDER BY id DESC";
+      connection.query(query, [id_client], (error, results) => {
+        if (error) {
+          return callback(error, null);
+        }
+        const remisesList = results.map((remiseData) => {
+          return new RemiseChequeClient(
+            remiseData.id,
+            remiseData.description,
+            remiseData.banque,
+            remiseData.montant,
+            remiseData.reste,
+            remiseData.est_validee,
+            remiseData.id_client,
+            remiseData.date_remise
+          );
+        });
+        return callback(null, remisesList);
+      });
+    }
+  }
+
+  static getAllOfClientMoreImportant(startDate, endDate, id_client, callback) {
+    if (startDate && endDate) {
+      const query =
+        "SELECT * FROM remise_cheque_client WHERE date_remise BETWEEN ? AND ? AND id_client = ? ORDER BY montant DESC";
+      connection.query(
+        query,
+        [new Date(startDate), new Date(endDate), id_client],
+        (error, results) => {
+          if (error) {
+            return callback(error, null);
+          }
+          const remisesList = results.map((remiseData) => {
+            return new RemiseChequeClient(
+              remiseData.id,
+              remiseData.description,
+              remiseData.banque,
+              remiseData.montant,
+              remiseData.reste,
+              remiseData.est_validee,
+              remiseData.id_client,
+              remiseData.date_remise
+            );
+          });
+          return callback(null, remisesList);
+        }
+      );
+    } else {
+      const query =
+        "SELECT * FROM remise_cheque_client WHERE id_client = ? ORDER BY montant DESC";
+      connection.query(query, [id_client], (error, results) => {
+        if (error) {
+          return callback(error, null);
+        }
+        const remisesList = results.map((remiseData) => {
+          return new RemiseChequeClient(
+            remiseData.id,
+            remiseData.description,
+            remiseData.banque,
+            remiseData.montant,
+            remiseData.reste,
+            remiseData.est_validee,
+            remiseData.id_client,
+            remiseData.date_remise
+          );
+        });
+        return callback(null, remisesList);
+      });
+    }
+  }
+
+  static getAllOfClientLessImportant(startDate, endDate, id_client, callback) {
+    if (startDate && endDate) {
+      const query =
+        "SELECT * FROM remise_cheque_client WHERE date_remise BETWEEN ? AND ? AND id_client = ? ORDER BY montant ASC";
+      connection.query(
+        query,
+        [new Date(startDate), new Date(endDate), id_client],
+        (error, results) => {
+          if (error) {
+            return callback(error, null);
+          }
+          const remisesList = results.map((remiseData) => {
+            return new RemiseChequeClient(
+              remiseData.id,
+              remiseData.description,
+              remiseData.banque,
+              remiseData.montant,
+              remiseData.reste,
+              remiseData.est_validee,
+              remiseData.id_client,
+              remiseData.date_remise
+            );
+          });
+          return callback(null, remisesList);
+        }
+      );
+    } else {
+      const query =
+        "SELECT * FROM remise_cheque_client WHERE id_client = ? ORDER BY montant ASC";
+      connection.query(query, [id_client], (error, results) => {
+        if (error) {
+          return callback(error, null);
+        }
+        const remisesList = results.map((remiseData) => {
+          return new RemiseChequeClient(
+            remiseData.id,
+            remiseData.description,
+            remiseData.banque,
+            remiseData.montant,
+            remiseData.reste,
+            remiseData.est_validee,
+            remiseData.id_client,
+            remiseData.date_remise
+          );
+        });
+        return callback(null, remisesList);
+      });
+    }
+  }
+
+  static getAllOfClientValidated(startDate, endDate, id_client, callback) {
+    if (startDate && endDate) {
+      const query =
+        "SELECT * FROM remise_cheque_client WHERE date_remise BETWEEN ? AND ? AND id_client = ? AND est_validee = 1 ORDER BY id DESC";
+      connection.query(
+        query,
+        [new Date(startDate), new Date(endDate), id_client],
+        (error, results) => {
+          if (error) {
+            return callback(error, null);
+          }
+          const remisesList = results.map((remiseData) => {
+            return new RemiseChequeClient(
+              remiseData.id,
+              remiseData.description,
+              remiseData.banque,
+              remiseData.montant,
+              remiseData.reste,
+              remiseData.est_validee,
+              remiseData.id_client,
+              remiseData.date_remise
+            );
+          });
+          return callback(null, remisesList);
+        }
+      );
+    } else {
+      const query =
+        "SELECT * FROM remise_cheque_client WHERE id_client = ? AND est_validee = 1 ORDER BY id DESC";
+      connection.query(query, [id_client], (error, results) => {
+        if (error) {
+          return callback(error, null);
+        }
+        const remisesList = results.map((remiseData) => {
+          return new RemiseChequeClient(
+            remiseData.id,
+            remiseData.description,
+            remiseData.banque,
+            remiseData.montant,
+            remiseData.reste,
+            remiseData.est_validee,
+            remiseData.id_client,
+            remiseData.date_remise
+          );
+        });
+        return callback(null, remisesList);
+      });
+    }
+  }
+
+  static getAllOfClientUnvalidated(startDate, endDate, id_client, callback) {
+    if (startDate && endDate) {
+      const query =
+        "SELECT * FROM remise_cheque_client WHERE date_remise BETWEEN ? AND ? AND id_client = ? AND est_validee = 0 ORDER BY id DESC";
+      connection.query(
+        query,
+        [new Date(startDate), new Date(endDate), id_client],
+        (error, results) => {
+          if (error) {
+            return callback(error, null);
+          }
+          const remisesList = results.map((remiseData) => {
+            return new RemiseChequeClient(
+              remiseData.id,
+              remiseData.description,
+              remiseData.banque,
+              remiseData.montant,
+              remiseData.reste,
+              remiseData.est_validee,
+              remiseData.id_client,
+              remiseData.date_remise
+            );
+          });
+          return callback(null, remisesList);
+        }
+      );
+    } else {
+      const query =
+        "SELECT * FROM remise_cheque_client WHERE id_client = ? AND est_validee = 0 ORDER BY id DESC";
+      connection.query(query, [id_client], (error, results) => {
+        if (error) {
+          return callback(error, null);
+        }
+        const remisesList = results.map((remiseData) => {
+          return new RemiseChequeClient(
+            remiseData.id,
+            remiseData.description,
+            remiseData.banque,
+            remiseData.montant,
+            remiseData.reste,
+            remiseData.est_validee,
+            remiseData.id_client,
+            remiseData.date_remise
+          );
+        });
+        return callback(null, remisesList);
+      });
+    }
+  }
+
+  static getAllOfClientRestLessImportant(
+    startDate,
+    endDate,
+    id_client,
+    callback
+  ) {
+    if (startDate && endDate) {
+      const query =
+        "SELECT * FROM remise_cheque_client WHERE date_remise BETWEEN ? AND ? AND id_client = ? ORDER BY reste ASC";
+      connection.query(
+        query,
+        [new Date(startDate), new Date(endDate), id_client],
+        (error, results) => {
+          if (error) {
+            return callback(error, null);
+          }
+          const remisesList = results.map((remiseData) => {
+            return new RemiseChequeClient(
+              remiseData.id,
+              remiseData.description,
+              remiseData.banque,
+              remiseData.montant,
+              remiseData.reste,
+              remiseData.est_validee,
+              remiseData.id_client,
+              remiseData.date_remise
+            );
+          });
+          return callback(null, remisesList);
+        }
+      );
+    } else {
+      const query =
+        "SELECT * FROM remise_cheque_client WHERE id_client = ? ORDER BY reste ASC";
+      connection.query(query, [id_client], (error, results) => {
+        if (error) {
+          return callback(error, null);
+        }
+        const remisesList = results.map((remiseData) => {
+          return new RemiseChequeClient(
+            remiseData.id,
+            remiseData.description,
+            remiseData.banque,
+            remiseData.montant,
+            remiseData.reste,
+            remiseData.est_validee,
+            remiseData.id_client,
+            remiseData.date_remise
+          );
+        });
+        return callback(null, remisesList);
+      });
+    }
+  }
+
+  static getAllOfClientRestMoreImportant(
+    startDate,
+    endDate,
+    id_client,
+    callback
+  ) {
+    if (startDate && endDate) {
+      const query =
+        "SELECT * FROM remise_cheque_client WHERE date_remise BETWEEN ? AND ? AND id_client = ? ORDER BY reste DESC";
+      connection.query(
+        query,
+        [new Date(startDate), new Date(endDate), id_client],
+        (error, results) => {
+          if (error) {
+            return callback(error, null);
+          }
+          const remisesList = results.map((remiseData) => {
+            return new RemiseChequeClient(
+              remiseData.id,
+              remiseData.description,
+              remiseData.banque,
+              remiseData.montant,
+              remiseData.reste,
+              remiseData.est_validee,
+              remiseData.id_client,
+              remiseData.date_remise
+            );
+          });
+          return callback(null, remisesList);
+        }
+      );
+    } else {
+      const query =
+        "SELECT * FROM remise_cheque_client WHERE id_client = ? ORDER BY reste DESC";
+      connection.query(query, [id_client], (error, results) => {
+        if (error) {
+          return callback(error, null);
+        }
+        const remisesList = results.map((remiseData) => {
+          return new RemiseChequeClient(
+            remiseData.id,
+            remiseData.description,
+            remiseData.banque,
+            remiseData.montant,
+            remiseData.reste,
+            remiseData.est_validee,
+            remiseData.id_client,
+            remiseData.date_remise
+          );
+        });
+        return callback(null, remisesList);
+      });
+    }
+  }
+
+  static getAllOfClientBOABank(startDate, endDate, id_client, callback) {
+    if (startDate && endDate) {
+      const query =
+        "SELECT * FROM remise_cheque_client WHERE date_remise BETWEEN ? AND ? AND id_client = ? AND banque = 'BOA' ORDER BY id DESC";
+      connection.query(
+        query,
+        [new Date(startDate), new Date(endDate), id_client],
+        (error, results) => {
+          if (error) {
+            return callback(error, null);
+          }
+          const remisesList = results.map((remiseData) => {
+            return new RemiseChequeClient(
+              remiseData.id,
+              remiseData.description,
+              remiseData.banque,
+              remiseData.montant,
+              remiseData.reste,
+              remiseData.est_validee,
+              remiseData.id_client,
+              remiseData.date_remise
+            );
+          });
+          return callback(null, remisesList);
+        }
+      );
+    } else {
+      const query =
+        "SELECT * FROM remise_cheque_client WHERE id_client = ? AND banque = 'BOA' ORDER BY id DESC";
+      connection.query(query, [id_client], (error, results) => {
+        if (error) {
+          return callback(error, null);
+        }
+        const remisesList = results.map((remiseData) => {
+          return new RemiseChequeClient(
+            remiseData.id,
+            remiseData.description,
+            remiseData.banque,
+            remiseData.montant,
+            remiseData.reste,
+            remiseData.est_validee,
+            remiseData.id_client,
+            remiseData.date_remise
+          );
+        });
+        return callback(null, remisesList);
+      });
+    }
+  }
+
+  static getAllOfClientUBABank(startDate, endDate, id_client, callback) {
+    if (startDate && endDate) {
+      const query =
+        "SELECT * FROM remise_cheque_client WHERE date_remise BETWEEN ? AND ? AND id_client = ? AND banque = 'UBA' ORDER BY id DESC";
+      connection.query(
+        query,
+        [new Date(startDate), new Date(endDate), id_client],
+        (error, results) => {
+          if (error) {
+            return callback(error, null);
+          }
+          const remisesList = results.map((remiseData) => {
+            return new RemiseChequeClient(
+              remiseData.id,
+              remiseData.description,
+              remiseData.banque,
+              remiseData.montant,
+              remiseData.reste,
+              remiseData.est_validee,
+              remiseData.id_client,
+              remiseData.date_remise
+            );
+          });
+          return callback(null, remisesList);
+        }
+      );
+    } else {
+      const query =
+        "SELECT * FROM remise_cheque_client WHERE id_client = ? AND banque = 'UBA' ORDER BY id DESC";
+      connection.query(query, [id_client], (error, results) => {
+        if (error) {
+          return callback(error, null);
+        }
+        const remisesList = results.map((remiseData) => {
+          return new RemiseChequeClient(
+            remiseData.id,
+            remiseData.description,
+            remiseData.banque,
+            remiseData.montant,
+            remiseData.reste,
+            remiseData.est_validee,
+            remiseData.id_client,
+            remiseData.date_remise
+          );
+        });
+        return callback(null, remisesList);
+      });
+    }
+  }
+
+  static getAllOfClientNSIABank(startDate, endDate, id_client, callback) {
+    if (startDate && endDate) {
+      const query =
+        "SELECT * FROM remise_cheque_client WHERE date_remise BETWEEN ? AND ? AND id_client = ? AND banque = 'NSIA' ORDER BY id DESC";
+      connection.query(
+        query,
+        [new Date(startDate), new Date(endDate), id_client],
+        (error, results) => {
+          if (error) {
+            return callback(error, null);
+          }
+          const remisesList = results.map((remiseData) => {
+            return new RemiseChequeClient(
+              remiseData.id,
+              remiseData.description,
+              remiseData.banque,
+              remiseData.montant,
+              remiseData.reste,
+              remiseData.est_validee,
+              remiseData.id_client,
+              remiseData.date_remise
+            );
+          });
+          return callback(null, remisesList);
+        }
+      );
+    } else {
+      const query =
+        "SELECT * FROM remise_cheque_client WHERE id_client = ? AND banque = 'NSIA' ORDER BY id DESC";
+      connection.query(query, [id_client], (error, results) => {
+        if (error) {
+          return callback(error, null);
+        }
+        const remisesList = results.map((remiseData) => {
+          return new RemiseChequeClient(
+            remiseData.id,
+            remiseData.description,
+            remiseData.banque,
+            remiseData.montant,
+            remiseData.reste,
+            remiseData.est_validee,
+            remiseData.id_client,
+            remiseData.date_remise
+          );
+        });
+        return callback(null, remisesList);
+      });
+    }
+  }
+
+  static getAllOfClientBGFIBank(startDate, endDate, id_client, callback) {
+    if (startDate && endDate) {
+      const query =
+        "SELECT * FROM remise_cheque_client WHERE date_remise BETWEEN ? AND ? AND id_client = ? AND banque = 'BGFI' ORDER BY id DESC";
+      connection.query(
+        query,
+        [new Date(startDate), new Date(endDate), id_client],
+        (error, results) => {
+          if (error) {
+            return callback(error, null);
+          }
+          const remisesList = results.map((remiseData) => {
+            return new RemiseChequeClient(
+              remiseData.id,
+              remiseData.description,
+              remiseData.banque,
+              remiseData.montant,
+              remiseData.reste,
+              remiseData.est_validee,
+              remiseData.id_client,
+              remiseData.date_remise
+            );
+          });
+          return callback(null, remisesList);
+        }
+      );
+    } else {
+      const query =
+        "SELECT * FROM remise_cheque_client WHERE id_client = ? AND banque = 'BGFI' ORDER BY id DESC";
+      connection.query(query, [id_client], (error, results) => {
+        if (error) {
+          return callback(error, null);
+        }
+        const remisesList = results.map((remiseData) => {
+          return new RemiseChequeClient(
+            remiseData.id,
+            remiseData.description,
+            remiseData.banque,
+            remiseData.montant,
+            remiseData.reste,
+            remiseData.est_validee,
+            remiseData.id_client,
+            remiseData.date_remise
+          );
+        });
+        return callback(null, remisesList);
+      });
+    }
+  }
+
+  static getAllOfClientSGBBank(startDate, endDate, id_client, callback) {
+    if (startDate && endDate) {
+      const query =
+        "SELECT * FROM remise_cheque_client WHERE date_remise BETWEEN ? AND ? AND id_client = ? AND banque = 'SGB' ORDER BY id DESC";
+      connection.query(
+        query,
+        [new Date(startDate), new Date(endDate), id_client],
+        (error, results) => {
+          if (error) {
+            return callback(error, null);
+          }
+          const remisesList = results.map((remiseData) => {
+            return new RemiseChequeClient(
+              remiseData.id,
+              remiseData.description,
+              remiseData.banque,
+              remiseData.montant,
+              remiseData.reste,
+              remiseData.est_validee,
+              remiseData.id_client,
+              remiseData.date_remise
+            );
+          });
+          return callback(null, remisesList);
+        }
+      );
+    } else {
+      const query =
+        "SELECT * FROM remise_cheque_client WHERE id_client = ? AND banque = 'SGB' ORDER BY id DESC";
+      connection.query(query, [id_client], (error, results) => {
+        if (error) {
+          return callback(error, null);
+        }
+        const remisesList = results.map((remiseData) => {
+          return new RemiseChequeClient(
+            remiseData.id,
+            remiseData.description,
+            remiseData.banque,
+            remiseData.montant,
+            remiseData.reste,
+            remiseData.est_validee,
+            remiseData.id_client,
+            remiseData.date_remise
+          );
+        });
+        return callback(null, remisesList);
+      });
+    }
+  }
+
+  static getAllOfClientEcobankBank(startDate, endDate, id_client, callback) {
+    if (startDate && endDate) {
+      const query =
+        "SELECT * FROM remise_cheque_client WHERE date_remise BETWEEN ? AND ? AND id_client = ? AND banque = 'Ecobank' ORDER BY id DESC";
+      connection.query(
+        query,
+        [new Date(startDate), new Date(endDate), id_client],
+        (error, results) => {
+          if (error) {
+            return callback(error, null);
+          }
+          const remisesList = results.map((remiseData) => {
+            return new RemiseChequeClient(
+              remiseData.id,
+              remiseData.description,
+              remiseData.banque,
+              remiseData.montant,
+              remiseData.reste,
+              remiseData.est_validee,
+              remiseData.id_client,
+              remiseData.date_remise
+            );
+          });
+          return callback(null, remisesList);
+        }
+      );
+    } else {
+      const query =
+        "SELECT * FROM remise_cheque_client WHERE id_client = ? AND banque = 'Ecobank' ORDER BY id DESC";
+      connection.query(query, [id_client], (error, results) => {
+        if (error) {
+          return callback(error, null);
+        }
+        const remisesList = results.map((remiseData) => {
+          return new RemiseChequeClient(
+            remiseData.id,
+            remiseData.description,
+            remiseData.banque,
+            remiseData.montant,
+            remiseData.reste,
+            remiseData.est_validee,
+            remiseData.id_client,
+            remiseData.date_remise
+          );
+        });
+        return callback(null, remisesList);
+      });
+    }
   }
 
   update(callback) {

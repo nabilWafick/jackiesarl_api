@@ -127,7 +127,7 @@ function () {
   }, {
     key: "getAll",
     value: function getAll(callback) {
-      var query = "SELECT * FROM activites_depot";
+      var query = "SELECT * FROM activites_depot ORDER BY id DESC";
       connection.query(query, function (error, results) {
         if (error) {
           return callback(error, null);
@@ -141,19 +141,34 @@ function () {
     }
   }, {
     key: "getAllByDepotID",
-    value: function getAllByDepotID(id_depot, callback) {
-      var query = "SELECT * FROM activites_depot WHERE id_depot = ? ";
-      connection.query(query, [id_depot], function (error, results) {
-        if (error) {
-          return callback(error, null);
-        }
+    value: function getAllByDepotID(startDate, endDate, id_depot, callback) {
+      if (startDate && endDate) {
+        var query = "SELECT * FROM activites_depot WHERE date_remplissage BETWEEN ? AND ? AND id_depot = ? ORDER BY id DESC";
+        connection.query(query, [new Date(startDate), new Date(endDate), id_depot], function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
 
-        var activitesDepotList = results.map(function (activitesDepotData) {
-          return new ActivitesDepot(activitesDepotData.id, activitesDepotData.id_depot, activitesDepotData.quantite_avant_vente, activitesDepotData.vente, activitesDepotData.quantite_apres_vente, activitesDepotData.versement, activitesDepotData.depense, activitesDepotData.observation, new Date(activitesDepotData.date_remplissage));
-        }); //console.log(activitesDepotList.length);
+          var activitesDepotList = results.map(function (activitesDepotData) {
+            return new ActivitesDepot(activitesDepotData.id, activitesDepotData.id_depot, activitesDepotData.quantite_avant_vente, activitesDepotData.vente, activitesDepotData.quantite_apres_vente, activitesDepotData.versement, activitesDepotData.depense, activitesDepotData.observation, new Date(activitesDepotData.date_remplissage));
+          }); //console.log(activitesDepotList.length);
 
-        return callback(null, activitesDepotList);
-      });
+          return callback(null, activitesDepotList);
+        });
+      } else {
+        var _query = "SELECT * FROM activites_depot WHERE id_depot = ? ORDER BY id DESC";
+        connection.query(_query, [id_depot], function (error, results) {
+          if (error) {
+            return callback(error, null);
+          }
+
+          var activitesDepotList = results.map(function (activitesDepotData) {
+            return new ActivitesDepot(activitesDepotData.id, activitesDepotData.id_depot, activitesDepotData.quantite_avant_vente, activitesDepotData.vente, activitesDepotData.quantite_apres_vente, activitesDepotData.versement, activitesDepotData.depense, activitesDepotData.observation, new Date(activitesDepotData.date_remplissage));
+          }); //console.log(activitesDepotList.length);
+
+          return callback(null, activitesDepotList);
+        });
+      }
     }
   }]);
 

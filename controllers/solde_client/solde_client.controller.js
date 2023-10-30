@@ -61,6 +61,82 @@ class SoldeClientController {
       }
     );
   };
+
+  static getAllAdvanceMoreImportant = (req, res) => {
+    const startDate = req.params.startDate;
+    const endDate = req.params.endDate;
+    SoldeClient.getAllAdvanceMoreImportant(
+      startDate,
+      endDate,
+      (soldesClientsError, soldesClients) => {
+        if (soldesClientsError) {
+          return res.status(500).json({
+            status: 500,
+            error: "Erreur lors de la récupéraition du solde du client",
+          });
+        }
+
+        return res.status(200).json(soldesClients);
+      }
+    );
+  };
+
+  static getAllAdvanceLessImportant = (req, res) => {
+    const startDate = req.params.startDate;
+    const endDate = req.params.endDate;
+    SoldeClient.getAllAdvanceLessImportant(
+      startDate,
+      endDate,
+      (soldesClientsError, soldesClients) => {
+        if (soldesClientsError) {
+          return res.status(500).json({
+            status: 500,
+            error: "Erreur lors de la récupéraition du solde du client",
+          });
+        }
+
+        return res.status(200).json(soldesClients);
+      }
+    );
+  };
+
+  static getAllDebtsMoreImportant = (req, res) => {
+    const startDate = req.params.startDate;
+    const endDate = req.params.endDate;
+    SoldeClient.getAllDebtsMoreImportant(
+      startDate,
+      endDate,
+      (soldesClientsError, soldesClients) => {
+        if (soldesClientsError) {
+          return res.status(500).json({
+            status: 500,
+            error: "Erreur lors de la récupéraition du solde du client",
+          });
+        }
+
+        return res.status(200).json(soldesClients);
+      }
+    );
+  };
+
+  static getAllDebtsLessImportant = (req, res) => {
+    const startDate = req.params.startDate;
+    const endDate = req.params.endDate;
+    SoldeClient.getAllDebtsLessImportant(
+      startDate,
+      endDate,
+      (soldesClientsError, soldesClients) => {
+        if (soldesClientsError) {
+          return res.status(500).json({
+            status: 500,
+            error: "Erreur lors de la récupéraition du solde du client",
+          });
+        }
+
+        return res.status(200).json(soldesClients);
+      }
+    );
+  };
 }
 
 module.exports = SoldeClientController;

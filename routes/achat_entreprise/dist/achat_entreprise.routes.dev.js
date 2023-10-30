@@ -27,7 +27,7 @@ var upload = multer({
 
 router.post("/achat-entreprise", upload.single("bordereau"), AchatEntrepriseController.create);
 router.get("/achat-entreprise/:bon_commande", AchatEntrepriseController.getByBonCommande);
-router.get("/achat-entreprise/", AchatEntrepriseController.getAll);
+router.get("/achats-entreprise-default/:startDate?/:endDate?", AchatEntrepriseController.getAll);
 router.put("/achat-entreprise/:bon_commande", upload.single("bordereau"), AchatEntrepriseController.update);
 router["delete"]("/achat-entreprise/:bon_commande", AchatEntrepriseController["delete"]);
 module.exports = router;
