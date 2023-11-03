@@ -1,16 +1,66 @@
 const Employes = require("../../models/employes/employes.models");
-
+const jwt = require("jsonwebtoken");
 class EmployesController {
   // Créer un nouvel employé
-  static create = (req, res) => {
-    const employeData = req.body;
-    Employes.create(employeData, (error, employe) => {
-      if (error) {
+  static create = async (req, res) => {
+    const { nom, prenoms, email, numero_telephone, role, password } = req.body;
+
+    Employes.getAll(async (employees_error, employees) => {
+      if (employees_error) {
         return res
           .status(500)
-          .json({ error: "Erreur lors de la création de l'employé" });
+          .json({ status: 500, error: "Erreur lors de la création du client" });
       }
-      return res.status(201).json(employe);
+
+      const errors = {
+        firstname: null,
+        lastname: null,
+        email: null,
+        phoneNumber: null,
+      };
+
+      let exist = false;
+
+      employees.forEach((employee) => {
+        if (employee.prenoms == prenoms && employee.nom == nom) {
+          exist = true;
+          errors.firstname = "Ce prénom existe déjà";
+          errors.lastname = "Ce nom existe déjà";
+        } else if (errors.email == email) {
+          exist = true;
+          errors.email = "Cet email existe déjà";
+        } else if (errors.phoneNumber == numero_telephone) {
+          exist = true;
+          errors.phoneNumber = "Ce numéro de téléphone existe déjà";
+        }
+      });
+
+      console.log("exist:", exist);
+
+      if (exist == true) {
+        return res.status(406).json({ status: 406, errors: errors });
+      }
+
+      const hashedPassword = await bcrypt.hash(password, 10);
+      const token = jwt.sign({ email }, process.env.JWT_USER_TOKEN_KEY);
+      const employeeData = {
+        nom: nom,
+        prenoms: prenoms,
+        email: email,
+        numero_telephone: numero_telephone,
+        role: role,
+        password: hashedPassword,
+        token: token,
+      };
+      Employes.create(employeeData, (error, employe) => {
+        if (error) {
+          return res.status(500).json({
+            status: 500,
+            error: "Erreur lors de la création de l'employé",
+          });
+        }
+        return res.status(201).json({ status: 201, employe });
+      });
     });
   };
 

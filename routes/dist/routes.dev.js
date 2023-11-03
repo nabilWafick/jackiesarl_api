@@ -12,9 +12,9 @@ var activitesBanqueRoutes = require("./activites_banque/activites_banque.routes"
 
 var activitesDepotRoutes = require("./activites_depot/activites_depot.routes");
 
-var autorisationsRoutes = require("./autorisations/autorisations.routes");
+var authRoutes = require("./auth/auth.routes");
 
-var avanceRoutes = require("./avance/avance.routes");
+var autorisationsRoutes = require("./autorisations/autorisations.routes");
 
 var brouillardRoutes = require("./brouillard/brouillard.routes");
 
@@ -23,8 +23,6 @@ var clientsRoutes = require("./clients/clients.routes");
 var clientsTonnagesRoutes = require("./clients_tonnages/clients_tonnages.routes");
 
 var commandesRoutes = require("./commandes/commandes.routes");
-
-var creancesRoutes = require("./creances/creances.routes");
 
 var depensesRoutes = require("./depenses/depenses.routes");
 
@@ -52,13 +50,12 @@ router.use("/", achatClientRoutes);
 router.use("/", achatEntrepriseRoutes);
 router.use("/", activitesBanqueRoutes);
 router.use("/", activitesDepotRoutes);
+router.use("/", authRoutes);
 router.use("/", autorisationsRoutes);
-router.use("/", avanceRoutes);
 router.use("/", brouillardRoutes);
 router.use("/", clientsRoutes);
 router.use("/", clientsTonnagesRoutes);
 router.use("/", commandesRoutes);
-router.use("/", creancesRoutes);
 router.use("/", depensesRoutes);
 router.use("/", employesRoutes);
 router.use("/", modificationsRoutes);

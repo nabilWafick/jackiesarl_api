@@ -49,9 +49,7 @@ class ClientsController {
         }
       });
       // console.log("errors", errors);
-      if (exist) {
-        //  console.log("Ce client existe dejà");
-        //  console.log(errors);
+      if (exist == true) {
         return res.status(400).json({ status: 400, errors: errors });
       }
       Clients.create(clientData, (error, client) => {

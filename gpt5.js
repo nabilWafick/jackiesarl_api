@@ -68,10 +68,10 @@ const authorize = (permission) => {
 // Création d'un nouvel employé
 app.post("/register", async (req, res) => {
   try {
-    const { nom, prenoms, email, password, role, permissions } = req.body;
+    const { nom, prenoms, email, role, password } = req.body;
     const hashedPassword = await bcrypt.hash(password, 10);
-    const token = jwt.sign({ email }, accessTokenSecret, { expiresIn: "7d" });
-    const refreshToken = jwt.sign({ email }, refreshTokenSecret);
+    const token = jwt.sign({ email }, accessTokenSecret, { expiresIn: "5m" });
+    //   const refreshToken = jwt.sign({ email }, refreshTokenSecret, { expiresIn: "5m" });
     const newEmployee = {
       id: employeesDB.length + 1,
       nom,
@@ -87,9 +87,10 @@ app.post("/register", async (req, res) => {
     // Retournez une réponse avec les cookies (access token et refresh token)
     res.cookie("accessToken", token, {
       httpOnly: true,
-      maxAge: 7 * 24 * 60 * 60 * 1000,
+      maxAge: 5 * 60 * 1000,
+      //   maxAge: 7 * 24 * 60 * 60 * 1000,
     }); // 7 jours d'expiration
-    res.cookie("refreshToken", refreshToken, { httpOnly: true });
+    //   res.cookie("refreshToken", refreshToken, { httpOnly: true });
     res.json({ message: "Employé créé avec succès" });
   } catch (error) {
     console.error(error);
@@ -137,6 +138,7 @@ app.post("/login", async (req, res) => {
 // Utilisation unique du refresh token pour renouveler l'access token
 app.post("/refresh", (req, res) => {
   const refreshToken = req.cookies.refreshToken;
+
   if (!refreshToken) {
     return res.status(401).json({ message: "Non authentifié" });
   }

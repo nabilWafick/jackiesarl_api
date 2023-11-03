@@ -4,10 +4,16 @@ const cookieParser = require("cookie-parser");
 const cors = require("cors");
 const app = express();
 const routes = require("./routes/routes");
-const config = require("./configurations/config");
+//const config = require("./configurations/config");
 const port = process.env.PORT;
 
-app.use(cors());
+app.use(
+  cors({
+    origin: ["http://localhost:5173"],
+    methods: ["POST", "GET", "PUT", "DELETE", "HEAD", "PATCH"],
+    credentials: true,
+  })
+);
 app.use(cookieParser());
 
 // Middleware pour analyser le corps des requêtes au format JSON

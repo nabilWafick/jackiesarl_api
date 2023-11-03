@@ -79,14 +79,14 @@ var authorize = function authorize(permission) {
 
 
 app.post("/register", function _callee(req, res) {
-  var _req$body, nom, prenoms, email, password, role, permissions, hashedPassword, token, refreshToken, newEmployee;
+  var _req$body, nom, prenoms, email, role, password, hashedPassword, token, newEmployee;
 
   return regeneratorRuntime.async(function _callee$(_context) {
     while (1) {
       switch (_context.prev = _context.next) {
         case 0:
           _context.prev = 0;
-          _req$body = req.body, nom = _req$body.nom, prenoms = _req$body.prenoms, email = _req$body.email, password = _req$body.password, role = _req$body.role, permissions = _req$body.permissions;
+          _req$body = req.body, nom = _req$body.nom, prenoms = _req$body.prenoms, email = _req$body.email, role = _req$body.role, password = _req$body.password;
           _context.next = 4;
           return regeneratorRuntime.awrap(bcrypt.hash(password, 10));
 
@@ -95,11 +95,9 @@ app.post("/register", function _callee(req, res) {
           token = jwt.sign({
             email: email
           }, accessTokenSecret, {
-            expiresIn: "7d"
-          });
-          refreshToken = jwt.sign({
-            email: email
-          }, refreshTokenSecret);
+            expiresIn: "5m"
+          }); //   const refreshToken = jwt.sign({ email }, refreshTokenSecret, { expiresIn: "5m" });
+
           newEmployee = {
             id: employeesDB.length + 1,
             nom: nom,
@@ -115,32 +113,31 @@ app.post("/register", function _callee(req, res) {
 
           res.cookie("accessToken", token, {
             httpOnly: true,
-            maxAge: 7 * 24 * 60 * 60 * 1000
-          }); // 7 jours d'expiration
+            maxAge: 5 * 60 * 1000 //   maxAge: 7 * 24 * 60 * 60 * 1000,
 
-          res.cookie("refreshToken", refreshToken, {
-            httpOnly: true
-          });
+          }); // 7 jours d'expiration
+          //   res.cookie("refreshToken", refreshToken, { httpOnly: true });
+
           res.json({
             message: "Employé créé avec succès"
           });
-          _context.next = 18;
+          _context.next = 16;
           break;
 
-        case 14:
-          _context.prev = 14;
+        case 12:
+          _context.prev = 12;
           _context.t0 = _context["catch"](0);
           console.error(_context.t0);
           res.status(500).json({
             message: "Erreur lors de la création de l'employé"
           });
 
-        case 18:
+        case 16:
         case "end":
           return _context.stop();
       }
     }
-  }, null, null, [[0, 14]]);
+  }, null, null, [[0, 12]]);
 }); // Authentification de l'employé
 
 app.post("/login", function _callee2(req, res) {
