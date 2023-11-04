@@ -46,15 +46,18 @@ function () {
   _createClass(Employes, [{
     key: "update",
     value: function update(callback) {
-      var query = "UPDATE employes SET nom = ?, prenoms = ?, email = ?, password = ?, role = ?, permissions = ?,token = ?, date_ajout = ? WHERE id = ?";
+      var query = "UPDATE employes SET nom = ?, prenoms = ?, email = ?, numero_telephone = ?,password = ?, role = ?, permissions = ?,token = ?, date_ajout = ? WHERE id = ?";
 
       var id = this.id,
-          updatedData = _objectWithoutProperties(this, ["id"]);
+          updatedData = _objectWithoutProperties(this, ["id"]); //console.log("updated data json", JSON.stringify(updatedData.permissions));
 
-      connection.query(query, [].concat(_toConsumableArray(Object.values(updatedData)), [id]), function (error, results) {
+
+      connection.query(query, [updatedData.nom, updatedData.prenoms, updatedData.email, updatedData.numero_telephone, updatedData.password, updatedData.role, JSON.stringify(updatedData.permissions), updatedData.token, new Date(updatedData.date_ajout), id], function (error, results) {
         if (error) {
+          //  console.log("update error", error);
           return callback(error);
-        }
+        } //  console.log("updated successfuly");
+
 
         return callback(null);
       });
@@ -182,14 +185,14 @@ function () {
   }, {
     key: "getAll",
     value: function getAll(callback) {
-      var query = "SELECT * FROM employes";
+      var query = "SELECT * FROM employes ORDER BY id DESC";
       connection.query(query, function (error, results) {
         if (error) {
           return callback(error, null);
         }
 
         var employesList = results.map(function (employeData) {
-          return new Employes(employeData.id, employeData.nom, employeData.prenoms, employeData.email, employeData.numero_telephone, employeData.password, employeData.permissions, employeData.token, employeData.date_ajout);
+          return new Employes(employeData.id, employeData.nom, employeData.prenoms, employeData.email, employeData.numero_telephone, employeData.password, employeData.role, employeData.permissions, employeData.token, employeData.date_ajout);
         });
         return callback(null, employesList);
       });

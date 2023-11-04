@@ -115,6 +115,7 @@ class Employes {
       "INSERT INTO employes (id, nom, prenoms, email, numero_telephone, password, role, permissions, token, date_ajout) VALUES (NULL, ?, ?, ?, ?, ?, ?, ?, ?,?)";
 
     //  console.log("employeeDefaultPermissions", employeeDefaultPermissions);
+
     connection.query(
       query,
       [
@@ -197,7 +198,7 @@ class Employes {
   }
 
   static getAll(callback) {
-    const query = "SELECT * FROM employes";
+    const query = "SELECT * FROM employes ORDER BY id DESC";
     connection.query(query, (error, results) => {
       if (error) {
         return callback(error, null);
@@ -210,6 +211,7 @@ class Employes {
           employeData.email,
           employeData.numero_telephone,
           employeData.password,
+          employeData.role,
           employeData.permissions,
           employeData.token,
           employeData.date_ajout
@@ -221,15 +223,29 @@ class Employes {
 
   update(callback) {
     const query =
-      "UPDATE employes SET nom = ?, prenoms = ?, email = ?, password = ?, role = ?, permissions = ?,token = ?, date_ajout = ? WHERE id = ?";
+      "UPDATE employes SET nom = ?, prenoms = ?, email = ?, numero_telephone = ?,password = ?, role = ?, permissions = ?,token = ?, date_ajout = ? WHERE id = ?";
     const { id, ...updatedData } = this;
+    //console.log("updated data json", JSON.stringify(updatedData.permissions));
     connection.query(
       query,
-      [...Object.values(updatedData), id],
+      [
+        updatedData.nom,
+        updatedData.prenoms,
+        updatedData.email,
+        updatedData.numero_telephone,
+        updatedData.password,
+        updatedData.role,
+        JSON.stringify(updatedData.permissions),
+        updatedData.token,
+        new Date(updatedData.date_ajout),
+        id,
+      ],
       (error, results) => {
         if (error) {
+          //  console.log("update error", error);
           return callback(error);
         }
+        //  console.log("updated successfuly");
         return callback(null);
       }
     );

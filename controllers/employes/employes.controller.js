@@ -95,6 +95,7 @@ class EmployesController {
   static update = (req, res) => {
     const id = req.params.id;
     const updatedData = req.body;
+    // console.log("updatedData", updatedData);
     Employes.getById(id, (getError, existingEmploye) => {
       if (getError) {
         return res
@@ -105,13 +106,25 @@ class EmployesController {
         return res.status(404).json({ error: "Employé non trouvé" });
       }
       existingEmploye = { ...existingEmploye, ...updatedData };
+      existingEmploye = new Employes(
+        existingEmploye.id,
+        existingEmploye.nom,
+        existingEmploye.prenoms,
+        existingEmploye.email,
+        existingEmploye.numero_telephone,
+        existingEmploye.password,
+        existingEmploye.role,
+        existingEmploye.permissions,
+        existingEmploye.token,
+        existingEmploye.date_ajout
+      );
       existingEmploye.update((updateError) => {
         if (updateError) {
           return res
             .status(500)
             .json({ error: "Erreur lors de la mise à jour de l'employé" });
         }
-        return res.status(200).json(existingEmploye);
+        return res.status(200).json({ status: 200, employee: existingEmploye });
       });
     });
   };
