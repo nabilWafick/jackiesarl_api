@@ -161,10 +161,10 @@ class Employes {
         employeData.prenoms,
         employeData.email,
         employeData.numero_telephone,
-        employeData.password,
+        "employee password",
         employeData.role,
         employeData.permissions,
-        employeData.token,
+        "employee token",
         employeData.date_ajout
       );
       return callback(null, employe);
@@ -210,10 +210,10 @@ class Employes {
           employeData.prenoms,
           employeData.email,
           employeData.numero_telephone,
-          employeData.password,
+          " employee password",
           employeData.role,
           employeData.permissions,
-          employeData.token,
+          "employee token",
           employeData.date_ajout
         );
       });

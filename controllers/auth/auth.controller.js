@@ -157,7 +157,7 @@ class AuthController {
         });
       }
 
-      const match = await bcrypt.compare(password, employe.password);
+      const match = bcrypt.compareSync(password, employe.password);
 
       if (match) {
         const newAccessToken = jwt.sign(

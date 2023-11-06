@@ -160,7 +160,7 @@ function () {
         }
 
         var employeData = results[0];
-        var employe = new Employes(employeData.id, employeData.nom, employeData.prenoms, employeData.email, employeData.numero_telephone, employeData.password, employeData.role, employeData.permissions, employeData.token, employeData.date_ajout);
+        var employe = new Employes(employeData.id, employeData.nom, employeData.prenoms, employeData.email, employeData.numero_telephone, "employee password", employeData.role, employeData.permissions, "employee token", employeData.date_ajout);
         return callback(null, employe);
       });
     }
@@ -192,7 +192,7 @@ function () {
         }
 
         var employesList = results.map(function (employeData) {
-          return new Employes(employeData.id, employeData.nom, employeData.prenoms, employeData.email, employeData.numero_telephone, employeData.password, employeData.role, employeData.permissions, employeData.token, employeData.date_ajout);
+          return new Employes(employeData.id, employeData.nom, employeData.prenoms, employeData.email, employeData.numero_telephone, " employee password", employeData.role, employeData.permissions, "employee token", employeData.date_ajout);
         });
         return callback(null, employesList);
       });

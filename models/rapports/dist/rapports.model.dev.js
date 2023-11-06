@@ -26,16 +26,19 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 var connection = require("../_db/database");
 
+var Employes = require("../../models/employes/employes.models");
+
 var Rapports =
 /*#__PURE__*/
 function () {
-  function Rapports(id, rapport, id_employe, date_envoi) {
+  function Rapports(id, rapport, date_envoi, id_employe, employe) {
     _classCallCheck(this, Rapports);
 
     this.id = id;
     this.rapport = rapport;
-    this.id_employe = id_employe;
     this.date_envoi = date_envoi;
+    this.id_employe = id_employe;
+    this.employe = employe;
   }
 
   _createClass(Rapports, [{
@@ -57,14 +60,16 @@ function () {
   }], [{
     key: "create",
     value: function create(rapportData, callback) {
-      var query = "INSERT INTO rapports (id, rapport,id_employe, date_envoi, ) VALUES (NULL, ?, ?, ?)";
+      var query = "INSERT INTO rapports (id, rapport, date_envoi, id_employe ) VALUES (NULL, ?, ?, ?)";
       var currentDate = new Date();
-      connection.query(query, [rapportData.rapport, rapportData.id_employe, currentDate], function (error, results) {
+      connection.query(query, [rapportData.rapport, currentDate, rapportData.id_employe], function (error, results) {
         if (error) {
+          //   console.log("SQL error", error);
           return callback(error, null);
         }
 
-        var newRapport = _construct(Rapports, [results.insertId].concat(_toConsumableArray(Object.values(rapportData)), [currentDate]));
+        var newRapport = _construct(Rapports, [results.insertId].concat(_toConsumableArray(Object.values(rapportData)), [currentDate])); //  console.log("Insert sucessfuly and report id", results.insertId);
+
 
         return callback(null, newRapport);
       });
@@ -83,22 +88,40 @@ function () {
         }
 
         var rapportData = results[0];
-        var rapport = new Rapports(rapportData.id, rapportData.rapport, rapportData.date_envoi, rapportData.id_employe);
+        var rapport = new Rapports(rapportData.id, rapportData.rapport, rapportData.date_envoi, rapportData.id_employe, undefined);
         return callback(null, rapport);
       });
     }
   }, {
     key: "getAll",
     value: function getAll(callback) {
-      var query = "SELECT * FROM rapports";
+      var query = "\n    SELECT employes.id as employee_id,employes.nom, employes.prenoms,\n    employes.email,employes.numero_telephone,employes.password,\n    employes.role, employes.permissions, employes.token, \n    employes.date_ajout, rapports.id as id_rapport, rapports.rapport,rapports.date_envoi\n    FROM employes,rapports \n    WHERE employes.id = rapports.id_employe\n    ORDER BY rapports.id DESC";
       connection.query(query, function (error, results) {
         if (error) {
           return callback(error, null);
         }
 
         var rapportsList = results.map(function (rapportData) {
-          return new Rapports(rapportData.id, rapportData.rapport, rapportData.date_envoi, rapportData.id_employe);
+          return new Rapports(rapportData.id_rapport, rapportData.rapport, rapportData.date_envoi, rapportData.employee_id, new Employes(rapportData.employee_id, rapportData.nom, rapportData.prenoms, rapportData.email, rapportData.numero_telephone, "employee password", rapportData.role, "employee permissions", "employee token", rapportData.date_ajout));
         });
+        return callback(null, rapportsList);
+      });
+    }
+  }, {
+    key: "getAllOfEmployee",
+    value: function getAllOfEmployee(employee_id, callback) {
+      //  console.log("employee_id", employee_id);
+      var query = "\n    SELECT employes.id as employee_id,employes.nom, employes.prenoms,\n    employes.email,employes.numero_telephone,employes.password,\n    employes.role, employes.permissions, employes.token, \n    employes.date_ajout, rapports.id as id_rapport, rapports.rapport,rapports.date_envoi\n    FROM employes,rapports \n    WHERE rapports.id_employe = ? AND employes.id = ?\n    ORDER BY rapports.id DESC";
+      connection.query(query, [employee_id, employee_id], function (error, results) {
+        if (error) {
+          //   console.log("SQL error", error);
+          return callback(error, null);
+        }
+
+        var rapportsList = results.map(function (rapportData) {
+          return new Rapports(rapportData.id_rapport, rapportData.rapport, rapportData.date_envoi, rapportData.employee_id, new Employes(rapportData.employee_id, rapportData.nom, rapportData.prenoms, rapportData.email, rapportData.numero_telephone, "employee password", rapportData.role, "employee permissions", "employee token", rapportData.date_ajout));
+        }); //  console.log("employee rapportsList", rapportsList);
+
         return callback(null, rapportsList);
       });
     }
