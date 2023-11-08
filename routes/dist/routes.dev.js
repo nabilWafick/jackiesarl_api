@@ -44,6 +44,8 @@ var stockBonCommandeRoutes = require("./stock_bon_commande/stock_bon_commande.ro
 
 var stockCamionRoutes = require("./stock_camion/stock_camion.routes");
 
+var tableBordRoutes = require("./table_bord/table_bord.routes");
+
 var openFileRoute = require("./open_file/open_file.routes");
 
 router.use("/", achatClientRoutes);
@@ -66,5 +68,6 @@ router.use("/", soldeClientRoutes);
 router.use("/", soldeCourantRoutes);
 router.use("/", stockBonCommandeRoutes);
 router.use("/", stockCamionRoutes);
+router.use("/", tableBordRoutes);
 router.use("/", openFileRoute);
 module.exports = router;

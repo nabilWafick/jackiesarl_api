@@ -4,8 +4,14 @@ const cookieParser = require("cookie-parser");
 const cors = require("cors");
 const app = express();
 const routes = require("./routes/routes");
-//const config = require("./configurations/config");
+const path = require("path");
 const port = process.env.PORT;
+
+const publicsDirectory = path.join(__dirname, "public");
+app.use(express.static(publicsDirectory));
+
+const uploadsDirectory = path.join(__dirname, "uploads");
+app.use(express.static(uploadsDirectory));
 
 app.use(
   cors({

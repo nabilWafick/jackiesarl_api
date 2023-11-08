@@ -10,10 +10,15 @@ var cors = require("cors");
 
 var app = express();
 
-var routes = require("./routes/routes"); //const config = require("./configurations/config");
+var routes = require("./routes/routes");
 
+var path = require("path");
 
 var port = process.env.PORT;
+var publicsDirectory = path.join(__dirname, "public");
+app.use(express["static"](publicsDirectory));
+var uploadsDirectory = path.join(__dirname, "uploads");
+app.use(express["static"](uploadsDirectory));
 app.use(cors({
   origin: ["http://localhost:5173"],
   methods: ["POST", "GET", "PUT", "DELETE", "HEAD", "PATCH"],

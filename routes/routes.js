@@ -21,6 +21,7 @@ const soldeClientRoutes = require("./solde_client/solde_client.routes");
 const soldeCourantRoutes = require("./solde_courant/solde_courant.routes");
 const stockBonCommandeRoutes = require("./stock_bon_commande/stock_bon_commande.routes");
 const stockCamionRoutes = require("./stock_camion/stock_camion.routes");
+const tableBordRoutes = require("./table_bord/table_bord.routes");
 const openFileRoute = require("./open_file/open_file.routes");
 
 router.use("/", achatClientRoutes);
@@ -43,6 +44,7 @@ router.use("/", soldeClientRoutes);
 router.use("/", soldeCourantRoutes);
 router.use("/", stockBonCommandeRoutes);
 router.use("/", stockCamionRoutes);
+router.use("/", tableBordRoutes);
 router.use("/", openFileRoute);
 
 module.exports = router;
