@@ -34,8 +34,13 @@ class PaiementClientController {
         const file = req.file;
         console.log("paiementClientDataf", paiementClientDataf);
         console.log("file", file);
+
         const paiementClientData = {
           ...paiementClientDataf,
+          est_valide: parseInt(paiementClientDataf.est_valide),
+          montant: parseFloat(paiementClientDataf.montant),
+          numero_bc: parseInt(paiementClientDataf.numero_bc),
+          id_client: parseInt(paiementClientDataf.id_client),
           categorie: achatEntreprise.categorie,
           bordereau: file ? file.path : "",
         };
@@ -499,6 +504,10 @@ class PaiementClientController {
           existingPaiementClient = {
             ...existingPaiementClient,
             ...updatedData,
+            est_valide: parseInt(updatedData.est_valide),
+            montant: parseFloat(updatedData.montant),
+            numero_bc: parseInt(updatedData.numero_bc),
+            id_client: parseInt(updatedData.id_client),
             categorie: achatEntreprise.categorie,
           };
 

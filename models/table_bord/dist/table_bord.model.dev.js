@@ -183,7 +183,7 @@ function () {
     key: "getDailyUntraitedOrdersTotal",
     value: function getDailyUntraitedOrdersTotal(isToday, callback) {
       if (isToday == 1) {
-        var query = "\n        SELECT COALESCE(SUM(CASE WHEN categorie = 'CIM BENIN' THEN 1 ELSE 0 END),0)\n        AS commande_journaliere_non_traitee_CIMBENIN,\n        COALESCE(SUM(CASE WHEN categorie = 'NOCIBE' THEN 1 ELSE 0 END),0)\n        AS commande_journaliere_non_traitee_NOCIBE\n        FROM commandes\n        WHERE DATE(date_commande) = CURDATE()\n        AND est_traitee = 0;\n      ";
+        var query = "\n        SELECT COALESCE(SUM(CASE WHEN categorie = 'CIM BENIN' THEN quantite_achetee ELSE 0 END),0)\n        AS commande_journaliere_non_traitee_CIMBENIN,\n        COALESCE(SUM(CASE WHEN categorie = 'NOCIBE' THEN quantite_achetee ELSE 0 END),0)\n        AS commande_journaliere_non_traitee_NOCIBE\n        FROM commandes\n        WHERE DATE(date_commande) = CURDATE()\n        AND est_traitee = 0;\n      ";
         connection.query(query, function (error, results) {
           if (error) {
             return callback(error, null);
@@ -202,7 +202,7 @@ function () {
           }]);
         });
       } else {
-        var _query4 = "\n        SELECT COALESCE(SUM(CASE WHEN categorie = 'CIM BENIN' THEN 1 ELSE 0 END),0)\n        AS commande_journaliere_non_traitee_CIMBENIN,\n        COALESCE(SUM(CASE WHEN categorie = 'NOCIBE' THEN 1 ELSE 0 END),0)\n        AS commande_journaliere_non_traitee_NOCIBE\n        FROM commandes\n        WHERE DATE(date_commande) = DATE_SUB(CURDATE(), INTERVAL 1 DAY)\n        AND est_traitee = 0;\n      ";
+        var _query4 = "\n        SELECT COALESCE(SUM(CASE WHEN categorie = 'CIM BENIN' THEN quantite_achetee ELSE 0 END),0)\n        AS commande_journaliere_non_traitee_CIMBENIN,\n        COALESCE(SUM(CASE WHEN categorie = 'NOCIBE' THEN quantite_achetee ELSE 0 END),0)\n        AS commande_journaliere_non_traitee_NOCIBE\n        FROM commandes\n        WHERE DATE(date_commande) = DATE_SUB(CURDATE(), INTERVAL 1 DAY)\n        AND est_traitee = 0;\n      ";
         connection.query(_query4, function (error, results) {
           if (error) {
             return callback(error, null);
@@ -226,7 +226,7 @@ function () {
     key: "getDailyTraitedOrdersTotal",
     value: function getDailyTraitedOrdersTotal(isToday, callback) {
       if (isToday == 1) {
-        var query = "\n      SELECT COALESCE(SUM(CASE WHEN categorie = 'CIM BENIN' THEN 1 ELSE 0 END),0)\n      AS commande_journaliere_traitee_CIMBENIN,\n      COALESCE(SUM(CASE WHEN categorie = 'NOCIBE' THEN 1 ELSE 0 END),0)\n      AS commande_journaliere_traitee_NOCIBE\n      FROM commandes\n      WHERE DATE(date_commande) = CURDATE()\n      AND est_traitee = 1\n      ";
+        var query = "\n      SELECT COALESCE(SUM(CASE WHEN categorie = 'CIM BENIN' THEN quantite_achetee ELSE 0 END),0)\n      AS commande_journaliere_traitee_CIMBENIN,\n      COALESCE(SUM(CASE WHEN categorie = 'NOCIBE' THEN quantite_achetee ELSE 0 END),0)\n      AS commande_journaliere_traitee_NOCIBE\n      FROM commandes\n      WHERE DATE(date_commande) = CURDATE()\n      AND est_traitee = 1\n      ";
         connection.query(query, function (error, results) {
           if (error) {
             return callback(error, null);
@@ -245,7 +245,7 @@ function () {
           }]);
         });
       } else {
-        var _query5 = "\n        SELECT COALESCE(SUM(CASE WHEN categorie = 'CIM BENIN' THEN 1 ELSE 0 END),0)\n        AS commande_journaliere_traitee_CIMBENIN,\n        COALESCE(SUM(CASE WHEN categorie = 'NOCIBE' THEN 1 ELSE 0 END),0)\n        AS commande_journaliere_traitee_NOCIBE\n        FROM commandes\n        WHERE DATE(date_commande) = DATE_SUB(CURDATE(), INTERVAL 1 DAY)\n        AND est_traitee = 1;\n      ";
+        var _query5 = "\n        SELECT COALESCE(SUM(CASE WHEN categorie = 'CIM BENIN' THEN quantite_achetee ELSE 0 END),0)\n        AS commande_journaliere_traitee_CIMBENIN,\n        COALESCE(SUM(CASE WHEN categorie = 'NOCIBE' THEN quantite_achetee ELSE 0 END),0)\n        AS commande_journaliere_traitee_NOCIBE\n        FROM commandes\n        WHERE DATE(date_commande) = DATE_SUB(CURDATE(), INTERVAL quantite_achetee DAY)\n        AND est_traitee = 1;\n      ";
         connection.query(_query5, function (error, results) {
           if (error) {
             return callback(error, null);
@@ -257,10 +257,10 @@ function () {
 
           return callback(null, [{
             categorie: "CIM BENIN",
-            total_commande_non_traitee: results[0].commande_journaliere_traitee_CIMBENIN
+            total_commande_traitee: results[0].commande_journaliere_traitee_CIMBENIN
           }, {
             categorie: "NOCIBE",
-            total_commande_non_traitee: results[0].commande_journaliere_traitee_NOCIBE
+            total_commande_traitee: results[0].commande_journaliere_traitee_NOCIBE
           }]);
         });
       }

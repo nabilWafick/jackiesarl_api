@@ -200,9 +200,9 @@ class TableBord {
   static getDailyUntraitedOrdersTotal(isToday, callback) {
     if (isToday == 1) {
       const query = `
-        SELECT COALESCE(SUM(CASE WHEN categorie = 'CIM BENIN' THEN 1 ELSE 0 END),0)
+        SELECT COALESCE(SUM(CASE WHEN categorie = 'CIM BENIN' THEN quantite_achetee ELSE 0 END),0)
         AS commande_journaliere_non_traitee_CIMBENIN,
-        COALESCE(SUM(CASE WHEN categorie = 'NOCIBE' THEN 1 ELSE 0 END),0)
+        COALESCE(SUM(CASE WHEN categorie = 'NOCIBE' THEN quantite_achetee ELSE 0 END),0)
         AS commande_journaliere_non_traitee_NOCIBE
         FROM commandes
         WHERE DATE(date_commande) = CURDATE()
@@ -230,9 +230,9 @@ class TableBord {
       });
     } else {
       const query = `
-        SELECT COALESCE(SUM(CASE WHEN categorie = 'CIM BENIN' THEN 1 ELSE 0 END),0)
+        SELECT COALESCE(SUM(CASE WHEN categorie = 'CIM BENIN' THEN quantite_achetee ELSE 0 END),0)
         AS commande_journaliere_non_traitee_CIMBENIN,
-        COALESCE(SUM(CASE WHEN categorie = 'NOCIBE' THEN 1 ELSE 0 END),0)
+        COALESCE(SUM(CASE WHEN categorie = 'NOCIBE' THEN quantite_achetee ELSE 0 END),0)
         AS commande_journaliere_non_traitee_NOCIBE
         FROM commandes
         WHERE DATE(date_commande) = DATE_SUB(CURDATE(), INTERVAL 1 DAY)
@@ -264,9 +264,9 @@ class TableBord {
   static getDailyTraitedOrdersTotal(isToday, callback) {
     if (isToday == 1) {
       const query = `
-      SELECT COALESCE(SUM(CASE WHEN categorie = 'CIM BENIN' THEN 1 ELSE 0 END),0)
+      SELECT COALESCE(SUM(CASE WHEN categorie = 'CIM BENIN' THEN quantite_achetee ELSE 0 END),0)
       AS commande_journaliere_traitee_CIMBENIN,
-      COALESCE(SUM(CASE WHEN categorie = 'NOCIBE' THEN 1 ELSE 0 END),0)
+      COALESCE(SUM(CASE WHEN categorie = 'NOCIBE' THEN quantite_achetee ELSE 0 END),0)
       AS commande_journaliere_traitee_NOCIBE
       FROM commandes
       WHERE DATE(date_commande) = CURDATE()
@@ -294,12 +294,12 @@ class TableBord {
       });
     } else {
       const query = `
-        SELECT COALESCE(SUM(CASE WHEN categorie = 'CIM BENIN' THEN 1 ELSE 0 END),0)
+        SELECT COALESCE(SUM(CASE WHEN categorie = 'CIM BENIN' THEN quantite_achetee ELSE 0 END),0)
         AS commande_journaliere_traitee_CIMBENIN,
-        COALESCE(SUM(CASE WHEN categorie = 'NOCIBE' THEN 1 ELSE 0 END),0)
+        COALESCE(SUM(CASE WHEN categorie = 'NOCIBE' THEN quantite_achetee ELSE 0 END),0)
         AS commande_journaliere_traitee_NOCIBE
         FROM commandes
-        WHERE DATE(date_commande) = DATE_SUB(CURDATE(), INTERVAL 1 DAY)
+        WHERE DATE(date_commande) = DATE_SUB(CURDATE(), INTERVAL quantite_achetee DAY)
         AND est_traitee = 1;
       `;
       connection.query(query, (error, results) => {
@@ -312,12 +312,12 @@ class TableBord {
         return callback(null, [
           {
             categorie: "CIM BENIN",
-            total_commande_non_traitee:
+            total_commande_traitee:
               results[0].commande_journaliere_traitee_CIMBENIN,
           },
           {
             categorie: "NOCIBE",
-            total_commande_non_traitee:
+            total_commande_traitee:
               results[0].commande_journaliere_traitee_NOCIBE,
           },
         ]);
