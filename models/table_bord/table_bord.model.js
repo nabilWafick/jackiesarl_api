@@ -299,7 +299,7 @@ class TableBord {
         COALESCE(SUM(CASE WHEN categorie = 'NOCIBE' THEN quantite_achetee ELSE 0 END),0)
         AS commande_journaliere_traitee_NOCIBE
         FROM commandes
-        WHERE DATE(date_commande) = DATE_SUB(CURDATE(), INTERVAL quantite_achetee DAY)
+        WHERE DATE(date_commande) = DATE_SUB(CURDATE(), INTERVAL 1 DAY)
         AND est_traitee = 1;
       `;
       connection.query(query, (error, results) => {

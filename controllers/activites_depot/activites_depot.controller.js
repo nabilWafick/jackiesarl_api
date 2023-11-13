@@ -17,8 +17,8 @@ class ActivitesDepotController {
       }
 
       if (activiteDepotData.vente > brouillard.stock_actuel) {
-        return res.status(402).json({
-          status: 402,
+        return res.status(406).json({
+          status: 406,
           error: `La quantité de vente est supérieure au stock atuel. ${brouillard.stock_actuel} t disponible`,
         });
       } else {

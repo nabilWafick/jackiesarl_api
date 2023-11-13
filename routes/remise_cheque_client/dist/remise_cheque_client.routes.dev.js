@@ -4,10 +4,14 @@ var express = require("express");
 
 var router = express.Router();
 
-var RemiseChequeClientController = require("../../controllers/remise_cheque_client/remise_cheque.controller"); // Routes pour la table `remise_cheque_client`
+var RemiseChequeClientController = require("../../controllers/remise_cheque_client/remise_cheque.controller");
+
+var AuthorisationMiddleware = require("../../middleware/authorisation/authorisation.middleware");
+
+var AuthenticationMiddleware = require("../../middleware/authentication/authentication.middleware"); // Routes pour la table `remise_cheque_client`
 
 
-router.post("/remise-cheque-client", RemiseChequeClientController.create);
+router.post("/remise-cheque-client", AuthenticationMiddleware.authenticate, AuthorisationMiddleware.authorize("ajouter-remise-cheque-client"), RemiseChequeClientController.create);
 router.get("/remise-cheque-client/:id", RemiseChequeClientController.getById);
 router.get("/remise-cheques-clients/", RemiseChequeClientController.getAll);
 router.get("/remise-cheques-client/client-default/:id_client/:startDate?/:endDate?", RemiseChequeClientController.getAllOfClient); // ====================== Seniority
@@ -29,6 +33,6 @@ router.get("/remise-cheques-client/client/:id_client/SGB/:startDate?/:endDate?",
 router.get("/remise-cheques-client/client/:id_client/Ecobank/:startDate?/:endDate?", RemiseChequeClientController.getAllOfClientEcobankBank);
 router.get("/remise-cheques-client/client/:id_client/validated/:startDate?/:endDate?", RemiseChequeClientController.getAllOfClientValidated);
 router.get("/remise-cheques-client/client/:id_client/unvalidated/:startDate?/:endDate?", RemiseChequeClientController.getAllOfClientUnvalidated);
-router.put("/remise-cheque-client/:id", RemiseChequeClientController.update);
-router["delete"]("/remise-cheque-client/:id", RemiseChequeClientController["delete"]);
+router.put("/remise-cheque-client/:id", AuthenticationMiddleware.authenticate, AuthorisationMiddleware.authorize("modifier-remise-cheque-client"), RemiseChequeClientController.update);
+router["delete"]("/remise-cheque-client/:id", AuthenticationMiddleware.authenticate, AuthorisationMiddleware.authorize("supprimer-remise-cheque-client"), RemiseChequeClientController["delete"]);
 module.exports = router;

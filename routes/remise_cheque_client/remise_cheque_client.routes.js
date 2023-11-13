@@ -1,9 +1,16 @@
 const express = require("express");
 const router = express.Router();
 const RemiseChequeClientController = require("../../controllers/remise_cheque_client/remise_cheque.controller");
+const AuthorisationMiddleware = require("../../middleware/authorisation/authorisation.middleware");
+const AuthenticationMiddleware = require("../../middleware/authentication/authentication.middleware");
 
 // Routes pour la table `remise_cheque_client`
-router.post("/remise-cheque-client", RemiseChequeClientController.create);
+router.post(
+  "/remise-cheque-client",
+  AuthenticationMiddleware.authenticate,
+  AuthorisationMiddleware.authorize("ajouter-remise-cheque-client"),
+  RemiseChequeClientController.create
+);
 router.get("/remise-cheque-client/:id", RemiseChequeClientController.getById);
 router.get("/remise-cheques-clients/", RemiseChequeClientController.getAll);
 
@@ -83,7 +90,17 @@ router.get(
   RemiseChequeClientController.getAllOfClientUnvalidated
 );
 
-router.put("/remise-cheque-client/:id", RemiseChequeClientController.update);
-router.delete("/remise-cheque-client/:id", RemiseChequeClientController.delete);
+router.put(
+  "/remise-cheque-client/:id",
+  AuthenticationMiddleware.authenticate,
+  AuthorisationMiddleware.authorize("modifier-remise-cheque-client"),
+  RemiseChequeClientController.update
+);
+router.delete(
+  "/remise-cheque-client/:id",
+  AuthenticationMiddleware.authenticate,
+  AuthorisationMiddleware.authorize("supprimer-remise-cheque-client"),
+  RemiseChequeClientController.delete
+);
 
 module.exports = router;

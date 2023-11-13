@@ -107,7 +107,7 @@ function () {
   }, {
     key: "getAll",
     value: function getAll(callback) {
-      var query = "SELECT * FROM activites_banque";
+      var query = "SELECT * FROM activites_banque ORDER BY id DESC";
       connection.query(query, function (error, results) {
         if (error) {
           return callback(error, null);

@@ -1,5 +1,6 @@
 const Rapports = require("../../models/rapports/rapports.model");
 
+/*
 const fs = require("fs");
 
 deleteFile = (file) => {
@@ -11,19 +12,24 @@ deleteFile = (file) => {
     }
   });
 };
+*/
 
 class RapportsController {
   // Créer un nouveau rapport
   static create = (req, res) => {
     let rapportDataf = req.body;
     const file = req.file;
-    console.log("rapportDataf", rapportDataf);
-    console.log("file", file);
+    // console.log("rapportDataf", rapportDataf);
+    //  console.log("file", file);
+    const needed_path = file && file.path.split("/uploads")[1];
+    //console.log("needeed path", needed_path);
+    const fileLink = file && `http://127.0.0.1:7000${needed_path}`;
+    // console.log("file link", fileLink);
     const rapportData = {
       id_employe: parseInt(rapportDataf.id_employe),
-      rapport: file.path,
+      rapport: fileLink,
     };
-    console.log("rapportData", rapportData);
+    //  console.log("rapportData", rapportData);
 
     Rapports.create(rapportData, (error, rapport) => {
       if (error) {
@@ -74,6 +80,8 @@ class RapportsController {
       return res.status(200).json(rapports);
     });
   };
+
+  // ========== Non utiliser dans l'application
 
   // Mettre à jour un rapport par ID
   static update = (req, res) => {

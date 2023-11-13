@@ -57,7 +57,7 @@ class SoldeCourant {
   }
 
   static getAll(callback) {
-    const query = "SELECT * FROM solde_courant";
+    const query = "SELECT * FROM solde_courant ORDER BY id DESC";
     connection.query(query, (error, results) => {
       if (error) {
         return callback(error, null);

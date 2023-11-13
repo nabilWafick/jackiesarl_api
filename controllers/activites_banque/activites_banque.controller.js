@@ -23,8 +23,8 @@ class ActivitesBanqueController {
         }
 
         if (activiteBanqueData.credit > soldeCourant.solde_actuel) {
-          return res.status(402).json({
-            status: 402,
+          return res.status(406).json({
+            status: 406,
             error: `Le crédit est supérieur au solde actuel. Solde actuel: ${soldeCourant.solde_actuel}`,
           });
         } else {
@@ -92,8 +92,8 @@ class ActivitesBanqueController {
               );
             });
           } else {
-            return res.status(402).json({
-              status: 402,
+            return res.status(406).json({
+              status: 406,
               error: `Le crédit est égal au solde actuel. Solde actuel: ${soldeCourant.solde_actuel}`,
             });
           }

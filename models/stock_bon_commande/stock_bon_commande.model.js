@@ -85,7 +85,7 @@ class StockBonCommande {
       if (error) {
         return callback(error, null);
       }
-      if (results.length === 0) {
+      if (results.length == 0) {
         return callback(null, null); // Stock de bon de commande non trouvé
       }
       const stockData = results[0];
@@ -171,6 +171,35 @@ class StockBonCommande {
         updatedData.stock_apres_vente,
         new Date(updatedData.date_rechargement),
         id,
+      ],
+      (error, results) => {
+        if (error) {
+          return callback(error);
+        }
+        return callback(null);
+      }
+    );
+  }
+
+  static updateBC(
+    {
+      last_bon_commande,
+      new_bon_commande,
+      new_categorie,
+      new_quantite_achetee,
+    },
+    callback
+  ) {
+    const query =
+      "UPDATE stock_bon_commande SET numero_bc = ?, categorie = ?, quantite_achetee = ? WHERE numero_bc = ?";
+
+    connection.query(
+      query,
+      [
+        new_bon_commande,
+        new_categorie,
+        new_quantite_achetee,
+        last_bon_commande,
       ],
       (error, results) => {
         if (error) {

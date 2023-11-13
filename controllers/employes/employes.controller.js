@@ -76,7 +76,11 @@ class EmployesController {
       if (!employe) {
         return res.status(404).json({ error: "Employé non trouvé" });
       }
-      return res.status(200).json(employe);
+      return res.status(200).json({
+        ...employe,
+        password: "Employee Password",
+        token: "Employee Token",
+      });
     });
   };
 
@@ -105,7 +109,15 @@ class EmployesController {
       if (!existingEmploye) {
         return res.status(404).json({ error: "Employé non trouvé" });
       }
-      existingEmploye = { ...existingEmploye, ...updatedData };
+
+      //   console.log("existingEmploye", existingEmploye);
+
+      existingEmploye = {
+        ...existingEmploye,
+        permissions: updatedData.permissions,
+      };
+
+      //   console.log("new employee data", existingEmploye);
       existingEmploye = new Employes(
         existingEmploye.id,
         existingEmploye.nom,

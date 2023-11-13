@@ -1,8 +1,15 @@
 const AchatEntreprise = require("../../models/achat_entreprise/achat_entreprise.model");
+const path = require("path");
 const fs = require("fs");
+const AchatClient = require("../../models/achat_client/achat_client.model");
+const StockBonCommande = require("../../models/stock_bon_commande/stock_bon_commande.model");
 
-deleteFile = (file) => {
-  fs.unlink(file, (error) => {
+deleteFile = (fileLink) => {
+  const filePath = fileLink.split("http://127.0.0.1:7000/");
+  const directory = path.resolve(__dirname, "../..");
+  const dir = path.join(directory, `/uploads/${filePath}`);
+
+  fs.unlink(dir, (error) => {
     if (error) {
       console.error("Erreur de la suppression du fichier :", error);
     } else {
@@ -14,27 +21,53 @@ class AchatEntrepriseController {
   // Créer un nouvel achat entreprise
   static create = (req, res) => {
     let achatEntrepriseDataf = req.body;
-    const file = req.file;
-    console.log("achatEntrepriseDataf", achatEntrepriseDataf);
-    console.log("file", file);
-    let achatEntrepriseData = {
-      ...achatEntrepriseDataf,
-      bon_commande: parseFloat(achatEntrepriseDataf.bon_commande),
-      quantite_achetee: parseFloat(achatEntrepriseDataf.quantite_achetee),
-      montant: parseFloat(achatEntrepriseDataf.montant),
-      cheque: parseFloat(achatEntrepriseDataf.cheque),
-      bordereau: file ? file.path : "",
-    };
-    console.log("achatEntrepriseData", achatEntrepriseData);
-    AchatEntreprise.create(achatEntrepriseData, (error, achatEntreprise) => {
-      if (error) {
-        return res.status(500).json({
-          status: 500,
-          error: "Erreur lors de la création de l'achat entreprise",
-        });
+
+    AchatEntreprise.getByBonCommande(
+      parseInt(achatEntrepriseDataf.bon_commande),
+      (findError, purchase) => {
+        if (findError) {
+          return res.status(500).json({
+            status: 500,
+            error: "Erreur lors de la création de l'achat entreprise",
+          });
+        }
+        if (!purchase) {
+          const file = req.file;
+          console.log("achatEntrepriseDataf", achatEntrepriseDataf);
+          console.log("file", file);
+          const needed_path = file && file.path.split("/uploads")[1];
+          //console.log("needeed path", needed_path);
+          const fileLink = file && `http://127.0.0.1:7000${needed_path}`;
+          // console.log("file link", fileLink);
+          let achatEntrepriseData = {
+            ...achatEntrepriseDataf,
+            bon_commande: parseInt(achatEntrepriseDataf.bon_commande),
+            quantite_achetee: parseFloat(achatEntrepriseDataf.quantite_achetee),
+            montant: parseFloat(achatEntrepriseDataf.montant),
+            cheque: parseFloat(achatEntrepriseDataf.cheque),
+            bordereau: file ? fileLink : "",
+          };
+          console.log("achatEntrepriseData", achatEntrepriseData);
+          AchatEntreprise.create(
+            achatEntrepriseData,
+            (error, achatEntreprise) => {
+              if (error) {
+                return res.status(500).json({
+                  status: 500,
+                  error: "Erreur lors de la création de l'achat entreprise",
+                });
+              }
+              return res.status(201).json({ status: 201, achatEntreprise });
+            }
+          );
+        } else {
+          return res.status(406).json({
+            status: 406,
+            error: "Ce bon de commande existe déjà",
+          });
+        }
       }
-      return res.status(201).json({ status: 201, achatEntreprise });
-    });
+    );
   };
 
   // Récupérer un achat entreprise par ID
@@ -71,13 +104,14 @@ class AchatEntrepriseController {
   static update = (req, res) => {
     const bonCommande = req.params.bon_commande;
     const updatedData = req.body;
-    AchatEntreprise.getById(
+
+    AchatEntreprise.getByBonCommande(
       bonCommande,
       (getError, existingAchatEntreprise) => {
         if (getError) {
           return res.status(500).json({
             status: 500,
-            error: "Erreur lors de la récupération de l'achat entreprise",
+            error: "Erreur lors de la mise à jour de l'achat entreprise",
           });
         }
         if (!existingAchatEntreprise) {
@@ -86,49 +120,243 @@ class AchatEntrepriseController {
             .json({ status: 404, error: "Achat entreprise non trouvé" });
         }
 
-        existingAchatEntreprise = {
-          ...existingAchatEntreprise,
-          ...updatedData,
-          bon_commande: parseFloat(updatedData.bon_commande),
-          quantite_achetee: parseFloat(updatedData.quantite_achetee),
-          montant: parseFloat(updatedData.montant),
-          cheque: parseFloat(updatedData.cheque),
-        };
+        StockBonCommande.getByBonCommande(
+          updatedData.bon_commande,
+          (stockError, stock) => {
+            if (stockError) {
+              return res.status(500).json({
+                status: 500,
+                error: "Erreur lors de la mise à jour de l'achat entreprise",
+              });
+            }
+            console.log("stock from SQL: ", stock);
+            // si ce n'est pas encore utilise ou mise en vente
+            if (!stock || !stock.id) {
+              console.log("stock bon de commande !exist");
+              // ================== Final ==================
 
-        const file = req.file;
+              existingAchatEntreprise = {
+                ...existingAchatEntreprise,
+                ...updatedData,
+                bon_commande: parseFloat(updatedData.bon_commande),
+                quantite_achetee: parseFloat(updatedData.quantite_achetee),
+                montant: parseFloat(updatedData.montant),
+                cheque: parseFloat(updatedData.cheque),
+              };
 
-        console.log("existingAchatEntreprise", existingAchatEntreprise);
-        console.log("file", file);
-        if (file) {
-          const lastSlip = existingAchatEntreprise.bordereau;
-          existingAchatEntreprise = {
-            ...existingAchatEntreprise,
-            bordereau: file.path,
-          };
-          if (lastSlip != "") {
-            deleteFile(lastSlip);
+              const file = req.file;
+
+              console.log("existingAchatEntreprise", existingAchatEntreprise);
+              console.log("file", file);
+              if (file) {
+                const needed_path = file && file.path.split("/uploads")[1];
+                //console.log("needeed path", needed_path);
+                const fileLink = file && `http://127.0.0.1:7000${needed_path}`;
+                // console.log("file link", fileLink);
+                const lastSlip = existingAchatEntreprise.bordereau;
+                existingAchatEntreprise = {
+                  ...existingAchatEntreprise,
+                  bordereau: fileLink,
+                };
+                if (lastSlip != "") {
+                  deleteFile(lastSlip);
+                }
+              }
+
+              existingAchatEntreprise = new AchatEntreprise(
+                existingAchatEntreprise.bon_commande,
+                existingAchatEntreprise.categorie,
+                existingAchatEntreprise.quantite_achetee,
+                existingAchatEntreprise.montant,
+                existingAchatEntreprise.banque,
+                existingAchatEntreprise.cheque,
+                existingAchatEntreprise.bordereau,
+                existingAchatEntreprise.date_achat
+              );
+
+              console.log("new achat Entreprise", existingAchatEntreprise);
+
+              existingAchatEntreprise.update((updateError) => {
+                if (updateError) {
+                  return res.status(500).json({
+                    status: 500,
+                    error:
+                      "Erreur lors de la mise à jour de l'achat entreprise",
+                  });
+                }
+                return res
+                  .status(200)
+                  .json({ status: 200, existingAchatEntreprise });
+              });
+
+              // ==================== Final =================
+            }
+
+            // si le stock est mise en vente
+            else {
+              console.log("stock bon de commande exist");
+              // si c'est la quantite achetee qui veut etre modifie ou la categorie ou le bon commande
+              if (
+                parseFloat(updatedData.quantite_achetee) !=
+                  existingAchatEntreprise.quantite_achetee ||
+                updatedData.categorie != existingAchatEntreprise.categorie ||
+                parseFloat(updatedData.bon_commande) !=
+                  existingAchatEntreprise.bon_commande
+              ) {
+                AchatClient.getLastAchatStockBonCommande(
+                  updatedData.bon_commande,
+                  (lastAchatError, lastAchat) => {
+                    if (lastAchatError) {
+                      return res.status(500).json({
+                        status: 500,
+                        error:
+                          "Erreur lors de la mise à jour de l'achat entreprise",
+                      });
+                    }
+                    // si il n'y a pas d'achat client sur le stock
+                    if (!lastAchat) {
+                      // on met a jour le stock
+                      StockBonCommande.updateBC({
+                        last_bon_commande: existingAchatEntreprise.bon_commande,
+                        new_bon_commande: updatedData.bon_commande,
+                        new_categorie: updatedData.categorie,
+                        new_quantite_achetee: updatedData.quantite_achetee,
+                      });
+                      // on met a jour l'achat de l'entreprise
+                      // ================== Final ==================
+
+                      existingAchatEntreprise = {
+                        ...existingAchatEntreprise,
+                        ...updatedData,
+                        bon_commande: parseFloat(updatedData.bon_commande),
+                        quantite_achetee: parseFloat(
+                          updatedData.quantite_achetee
+                        ),
+                        montant: parseFloat(updatedData.montant),
+                        cheque: parseFloat(updatedData.cheque),
+                      };
+
+                      const file = req.file;
+
+                      console.log(
+                        "existingAchatEntreprise",
+                        existingAchatEntreprise
+                      );
+                      console.log("file", file);
+                      if (file) {
+                        const needed_path =
+                          file && file.path.split("/uploads")[1];
+                        //console.log("needeed path", needed_path);
+                        const fileLink =
+                          file && `http://127.0.0.1:7000${needed_path}`;
+                        // console.log("file link", fileLink);
+                        const lastSlip = existingAchatEntreprise.bordereau;
+                        existingAchatEntreprise = {
+                          ...existingAchatEntreprise,
+                          bordereau: fileLink,
+                        };
+                        if (lastSlip != "") {
+                          deleteFile(lastSlip);
+                        }
+                      }
+
+                      existingAchatEntreprise = new AchatEntreprise(
+                        existingAchatEntreprise.bon_commande,
+                        existingAchatEntreprise.categorie,
+                        existingAchatEntreprise.quantite_achetee,
+                        existingAchatEntreprise.montant,
+                        existingAchatEntreprise.banque,
+                        existingAchatEntreprise.cheque,
+                        existingAchatEntreprise.bordereau,
+                        existingAchatEntreprise.date_achat
+                      );
+
+                      existingAchatEntreprise.update((updateError) => {
+                        if (updateError) {
+                          return res.status(500).json({
+                            status: 500,
+                            error:
+                              "Erreur lors de la mise à jour de l'achat entreprise",
+                          });
+                        }
+                        return res
+                          .status(200)
+                          .json({ status: 200, existingAchatEntreprise });
+                      });
+
+                      // ==================== Final =================
+                    } else {
+                      return res.status(400).json({
+                        status: 400,
+                        error:
+                          "L'achat entreprise ne peut être modifié car le stock est déjà en vente",
+                      });
+                    }
+                  }
+                );
+              } else {
+                // ================== Final ==================
+
+                existingAchatEntreprise = {
+                  ...existingAchatEntreprise,
+                  ...updatedData,
+                  bon_commande: parseFloat(updatedData.bon_commande),
+                  quantite_achetee: parseFloat(updatedData.quantite_achetee),
+                  montant: parseFloat(updatedData.montant),
+                  cheque: parseFloat(updatedData.cheque),
+                };
+
+                const file = req.file;
+
+                console.log("existingAchatEntreprise", existingAchatEntreprise);
+                console.log("file", file);
+                if (file) {
+                  const needed_path = file && file.path.split("/uploads")[1];
+                  //console.log("needeed path", needed_path);
+                  const fileLink =
+                    file && `http://127.0.0.1:7000${needed_path}`;
+                  // console.log("file link", fileLink);
+                  const lastSlip = existingAchatEntreprise.bordereau;
+                  existingAchatEntreprise = {
+                    ...existingAchatEntreprise,
+                    bordereau: fileLink,
+                  };
+                  if (lastSlip != "") {
+                    deleteFile(lastSlip);
+                  }
+                }
+
+                existingAchatEntreprise = new AchatEntreprise(
+                  existingAchatEntreprise.bon_commande,
+                  existingAchatEntreprise.categorie,
+                  existingAchatEntreprise.quantite_achetee,
+                  existingAchatEntreprise.montant,
+                  existingAchatEntreprise.banque,
+                  existingAchatEntreprise.cheque,
+                  existingAchatEntreprise.bordereau,
+                  existingAchatEntreprise.date_achat
+                );
+
+                existingAchatEntreprise.update((updateError) => {
+                  if (updateError) {
+                    return res.status(500).json({
+                      status: 500,
+                      error:
+                        "Erreur lors de la mise à jour de l'achat entreprise",
+                    });
+                  }
+                  return res
+                    .status(200)
+                    .json({ status: 200, existingAchatEntreprise });
+                });
+
+                // ==================== Final =================
+              }
+            }
           }
-        }
-
-        existingAchatEntreprise = new AchatEntreprise(
-          existingAchatEntreprise.bon_commande,
-          existingAchatEntreprise.quantite_achetee,
-          existingAchatEntreprise.montant,
-          existingAchatEntreprise.banque,
-          existingAchatEntreprise.cheque,
-          existingAchatEntreprise.bordereau,
-          existingAchatEntreprise.date_achat
         );
 
-        existingAchatEntreprise.update((updateError) => {
-          if (updateError) {
-            return res.status(500).json({
-              status: 500,
-              error: "Erreur lors de la mise à jour de l'achat entreprise",
-            });
-          }
-          return res.status(200).json({ status: 200, existingAchatEntreprise });
-        });
+        // ==================== Final ===================
       }
     );
   };
@@ -136,7 +364,7 @@ class AchatEntrepriseController {
   // Supprimer un achat entreprise par bon de commande
   static delete = (req, res) => {
     const bonCommande = req.params.bon_commande;
-    AchatEntreprise.getById(
+    AchatEntreprise.getByBonCommande(
       bonCommande,
       (getError, existingAchatEntreprise) => {
         if (getError) {

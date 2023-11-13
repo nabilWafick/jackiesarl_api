@@ -100,7 +100,7 @@ function () {
           return callback(error, null);
         }
 
-        if (results.length === 0) {
+        if (results.length == 0) {
           return callback(null, null); // Stock de bon de commande non trouvé
         }
 
@@ -140,6 +140,22 @@ function () {
           return new StockBonCommande(stockData.id, stockData.numero_bc, stockData.categorie, stockData.quantite_achetee, stockData.stock_initial, stockData.stock_avant_vente, stockData.vente, stockData.stock_apres_vente, stockData.date_rechargement);
         });
         return callback(null, stocksList);
+      });
+    }
+  }, {
+    key: "updateBC",
+    value: function updateBC(_ref, callback) {
+      var last_bon_commande = _ref.last_bon_commande,
+          new_bon_commande = _ref.new_bon_commande,
+          new_categorie = _ref.new_categorie,
+          new_quantite_achetee = _ref.new_quantite_achetee;
+      var query = "UPDATE stock_bon_commande SET numero_bc = ?, categorie = ?, quantite_achetee = ? WHERE numero_bc = ?";
+      connection.query(query, [new_bon_commande, new_categorie, new_quantite_achetee, last_bon_commande], function (error, results) {
+        if (error) {
+          return callback(error);
+        }
+
+        return callback(null);
       });
     }
   }, {

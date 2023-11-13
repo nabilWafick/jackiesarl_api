@@ -1,11 +1,15 @@
 const AchatClient = require("../../models/achat_client/achat_client.model");
 const StockBonCommande = require("../../models/stock_bon_commande/stock_bon_commande.model");
 const Clients = require("../../models/clients/clients.model");
-
+const path = require("path");
 const fs = require("fs");
 
-deleteFile = (file) => {
-  fs.unlink(file, (error) => {
+deleteFile = (fileLink) => {
+  const filePath = fileLink.split("http://127.0.0.1:7000/");
+  const directory = path.resolve(__dirname, "../..");
+  const dir = path.join(directory, `/uploads/${filePath}`);
+
+  fs.unlink(dir, (error) => {
     if (error) {
       console.error("Erreur de la suppression du fichier :", error);
     } else {
@@ -40,8 +44,8 @@ class AchatClientController {
       }
       if (!existingClient) {
         return res
-          .status(401)
-          .json({ status: 401, error: "Client non trouvé" });
+          .status(404)
+          .json({ status: 404, error: "Client non trouvé" });
       }
 
       StockBonCommande.getLastBonCommande(
@@ -66,8 +70,8 @@ class AchatClientController {
               achatClientDataf.quantite_achetee >
               lastStockBonCommande.stock_apres_vente
             ) {
-              return res.status(402).json({
-                status: 402,
+              return res.status(406).json({
+                status: 406,
                 error: `La quantité demandée est supérieure à celle disponible. ${lastStockBonCommande.stock_apres_vente} t en stock`,
               });
             } else {
@@ -107,9 +111,13 @@ class AchatClientController {
                 const file = req.file;
                 console.log("achatClientDataf", achatClientDataf);
                 console.log("file", file);
+                const needed_path = file && file.path.split("/uploads")[1];
+                //console.log("needeed path", needed_path);
+                const fileLink = file && `http://127.0.0.1:7000${needed_path}`;
+                // console.log("file link", fileLink);
                 const achatClientData = {
                   ...achatClientDataf,
-                  bordereau: file ? file.path : "",
+                  bordereau: file ? fileLink : "",
                 };
                 console.log("achatClientData", achatClientData);
                 AchatClient.create(achatClientData, (error, achatClient) => {
@@ -502,8 +510,9 @@ class AchatClientController {
 
       // on verifie le stock bon de commande est le meme que l'ancien
 
-      if (updatedData.numero_bc === existingAchatClient.numero_bc) {
+      if (updatedData.numero_bc == existingAchatClient.numero_bc) {
         StockBonCommande.getLastBonCommande(
+          // last car on peut ajoute les stocks peu à peu, on prend le dernier ajouté
           updatedData.numero_bc,
           (getError, usedStockBonCommande) => {
             if (getError) {
@@ -567,10 +576,15 @@ class AchatClientController {
                 console.log("existingAchatClient", existingAchatClient);
                 console.log("file", file);
                 if (file) {
+                  const needed_path = file && file.path.split("/uploads")[1];
+                  //console.log("needeed path", needed_path);
+                  const fileLink =
+                    file && `http://127.0.0.1:7000${needed_path}`;
+                  // console.log("file link", fileLink);
                   const lastSlip = existingAchatClient.bordereau;
                   existingAchatClient = {
                     ...existingAchatClient,
-                    bordereau: file.path,
+                    bordereau: fileLink,
                   };
                   if (lastSlip != "") {
                     deleteFile(lastSlip);
@@ -604,8 +618,8 @@ class AchatClientController {
                 // ======================== Final ==========================
               });
             } else {
-              return res.status(402).json({
-                status: 402,
+              return res.status(406).json({
+                status: 406,
                 error: `La quantité achetée est supérieure à celle disponible. ${usedStockBonCommande.stock_apres_vente} t disponible`,
               });
             }
@@ -634,8 +648,8 @@ class AchatClientController {
               updatedData.quantite_achetee >
               newStockBonCommande.stock_apres_vente
             ) {
-              return res.status(402).json({
-                status: 402,
+              return res.status(406).json({
+                status: 406,
                 error: `La quantité demandée est supérieure à celle disponible. ${newStockBonCommande.stock_apres_vente} t en stock`,
               });
             } else {
@@ -725,11 +739,17 @@ class AchatClientController {
                       const file = req.file;
                       console.log("existingAchatClient", existingAchatClient);
                       console.log("file", file);
+                      const needed_path =
+                        file && file.path.split("/uploads")[1];
+                      //console.log("needeed path", needed_path);
+                      const fileLink =
+                        file && `http://127.0.0.1:7000${needed_path}`;
+                      // console.log("file link", fileLink);
                       if (file) {
                         const lastSlip = existingAchatClient.bordereau;
                         existingAchatClient = {
                           ...existingAchatClient,
-                          bordereau: file.path,
+                          bordereau: fileLink,
                         };
                         if (lastSlip != "") {
                           deleteFile(lastSlip);
@@ -788,17 +808,91 @@ class AchatClientController {
           .status(404)
           .json({ status: 404, error: "Achat client non trouvé" });
       }
-      existingAchatClient.delete((deleteError, id) => {
-        if (!id) {
-          return res
-            .status(500)
-            .json({ error: "Erreur lors de la suppression de l'achat client" });
-        }
 
-        if (existingAchatClient.bordereau != "")
-          deleteFile(existingAchatClient.bordereau);
-        return res.status(204).json({ status: 204, id: id });
-      });
+      AchatClient.getLastAchatStockBonCommande(
+        existingAchatClient.numero_bc,
+        (lastError, lastAchat) => {
+          if (lastError) {
+            return res.status(500).json({
+              status: 500,
+              error: "Erreur lors de la récupération de l'achat client",
+            });
+          }
+
+          if (existingAchatClient.id != lastAchat.id) {
+            return res.status(406).json({
+              status: 406,
+              error:
+                "L'ahat ne peut être supprimé car ce n'est pas le dernier effectué sur le bon de commande",
+            });
+          }
+
+          StockBonCommande.getLastBonCommande(
+            // last car on peut ajoute les stocks peu à peu, on prend le dernier ajouté
+            existingAchatClient.numero_bc,
+            (getError, usedStockBonCommande) => {
+              if (getError) {
+                return res.status(500).json({
+                  status: 500,
+                  error: "Stock Bon Commande non trouvé",
+                });
+              }
+
+              if (!usedStockBonCommande) {
+                return res.status(404).json({
+                  status: 404,
+                  error: "Stock Bon Commande non trouvé",
+                });
+              }
+
+              usedStockBonCommande.stock_avant_vente +=
+                existingAchatClient.quantite_achetee;
+              usedStockBonCommande.vente +=
+                -existingAchatClient.quantite_achetee;
+              usedStockBonCommande.stock_apres_vente +=
+                existingAchatClient.quantite_achetee;
+
+              usedStockBonCommande = new StockBonCommande(
+                usedStockBonCommande.id,
+                usedStockBonCommande.numero_bc,
+                usedStockBonCommande.categorie,
+                usedStockBonCommande.quantite_achetee,
+                usedStockBonCommande.stock_initial,
+                usedStockBonCommande.stock_avant_vente,
+                usedStockBonCommande.vente,
+                usedStockBonCommande.stock_apres_vente,
+                usedStockBonCommande.date_rechargement
+              );
+
+              usedStockBonCommande.update((updateError) => {
+                if (updateError) {
+                  return res.status(500).json({
+                    status: 500,
+                    error:
+                      "Erreur lors de la mise à jour du stock bon de commande",
+                  });
+                }
+
+                // stock bon de commande mise à jour avec succes
+
+                existingAchatClient.delete((deleteError, id) => {
+                  if (!id) {
+                    return res.status(500).json({
+                      error: "Erreur lors de la suppression de l'achat client",
+                    });
+                  }
+
+                  if (existingAchatClient.bordereau != "")
+                    deleteFile(existingAchatClient.bordereau);
+                  return res.status(204).json({ status: 204, id: id });
+                });
+              });
+            }
+          );
+        }
+      );
+
+      // final operation
     });
   };
 }

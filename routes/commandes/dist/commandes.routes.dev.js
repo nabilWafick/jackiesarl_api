@@ -4,10 +4,14 @@ var express = require("express");
 
 var router = express.Router();
 
-var CommandesController = require("../../controllers/commandes/commandes.controller"); // Routes pour la table `commandes`
+var CommandesController = require("../../controllers/commandes/commandes.controller");
+
+var AuthorisationMiddleware = require("../../middleware/authorisation/authorisation.middleware");
+
+var AuthenticationMiddleware = require("../../middleware/authentication/authentication.middleware"); // Routes pour la table `commandes`
 
 
-router.post("/commandes", CommandesController.create);
+router.post("/commandes", AuthenticationMiddleware.authenticate, AuthorisationMiddleware.authorize("ajouter-commande"), CommandesController.create);
 router.get("/commande/:id", CommandesController.getById);
 router.get("/commandes-default/:startDate?/:endDate?", CommandesController.getAll); // ================  Seniority
 
@@ -26,6 +30,6 @@ router.get("/commandes/nocibe-less-important/:startDate?/:endDate?", CommandesCo
 router.get("/commandes/destination/:startDate?/:endDate?", CommandesController.getAllGroupByDestination);
 router.get("/commandes/delivered/:startDate?/:endDate?", CommandesController.getAllDelivered);
 router.get("/commandes/undelivered/:startDate?/:endDate?", CommandesController.getAllUnDelivered);
-router.put("/commandes/:id", CommandesController.update);
-router["delete"]("/commandes/:id", CommandesController["delete"]);
+router.put("/commandes/:id", AuthenticationMiddleware.authenticate, AuthorisationMiddleware.authorize("modifier-commande"), CommandesController.update);
+router["delete"]("/commandes/:id", AuthenticationMiddleware.authenticate, AuthorisationMiddleware.authorize("supprimer-commande"), CommandesController["delete"]);
 module.exports = router;

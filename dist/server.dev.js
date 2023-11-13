@@ -20,7 +20,7 @@ app.use(express["static"](publicsDirectory));
 var uploadsDirectory = path.join(__dirname, "uploads");
 app.use(express["static"](uploadsDirectory));
 app.use(cors({
-  origin: ["http://localhost:5173"],
+  origin: ["http://localhost:5173", "http://192.168.203.65:5173"],
   methods: ["POST", "GET", "PUT", "DELETE", "HEAD", "PATCH"],
   credentials: true
 }));

@@ -82,6 +82,33 @@ class AchatClient {
     });
   }
 
+  static getLastAchatStockBonCommande(numero_bc, callback) {
+    const query =
+      "SELECT * FROM achat_client WHERE numero_bc = ?  ORDER BY date_achat DESC LIMIT 1";
+    connection.query(query, [numero_bc], (error, results) => {
+      if (error) {
+        return callback(error, null);
+      }
+      if (results.length === 0) {
+        return callback(null, null); // Achat client non trouvé
+      }
+      const achatClientData = results[0];
+      const achatClient = new AchatClient(
+        achatClientData.id,
+        undefined,
+        achatClientData.quantite_achetee,
+        achatClientData.categorie,
+        achatClientData.montant,
+        achatClientData.numero_ctp,
+        achatClientData.bordereau,
+        achatClientData.numero_bc,
+        achatClientData.id_client,
+        new Date(achatClientData.date_achat)
+      );
+      return callback(null, achatClient);
+    });
+  }
+
   // ================ All Client ================
 
   static getAll(startDate, endDate, callback) {

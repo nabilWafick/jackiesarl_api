@@ -1,6 +1,9 @@
 const express = require("express");
 const router = express.Router();
 const AchatClientController = require("../../controllers/achat_client/achat_client.controller");
+
+const AuthorisationMiddleware = require("../../middleware/authorisation/authorisation.middleware");
+const AuthenticationMiddleware = require("../../middleware/authentication/authentication.middleware");
 const multer = require("multer");
 const path = require("path");
 
@@ -12,7 +15,7 @@ const storage = multer.diskStorage({
     cb(null, dir);
   },
   filename: (req, file, cb) => {
-    console.log("file from multer", file);
+    //  console.log("file from multer", file);
     cb(null, Date.now() + "-" + file.originalname);
   },
 });
@@ -22,6 +25,8 @@ const upload = multer({ storage });
 // Routes pour la table `achat_client`
 router.post(
   "/achat-client",
+  AuthenticationMiddleware.authenticate,
+  AuthorisationMiddleware.authorize("ajouter-achat-client"),
   upload.single("bordereau"),
   AchatClientController.create
 );
@@ -131,9 +136,16 @@ router.get(
 
 router.put(
   "/achat-client/:id",
+  AuthenticationMiddleware.authenticate,
+  AuthorisationMiddleware.authorize("modifier-achat-client"),
   upload.single("bordereau"),
   AchatClientController.update
 );
-router.delete("/achat-client/:id", AchatClientController.delete);
+router.delete(
+  "/achat-client/:id",
+  AuthenticationMiddleware.authenticate,
+  AuthorisationMiddleware.authorize("supprimer-achat-client"),
+  AchatClientController.delete
+);
 
 module.exports = router;

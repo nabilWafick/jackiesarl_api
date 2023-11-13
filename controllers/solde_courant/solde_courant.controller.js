@@ -4,14 +4,35 @@ class SoldeCourantController {
   // Créer un nouveau solde courant
   static create = (req, res) => {
     const soldeCourantData = req.body;
-    SoldeCourant.create(soldeCourantData, (error, soldeCourant) => {
-      if (error) {
+    console.log("soldeCourantData", soldeCourantData);
+    SoldeCourant.getAll((getError, soldesCourants) => {
+      if (getError) {
         return res.status(500).json({
           status: 500,
           error: "Erreur lors de la création du solde courant",
         });
       }
-      return res.status(201).json({ status: 201, soldeCourant });
+      const exist = soldesCourants.filter(
+        (soldeCourant) => soldeCourant.banque == soldeCourantData.banque
+      );
+
+      console.log("exist", exist);
+      if (exist.length > 0) {
+        return res.status(406).json({
+          status: 406,
+          error: "La banque existe déjà",
+        });
+      } else {
+        SoldeCourant.create(soldeCourantData, (error, soldeCourant) => {
+          if (error) {
+            return res.status(500).json({
+              status: 500,
+              error: "Erreur lors de la création du solde courant",
+            });
+          }
+          return res.status(201).json({ status: 201, soldeCourant });
+        });
+      }
     });
   };
 
@@ -59,6 +80,9 @@ class SoldeCourantController {
           .json({ status: 404, error: "Solde courant non trouvé" });
       }
       existingSoldeCourant = { ...existingSoldeCourant, ...updatedData };
+
+      // existingSoldeCourant
+
       existingSoldeCourant.update((updateError) => {
         if (updateError) {
           return res.status(500).json({

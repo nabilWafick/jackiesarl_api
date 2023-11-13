@@ -1,9 +1,16 @@
 const express = require("express");
 const router = express.Router();
 const CommandesController = require("../../controllers/commandes/commandes.controller");
+const AuthorisationMiddleware = require("../../middleware/authorisation/authorisation.middleware");
+const AuthenticationMiddleware = require("../../middleware/authentication/authentication.middleware");
 
 // Routes pour la table `commandes`
-router.post("/commandes", CommandesController.create);
+router.post(
+  "/commandes",
+  AuthenticationMiddleware.authenticate,
+  AuthorisationMiddleware.authorize("ajouter-commande"),
+  CommandesController.create
+);
 router.get("/commande/:id", CommandesController.getById);
 
 router.get(
@@ -72,7 +79,17 @@ router.get(
   CommandesController.getAllUnDelivered
 );
 
-router.put("/commandes/:id", CommandesController.update);
-router.delete("/commandes/:id", CommandesController.delete);
+router.put(
+  "/commandes/:id",
+  AuthenticationMiddleware.authenticate,
+  AuthorisationMiddleware.authorize("modifier-commande"),
+  CommandesController.update
+);
+router.delete(
+  "/commandes/:id",
+  AuthenticationMiddleware.authenticate,
+  AuthorisationMiddleware.authorize("supprimer-commande"),
+  CommandesController.delete
+);
 
 module.exports = router;

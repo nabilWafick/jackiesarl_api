@@ -59,7 +59,7 @@ class AuthController {
                     .status(401)
                     .json({ status: 401, error: "Non authentifié" });
 
-                res.status(202).json({ status: 200, message: "Authentifié" });
+                res.status(202).json({ status: 202, message: "Authentifié" });
               });
             }
           );
@@ -132,7 +132,16 @@ class AuthController {
             error: "Erreur lors de la création de l'employé",
           });
         }
-        return res.status(201).json({ status: 201, employe });
+        return res
+          .status(201)
+          .json({
+            status: 201,
+            employe: {
+              ...employe,
+              token: "Employee Token",
+              password: "Employee Password",
+            },
+          });
       });
     });
   };
@@ -156,8 +165,13 @@ class AuthController {
           error: "Employé non trouvé ou l'email n'existe pas",
         });
       }
+      //   console.log("employe", employe);
+      //  console.log("password", password);
+      //  console.log("employe.password", employe.password);
 
       const match = bcrypt.compareSync(password, employe.password);
+
+      //  console.log("match", match);
 
       if (match) {
         const newAccessToken = jwt.sign(
@@ -173,7 +187,7 @@ class AuthController {
         };
         res.status(202).json({
           status: 202,
-          employe: authenticatedEmployee,
+          employe: { ...authenticatedEmployee, password: "Employe Password" },
           accessToken: newAccessToken,
         });
       } else {

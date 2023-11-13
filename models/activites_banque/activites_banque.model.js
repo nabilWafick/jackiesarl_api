@@ -70,7 +70,7 @@ class ActivitesBanque {
   }
 
   static getAll(callback) {
-    const query = "SELECT * FROM activites_banque";
+    const query = "SELECT * FROM activites_banque ORDER BY id DESC";
     connection.query(query, (error, results) => {
       if (error) {
         return callback(error, null);

@@ -105,7 +105,7 @@ function () {
   }, {
     key: "getAll",
     value: function getAll(callback) {
-      var query = "SELECT * FROM solde_courant";
+      var query = "SELECT * FROM solde_courant ORDER BY id DESC";
       connection.query(query, function (error, results) {
         if (error) {
           return callback(error, null);

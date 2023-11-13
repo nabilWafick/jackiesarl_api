@@ -177,8 +177,8 @@ class BrouillardController {
                     .json({ status: 200, existingBrouillard });
                 });
               } else {
-                return res.status(405).json({
-                  status: 405,
+                return res.status(406).json({
+                  status: 406,
                   error: "Le stock actuel ne peut être modifié",
                 });
               }

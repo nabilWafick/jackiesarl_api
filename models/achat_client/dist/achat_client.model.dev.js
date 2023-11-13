@@ -108,6 +108,24 @@ function () {
         var achatClient = new AchatClient(achatClientData.id, undefined, achatClientData.quantite_achetee, achatClientData.categorie, achatClientData.montant, achatClientData.numero_ctp, achatClientData.bordereau, achatClientData.numero_bc, achatClientData.id_client, new Date(achatClientData.date_achat));
         return callback(null, achatClient);
       });
+    }
+  }, {
+    key: "getLastAchatStockBonCommande",
+    value: function getLastAchatStockBonCommande(numero_bc, callback) {
+      var query = "SELECT * FROM achat_client WHERE numero_bc = ?  ORDER BY date_achat DESC LIMIT 1";
+      connection.query(query, [numero_bc], function (error, results) {
+        if (error) {
+          return callback(error, null);
+        }
+
+        if (results.length === 0) {
+          return callback(null, null); // Achat client non trouvé
+        }
+
+        var achatClientData = results[0];
+        var achatClient = new AchatClient(achatClientData.id, undefined, achatClientData.quantite_achetee, achatClientData.categorie, achatClientData.montant, achatClientData.numero_ctp, achatClientData.bordereau, achatClientData.numero_bc, achatClientData.id_client, new Date(achatClientData.date_achat));
+        return callback(null, achatClient);
+      });
     } // ================ All Client ================
 
   }, {

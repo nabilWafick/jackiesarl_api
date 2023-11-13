@@ -245,7 +245,7 @@ function () {
           }]);
         });
       } else {
-        var _query5 = "\n        SELECT COALESCE(SUM(CASE WHEN categorie = 'CIM BENIN' THEN quantite_achetee ELSE 0 END),0)\n        AS commande_journaliere_traitee_CIMBENIN,\n        COALESCE(SUM(CASE WHEN categorie = 'NOCIBE' THEN quantite_achetee ELSE 0 END),0)\n        AS commande_journaliere_traitee_NOCIBE\n        FROM commandes\n        WHERE DATE(date_commande) = DATE_SUB(CURDATE(), INTERVAL quantite_achetee DAY)\n        AND est_traitee = 1;\n      ";
+        var _query5 = "\n        SELECT COALESCE(SUM(CASE WHEN categorie = 'CIM BENIN' THEN quantite_achetee ELSE 0 END),0)\n        AS commande_journaliere_traitee_CIMBENIN,\n        COALESCE(SUM(CASE WHEN categorie = 'NOCIBE' THEN quantite_achetee ELSE 0 END),0)\n        AS commande_journaliere_traitee_NOCIBE\n        FROM commandes\n        WHERE DATE(date_commande) = DATE_SUB(CURDATE(), INTERVAL 1 DAY)\n        AND est_traitee = 1;\n      ";
         connection.query(_query5, function (error, results) {
           if (error) {
             return callback(error, null);

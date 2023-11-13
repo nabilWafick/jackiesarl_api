@@ -7,7 +7,7 @@ class ClientsController {
     if (clientData.email == "") {
       clientData.email = null;
     }
-    console.log("Client Data", clientData);
+
     Clients.getAll(undefined, undefined, (error, clients) => {
       if (error) {
         return res.status(500).json({
@@ -50,8 +50,9 @@ class ClientsController {
       });
       // console.log("errors", errors);
       if (exist == true) {
-        return res.status(400).json({ status: 400, errors: errors });
+        return res.status(406).json({ status: 406, errors: errors });
       }
+
       Clients.create(clientData, (error, client) => {
         if (error) {
           return res.status(500).json({
@@ -149,8 +150,8 @@ class ClientsController {
   static update = (req, res) => {
     const id = req.params.id;
     const updatedData = req.body;
-    console.log("Sended data for upadating client");
-    console.log(updatedData);
+    //  console.log("Sended data for upadating client");
+    //  console.log(updatedData);
     Clients.getById(id, (getError, existingClient) => {
       if (getError) {
         return res
@@ -161,23 +162,81 @@ class ClientsController {
         console.log("User to update not found");
         return res.status(404).json({ error: "Client non trouvé" });
       }
-      existingClient = { ...existingClient, ...updatedData };
-      existingClient = new Clients(
-        existingClient.id,
-        existingClient.nom,
-        existingClient.prenoms,
-        existingClient.numero_ifu,
-        existingClient.numero_telephone,
-        existingClient.email,
-        existingClient.date_ajout
-      );
-      existingClient.update((updateError) => {
-        if (updateError) {
-          return res
-            .status(500)
-            .json({ error: "Erreur lors de la mise à jour du client" });
+
+      Clients.getAll(undefined, undefined, (getError, clients) => {
+        if (getError) {
+          return res.status(500).json({
+            status: 500,
+            error: "Erreur lors de la mise à jour du client",
+          });
         }
-        return res.status(200).json(existingClient);
+
+        const errors = {
+          firstname: null,
+          lastname: null,
+          phoneNumber: null,
+          ifuNumber: null,
+          email: null,
+        };
+
+        // console.log("Founded Clients", clients);
+        let exist = false;
+        clients.forEach((client) => {
+          if (
+            updatedData.prenoms == client.prenoms &&
+            updatedData.nom == client.nom &&
+            client.id != id
+          ) {
+            exist = true;
+            errors.firstname = "Ce client existe dejà";
+            errors.lastname = "Ce client existe dejà";
+          }
+          if (
+            updatedData.numero_telephone == client.numero_telephone &&
+            client.id != id
+          ) {
+            exist = true;
+            errors.phoneNumber = "Ce téléphone existe dejà";
+          }
+          if (updatedData.numero_ifu == client.numero_ifu && client.id != id) {
+            exist = true;
+            errors.ifuNumber = "Ce numéro IFU existe dejà";
+          }
+
+          if (
+            updatedData.email == client.email &&
+            updatedData.email != null &&
+            client.id != id
+          ) {
+            exist = true;
+            errors.email = "Cet email existe dejà";
+          }
+        });
+
+        if (exist == true) {
+          return res.status(406).json({ status: 406, errors: errors });
+        }
+
+        existingClient = { ...existingClient, ...updatedData };
+
+        existingClient = new Clients(
+          existingClient.id,
+          existingClient.nom,
+          existingClient.prenoms,
+          existingClient.numero_ifu,
+          existingClient.numero_telephone,
+          existingClient.email,
+          existingClient.date_ajout
+        );
+        existingClient.update((updateError) => {
+          if (updateError) {
+            return res.status(500).json({
+              status: 500,
+              error: "Erreur lors de la mise à jour du client",
+            });
+          }
+          return res.status(200).json({ status: 200, client: existingClient });
+        });
       });
     });
   };

@@ -1,8 +1,13 @@
 const Depenses = require("../../models/depenses/depenses.model");
+const path = require("path");
 const fs = require("fs");
 
-deleteFile = (file) => {
-  fs.unlink(file, (error) => {
+deleteFile = (fileLink) => {
+  const filePath = fileLink.split("http://127.0.0.1:7000/");
+  const directory = path.resolve(__dirname, "../..");
+  const dir = path.join(directory, `/uploads/${filePath}`);
+
+  fs.unlink(dir, (error) => {
     if (error) {
       console.error("Erreur de la suppression du fichier :", error);
     } else {
@@ -17,9 +22,15 @@ class DepensesController {
     const file = req.file;
     console.log("depenseDataf", depenseDataf);
     console.log("file", file);
+    const needed_path = file && file && file.path.split("/uploads")[1];
+    //console.log("needeed path", needed_path);
+    const fileLink = file && file && `http://127.0.0.1:7000${needed_path}`;
+    // console.log("file link", fileLink);
     const depenseData = {
       ...depenseDataf,
-      piece: file ? file.path : "",
+      montant: parseFloat(depenseDataf.montant),
+      est_validee: parseInt(depenseDataf.est_validee),
+      piece: file ? fileLink : "",
     };
     console.log("depenseData", depenseData);
     Depenses.create(depenseData, (error, depense) => {
@@ -156,14 +167,23 @@ class DepensesController {
           .status(404)
           .json({ status: 404, error: "Dépense non trouvée" });
       }
-      existingDepense = { ...existingDepense, ...updatedData };
+      existingDepense = {
+        ...existingDepense,
+        ...updatedData,
+        montant: parseFloat(updatedData.montant),
+        est_validee: parseInt(updatedData.est_validee),
+      };
 
       const file = req.file;
       console.log("existingDepense", existingDepense);
       console.log("file", file);
       if (file) {
+        const needed_path = file && file.path.split("/uploads")[1];
+        //console.log("needeed path", needed_path);
+        const fileLink = file && `http://127.0.0.1:7000${needed_path}`;
+        // console.log("file link", fileLink);
         const lastSlip = existingDepense.piece;
-        existingDepense = { ...existingDepense, piece: file.path };
+        existingDepense = { ...existingDepense, piece: fileLink };
         if (lastSlip != "") {
           deleteFile(lastSlip);
         }

@@ -1,9 +1,14 @@
 const PaiementClient = require("../../models/paiement_client/paiement_client.model");
 const AchatEntreprise = require("../../models/achat_entreprise/achat_entreprise.model");
+const path = require("path");
 const fs = require("fs");
 
-deleteFile = (file) => {
-  fs.unlink(file, (error) => {
+deleteFile = (fileLink) => {
+  const filePath = fileLink.split("http://127.0.0.1:7000/");
+  const directory = path.resolve(__dirname, "../..");
+  const dir = path.join(directory, `/uploads/${filePath}`);
+
+  fs.unlink(dir, (error) => {
     if (error) {
       console.error("Erreur de la suppression du fichier :", error);
     } else {
@@ -34,7 +39,10 @@ class PaiementClientController {
         const file = req.file;
         console.log("paiementClientDataf", paiementClientDataf);
         console.log("file", file);
-
+        const needed_path = file && file.path.split("/uploads")[1];
+        //console.log("needeed path", needed_path);
+        const fileLink = file && `http://127.0.0.1:7000${needed_path}`;
+        // console.log("file link", fileLink);
         const paiementClientData = {
           ...paiementClientDataf,
           est_valide: parseInt(paiementClientDataf.est_valide),
@@ -42,7 +50,7 @@ class PaiementClientController {
           numero_bc: parseInt(paiementClientDataf.numero_bc),
           id_client: parseInt(paiementClientDataf.id_client),
           categorie: achatEntreprise.categorie,
-          bordereau: file ? file.path : "",
+          bordereau: file ? fileLink : "",
         };
         console.log("paiementClientData", paiementClientData);
         PaiementClient.create(paiementClientData, (error, paiementClient) => {
@@ -497,8 +505,8 @@ class PaiementClientController {
           }
           if (!achatEntreprise) {
             return res
-              .status(400)
-              .json({ status: 400, error: "Achat entreprise non trouvé" });
+              .status(406)
+              .json({ status: 406, error: "Achat entreprise non trouvé" });
           }
 
           existingPaiementClient = {
@@ -515,10 +523,14 @@ class PaiementClientController {
           console.log("existingPaiementClient", existingPaiementClient);
           console.log("file", file);
           if (file) {
+            const needed_path = file && file.path.split("/uploads")[1];
+            //console.log("needeed path", needed_path);
+            const fileLink = file && `http://127.0.0.1:7000${needed_path}`;
+            // console.log("file link", fileLink);
             const lastSlip = existingPaiementClient.bordereau;
             existingPaiementClient = {
               ...existingPaiementClient,
-              bordereau: file.path,
+              bordereau: fileLink,
             };
             if (lastSlip != "") {
               deleteFile(lastSlip);

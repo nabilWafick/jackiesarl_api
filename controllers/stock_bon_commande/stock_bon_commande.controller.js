@@ -44,8 +44,8 @@ class StockBonCommandeController {
                 stockBonCommandeData.stock_initial >
                 achatEntreprise.quantite_achetee
               ) {
-                return res.status(401).json({
-                  status: 401,
+                return res.status(406).json({
+                  status: 406,
                   error: `La quantité demandée est supérieure à celle disponible.\n ${achatEntreprise.quantite_achetee} t en stock`,
                 });
               }
@@ -80,8 +80,8 @@ class StockBonCommandeController {
               // le stock bon de commande existe dans la table
             } else {
               if (stockBonCommande.stock_apres_vente > 0) {
-                return res.status(402).json({
-                  status: 402,
+                return res.status(405).json({
+                  status: 405,
                   error: `Le stock bon de commande n'est pas épuisé.\n
                   \n ${stockBonCommande.stock_apres_vente} t en stock`,
                 });
@@ -89,8 +89,8 @@ class StockBonCommandeController {
                 stockBonCommandeData.stock_initial >
                 achatEntreprise.quantite_achetee - stockBonCommande.vente
               ) {
-                return res.status(401).json({
-                  status: 401,
+                return res.status(406).json({
+                  status: 406,
                   error: `La quantité demandée est supérieure à celle disponible.\n ${
                     achatEntreprise.quantite_achetee - stockBonCommande.vente
                   } t en stock`,

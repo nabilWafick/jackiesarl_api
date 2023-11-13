@@ -1,6 +1,9 @@
 const express = require("express");
 const router = express.Router();
 const PaiementClientController = require("../../controllers/paiement_client/paiement_client.controller");
+const AuthorisationMiddleware = require("../../middleware/authorisation/authorisation.middleware");
+const AuthenticationMiddleware = require("../../middleware/authentication/authentication.middleware");
+
 const multer = require("multer");
 const path = require("path");
 
@@ -22,6 +25,8 @@ const upload = multer({ storage });
 // Routes pour la table `paiement_client`
 router.post(
   "/paiement-client",
+  AuthenticationMiddleware.authenticate,
+  AuthorisationMiddleware.authorize("ajouter-paiement-client"),
   upload.single("bordereau"),
   PaiementClientController.create
 );
@@ -161,9 +166,16 @@ router.get(
 
 router.put(
   "/paiement-client/:id",
+  AuthenticationMiddleware.authenticate,
+  AuthorisationMiddleware.authorize("modifier-paiement-client"),
   upload.single("bordereau"),
   PaiementClientController.update
 );
-router.delete("/paiement-client/:id", PaiementClientController.delete);
+router.delete(
+  "/paiement-client/:id",
+  AuthenticationMiddleware.authenticate,
+  AuthorisationMiddleware.authorize("supprimer-paiement-client"),
+  PaiementClientController.delete
+);
 
 module.exports = router;

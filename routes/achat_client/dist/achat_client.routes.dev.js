@@ -6,6 +6,10 @@ var router = express.Router();
 
 var AchatClientController = require("../../controllers/achat_client/achat_client.controller");
 
+var AuthorisationMiddleware = require("../../middleware/authorisation/authorisation.middleware");
+
+var AuthenticationMiddleware = require("../../middleware/authentication/authentication.middleware");
+
 var multer = require("multer");
 
 var path = require("path");
@@ -17,7 +21,7 @@ var storage = multer.diskStorage({
     cb(null, dir);
   },
   filename: function filename(req, file, cb) {
-    console.log("file from multer", file);
+    //  console.log("file from multer", file);
     cb(null, Date.now() + "-" + file.originalname);
   }
 });
@@ -25,7 +29,7 @@ var upload = multer({
   storage: storage
 }); // Routes pour la table `achat_client`
 
-router.post("/achat-client", upload.single("bordereau"), AchatClientController.create);
+router.post("/achat-client", AuthenticationMiddleware.authenticate, AuthorisationMiddleware.authorize("ajouter-achat-client"), upload.single("bordereau"), AchatClientController.create);
 router.get("/achat-client/:id", AchatClientController.getById); // =================== All clients default
 
 router.get("/achats-clients-default/:startDate?/:endDate?", AchatClientController.getAll); // ================  Seniority
@@ -55,6 +59,6 @@ router.get("/achats-client/client/:id_client/cim-benin-less-important/:startDate
 
 router.get("/achats-client/client/:id_client/nocibe-most-important/:startDate?/:endDate?", AchatClientController.getAllOfClientNOCIBEMostImportant);
 router.get("/achats-client/client/:id_client/nocibe-less-important/:startDate?/:endDate?", AchatClientController.getAllOfClientNOCIBELessImportant);
-router.put("/achat-client/:id", upload.single("bordereau"), AchatClientController.update);
-router["delete"]("/achat-client/:id", AchatClientController["delete"]);
+router.put("/achat-client/:id", AuthenticationMiddleware.authenticate, AuthorisationMiddleware.authorize("modifier-achat-client"), upload.single("bordereau"), AchatClientController.update);
+router["delete"]("/achat-client/:id", AuthenticationMiddleware.authenticate, AuthorisationMiddleware.authorize("supprimer-achat-client"), AchatClientController["delete"]);
 module.exports = router;
