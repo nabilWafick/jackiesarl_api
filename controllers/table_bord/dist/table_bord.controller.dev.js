@@ -30,6 +30,20 @@ function () {
       });
     }
   }, {
+    key: "getWeekDailySales",
+    value: function getWeekDailySales(req, res) {
+      TableBord.getWeekDailySales(function (error, weekDailyPayments) {
+        if (error) {
+          return res.status(500).json({
+            status: 500,
+            error: "Erreur lors de la récupération des paiements de la semaine "
+          });
+        }
+
+        return res.status(200).json(weekDailyPayments);
+      });
+    }
+  }, {
     key: "getDailyRegisteredCustumersTotal",
     value: function getDailyRegisteredCustumersTotal(req, res) {
       var isToday = req.params.isToday;

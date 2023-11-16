@@ -89,6 +89,10 @@ class BrouillardController {
             });
           }
 
+          return res.status(200).json({ status: 200, existingBrouillard });
+          // on ne met pas a jour le stock apres vente de la derniere vente
+
+          /*    
           ActivitesDepot.getLastActiviteDepot(
             existingBrouillard.id,
             (lastActiviteError, lastActivite) => {
@@ -137,6 +141,7 @@ class BrouillardController {
               }
             }
           );
+          */
         });
       } else {
         // si ce n'est pas une augmentation de stock
@@ -227,13 +232,15 @@ class BrouillardController {
           .status(404)
           .json({ status: 404, error: "Brouillard non trouvé" });
       }
+      console.log("brouillard exist");
       existingBrouillard.delete((deleteError, id) => {
-        if (!id) {
+        if (deleteError) {
           return res.status(500).json({
             status: 500,
             error: "Erreur lors de la suppression du brouillard",
           });
         }
+        console.log("deleted brouillard id", id);
         return res.status(204).json({ status: 204, id });
       });
     });

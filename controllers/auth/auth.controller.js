@@ -132,16 +132,14 @@ class AuthController {
             error: "Erreur lors de la création de l'employé",
           });
         }
-        return res
-          .status(201)
-          .json({
-            status: 201,
-            employe: {
-              ...employe,
-              token: "Employee Token",
-              password: "Employee Password",
-            },
-          });
+        return res.status(201).json({
+          status: 201,
+          employe: {
+            ...employe,
+            token: "Employee Token",
+            password: "Employee Password",
+          },
+        });
       });
     });
   };
@@ -153,32 +151,32 @@ class AuthController {
 
     Employes.getByEmail(email, async (employeError, employe) => {
       if (employeError) {
-        res.status(500).json({
+        return res.status(500).json({
           status: 500,
           error: "Erreur lors de la récupération de l'employé",
         });
       }
 
       if (!employe) {
-        res.status(404).json({
+        return res.status(404).json({
           status: 404,
           error: "Employé non trouvé ou l'email n'existe pas",
         });
       }
-      //   console.log("employe", employe);
+      //  console.log("employe", employe);
       //  console.log("password", password);
       //  console.log("employe.password", employe.password);
 
       const match = bcrypt.compareSync(password, employe.password);
 
-      //  console.log("match", match);
+      //   console.log("match", match);
 
       if (match) {
         const newAccessToken = jwt.sign(
           { email },
           process.env.JWT_ACCESS_TOKEN_KEY,
           {
-            expiresIn: "5m",
+            expiresIn: "30m",
           }
         );
         const authenticatedEmployee = {
@@ -191,7 +189,9 @@ class AuthController {
           accessToken: newAccessToken,
         });
       } else {
-        res.status(401).json({ status: 401, error: "Mot de passe incorrecte" });
+        return res
+          .status(401)
+          .json({ status: 401, error: "Mot de passe incorrecte" });
       }
     });
   };
@@ -200,7 +200,9 @@ class AuthController {
 
   static logout = (req, res) => {
     req.clearCookie("accessToken");
-    res.status("200").json({ status: 200, error: "Déonnecté avec succès" });
+    return res
+      .status("200")
+      .json({ status: 200, error: "Déonnecté avec succès" });
   };
 }
 

@@ -1,4 +1,5 @@
 const Clients = require("../../models/clients/clients.model");
+const Modifications = require("../../models/modifications/modifications.model");
 
 class ClientsController {
   // Créer un nouveau client
@@ -159,7 +160,7 @@ class ClientsController {
           .json({ error: "Erreur lors de la récupération du client" });
       }
       if (!existingClient) {
-        console.log("User to update not found");
+        //   console.log("User to update not found");
         return res.status(404).json({ error: "Client non trouvé" });
       }
 
@@ -235,6 +236,19 @@ class ClientsController {
               error: "Erreur lors de la mise à jour du client",
             });
           }
+
+          //   console.log("employee", req.employee);
+
+          // =================== Add Modification ===================
+          Modifications.create(
+            {
+              modification: `Modification des données d'un client`,
+              id_employe: req.employee.id,
+            },
+            (error, modification) => {}
+          );
+          // =================== Add Modification ===================
+
           return res.status(200).json({ status: 200, client: existingClient });
         });
       });

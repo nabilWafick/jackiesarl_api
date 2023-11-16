@@ -7,6 +7,7 @@ var router = express.Router();
 var TableBordController = require("../../controllers/table_bord/table_bord.controller");
 
 router.get("/table-bord/total-paiements-hebdomadaire/", TableBordController.getWeekDailyPayments);
+router.get("/table-bord/total-ventes-hebdomadaire/", TableBordController.getWeekDailySales);
 router.get("/table-bord/total-clients-inscrits-quotidien/:isToday", TableBordController.getDailyRegisteredCustumersTotal);
 router.get("/table-bord/total-ventes-quotidiennes/:isToday", TableBordController.getDailySalesTotal);
 router.get("/table-bord/total-achats-entreprise-quotidiens/:isToday", TableBordController.getDailyCompanyPurchases);

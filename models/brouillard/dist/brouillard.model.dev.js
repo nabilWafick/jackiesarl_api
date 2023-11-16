@@ -50,6 +50,7 @@ function () {
       var query = "DELETE FROM brouillard WHERE id = ?";
       connection.query(query, [this.id], function (error, results) {
         if (error) {
+          console.log("SQL error", error);
           return callback(error, null);
         }
 

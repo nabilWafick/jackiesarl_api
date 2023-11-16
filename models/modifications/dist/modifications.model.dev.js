@@ -29,11 +29,12 @@ var connection = require("../_db/database");
 var Modifications =
 /*#__PURE__*/
 function () {
-  function Modifications(id, modification, date_modification, nom_employe, prenoms_employe) {
+  function Modifications(id, modification, details, date_modification, nom_employe, prenoms_employe) {
     _classCallCheck(this, Modifications);
 
     this.id = id;
     this.modification = modification;
+    this.details = details;
     this.nom_employe = nom_employe;
     this.prenoms_employe = prenoms_employe;
     this.date_modification = date_modification;
@@ -42,7 +43,7 @@ function () {
   _createClass(Modifications, [{
     key: "update",
     value: function update(callback) {
-      var query = "UPDATE modifications SET modification = ?, id_employe = ?, date_modification = ? WHERE id = ?";
+      var query = "UPDATE modifications SET modification = ?, details = ?, id_employe = ?, date_modification = ? WHERE id = ?";
 
       var id = this.id,
           updatedData = _objectWithoutProperties(this, ["id"]);
@@ -58,9 +59,9 @@ function () {
   }], [{
     key: "create",
     value: function create(modificationData, callback) {
-      var query = "INSERT INTO modifications (id, modification, id_employe, date_modification) VALUES (NULL, ?, ?, ?)";
+      var query = "INSERT INTO modifications (id, modification, details ,id_employe, date_modification) VALUES (NULL, ?, ?, ?, ?)";
       var currentDate = new Date();
-      connection.query(query, [modificationData.modification, modificationData.id_employe, currentDate], function (error, results) {
+      connection.query(query, [modificationData.modification, modificationData.details, modificationData.id_employe, currentDate], function (error, results) {
         if (error) {
           return callback(error, null);
         }
@@ -84,7 +85,7 @@ function () {
         }
 
         var modificationData = results[0];
-        var modification = new Modifications(modificationData.id, modificationData.modification, modificationData.date_modification, modificationData.nom, modificationData.prenoms);
+        var modification = new Modifications(modificationData.id, modificationData.modification, modificationData.details, modificationData.date_modification, modificationData.nom, modificationData.prenoms);
         return callback(null, modification);
       });
     }
@@ -92,27 +93,27 @@ function () {
     key: "getAll",
     value: function getAll(startDate, endDate, callback) {
       if (startDate && endDate) {
-        var query = "SELECT modifications.id, modification, date_modification, nom, prenoms  FROM modifications, employes WHERE modifications.id = employes.id AND date_modification BETWEEN ? AND ? ORDER BY id DESC";
+        var query = "SELECT modifications.id, modification, details, date_modification, nom, prenoms  FROM modifications, employes WHERE modifications.id_employe = employes.id AND date_modification BETWEEN ? AND ? ORDER BY id DESC";
         connection.query(query, [new Date(startDate), new Date(endDate)], function (error, results) {
           if (error) {
             return callback(error, null);
           }
 
           var modificationsList = results.map(function (modificationData) {
-            return new Modifications(modificationData.id, modificationData.modification, modificationData.date_modification, modificationData.nom, modificationData.prenoms);
+            return new Modifications(modificationData.id, modificationData.modification, modificationData.details, modificationData.date_modification, modificationData.nom, modificationData.prenoms);
           });
           return callback(null, modificationsList);
         });
       } else {
-        var _query = "SELECT modifications.id, modification, date_modification, nom, prenoms  FROM modifications, employes WHERE modifications.id = employes.id ORDER BY id DESC";
+        var _query = "SELECT modifications.id, modification, details, date_modification, nom, prenoms  FROM modifications, employes WHERE modifications.id_employe = employes.id ORDER BY id DESC";
         connection.query(_query, function (error, results) {
           if (error) {
             return callback(error, null);
           }
 
           var modificationsList = results.map(function (modificationData) {
-            console.log(modificationData);
-            return new Modifications(modificationData.id, modificationData.modification, modificationData.date_modification, modificationData.nom, modificationData.prenoms);
+            // console.log(modificationData);
+            return new Modifications(modificationData.id, modificationData.details, modificationData.modification, modificationData.date_modification, modificationData.nom, modificationData.prenoms);
           });
           return callback(null, modificationsList);
         });

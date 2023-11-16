@@ -120,6 +120,25 @@ function () {
       });
     }
   }, {
+    key: "getLastOfBanque",
+    value: function getLastOfBanque(id_banque, callback) {
+      var query = "SELECT * FROM activites_banque WHERE id_banque = ? ORDER BY id DESC LIMIT 1";
+      connection.query(query, [id_banque], function (error, results) {
+        if (error) {
+          console.log("SQL error", error);
+          return callback(error, null);
+        }
+
+        if (results.length == 0) {
+          return callback(null, null); // Activité banque non trouvée
+        }
+
+        var activitesBanqueData = results[0];
+        var activitesBanque = new ActivitesBanque(activitesBanqueData.id, activitesBanqueData.id_banque, activitesBanqueData.description, activitesBanqueData.debit, activitesBanqueData.credit, activitesBanqueData.solde_actuel, new Date(activitesBanqueData.date_activite));
+        return callback(null, activitesBanque);
+      });
+    }
+  }, {
     key: "getAllByBanqueID",
     value: function getAllByBanqueID(id_banque, callback) {
       var query = "SELECT * FROM activites_banque WHERE id_banque = ? ORDER BY id DESC";

@@ -511,8 +511,8 @@ class AchatClientController {
       // on verifie le stock bon de commande est le meme que l'ancien
 
       if (updatedData.numero_bc == existingAchatClient.numero_bc) {
+        // last car on peut ajoute les stocks peu à peu, on prend le dernier ajouté
         StockBonCommande.getLastBonCommande(
-          // last car on peut ajoute les stocks peu à peu, on prend le dernier ajouté
           updatedData.numero_bc,
           (getError, usedStockBonCommande) => {
             if (getError) {

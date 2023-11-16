@@ -36,6 +36,24 @@ function () {
       });
     }
   }, {
+    key: "getWeekDailySales",
+    value: function getWeekDailySales(callback) {
+      var query = "SELECT DISTINCT CASE \n    WHEN jours.days = 'Monday' THEN 'Lundi'\n    WHEN jours.days = 'Tuesday' THEN 'Mardi'\n    WHEN jours.days = 'Wednesday' THEN 'Mercredi'\n    WHEN jours.days = 'Thursday' THEN 'Jeudi'\n    WHEN jours.days = 'Friday' THEN 'Vendredi'\n    WHEN jours.days = 'Saturday' THEN 'Samedi'\n    WHEN jours.days = 'Sunday' THEN 'Dimanche'\n  END AS jour, COALESCE(SUM(achat_client.montant),0) as total_vente_journalier from jours\nLEFT JOIN achat_client\nON jours.days = DAYNAME(achat_client.date_achat)\nAND WEEK(achat_client.date_achat) = WEEK(CURRENT_DATE)\nGROUP by jours.days ORDER BY\n  FIELD(jour, 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', \n  'Samedi','Dimanche')";
+      connection.query(query, function (error, results) {
+        if (error) {
+          return callback(error, null);
+        }
+
+        var ventesJournalieres = results.map(function (venteJournaliere) {
+          return {
+            jour: venteJournaliere.jour,
+            total_vente: venteJournaliere.total_vente_journalier
+          };
+        });
+        return callback(null, ventesJournalieres);
+      });
+    }
+  }, {
     key: "getDailyRegisteredCustumersTotal",
     value: function getDailyRegisteredCustumersTotal(isToday, callback) {
       if (isToday == 1) {
@@ -69,43 +87,12 @@ function () {
           });
         });
       }
-    } // static getDailyRegisteredCustumersTotal(isToday, callback) {
-    //   if (isToday==1) {
-    //     const query = `
-    //           SELECT COUNT(*) AS total_journalier_clients_inscrits
-    //           FROM clients
-    //           WHERE DATE(date_ajout) = CURDATE()`;
-    //     connection.query(query, (error, results) => {
-    //       if (error) {
-    //         return callback(error, null);
-    //       }
-    //       if (results.length == 0) {
-    //         return callback(null, null);
-    //       }
-    //       return callback(null, results[0].total_journalier_clients_inscrits);
-    //     });
-    //   } else {
-    //     const query = `
-    //           SELECT COUNT(*) AS total_journalier_clients_inscrits
-    //           FROM clients
-    //           WHERE DATE(date_ajout) = DATE_SUB(CURDATE(), INTERVAL 1 DAY)`;
-    //     connection.query(query, (error, results) => {
-    //       if (error) {
-    //         return callback(error, null);
-    //       }
-    //       if (results.length == 0) {
-    //         return callback(null, null);
-    //       }
-    //       return callback(null, results[0].total_journalier_clients_inscrits);
-    //     });
-    //   }
-    // }
-
+    }
   }, {
     key: "getDailySalesTotal",
     value: function getDailySalesTotal(isToday, callback) {
       if (isToday == 1) {
-        var query = "\n      SELECT COALESCE(SUM(montant),0) AS total_vente_journaliere\n      FROM achat_client\n      WHERE DATE(date_achat) = CURDATE()";
+        var query = "\n      SELECT COALESCE(SUM(quantite_achetee),0) as total_quantite_journaliere,\n      COALESCE(SUM(montant),0) AS total_vente_journaliere\n      FROM achat_client\n      WHERE DATE(date_achat) = CURDATE()";
         connection.query(query, function (error, results) {
           if (error) {
             return callback(error, null);
@@ -116,11 +103,12 @@ function () {
           }
 
           return callback(null, {
+            total_quantite: results[0].total_quantite_journaliere,
             total_vente: results[0].total_vente_journaliere
           });
         });
       } else {
-        var _query2 = "\n      SELECT COALESCE(SUM(montant),0) AS total_vente_journaliere\n      FROM achat_client\n      WHERE DATE(date_achat) = DATE_SUB(CURDATE(), INTERVAL 1 DAY)\n      ";
+        var _query2 = "\n      SELECT COALESCE(SUM(quantite_achetee),0) as total_quantite_journaliere,\n      COALESCE(SUM(montant),0) AS total_vente_journaliere\n      FROM achat_client\n      WHERE DATE(date_achat) = DATE_SUB(CURDATE(), INTERVAL 1 DAY)\n      ";
         connection.query(_query2, function (error, results) {
           if (error) {
             return callback(error, null);
@@ -131,6 +119,7 @@ function () {
           }
 
           return callback(null, {
+            total_quantite: results[0].total_quantite_journaliere,
             total_vente: results[0].total_vente_journaliere
           });
         });

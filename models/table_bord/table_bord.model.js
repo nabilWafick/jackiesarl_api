@@ -23,7 +23,6 @@ class TableBord {
       if (error) {
         return callback(error, null);
       }
-
       const paiementsJournaliers = results.map((paiementJournalier) => {
         return {
           jour: paiementJournalier.jour,
@@ -31,6 +30,37 @@ class TableBord {
         };
       });
       return callback(null, paiementsJournaliers);
+    });
+  }
+
+  static getWeekDailySales(callback) {
+    const query = `SELECT DISTINCT CASE 
+    WHEN jours.days = 'Monday' THEN 'Lundi'
+    WHEN jours.days = 'Tuesday' THEN 'Mardi'
+    WHEN jours.days = 'Wednesday' THEN 'Mercredi'
+    WHEN jours.days = 'Thursday' THEN 'Jeudi'
+    WHEN jours.days = 'Friday' THEN 'Vendredi'
+    WHEN jours.days = 'Saturday' THEN 'Samedi'
+    WHEN jours.days = 'Sunday' THEN 'Dimanche'
+  END AS jour, COALESCE(SUM(achat_client.montant),0) as total_vente_journalier from jours
+LEFT JOIN achat_client
+ON jours.days = DAYNAME(achat_client.date_achat)
+AND WEEK(achat_client.date_achat) = WEEK(CURRENT_DATE)
+GROUP by jours.days ORDER BY
+  FIELD(jour, 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 
+  'Samedi','Dimanche')`;
+
+    connection.query(query, (error, results) => {
+      if (error) {
+        return callback(error, null);
+      }
+      const ventesJournalieres = results.map((venteJournaliere) => {
+        return {
+          jour: venteJournaliere.jour,
+          total_vente: venteJournaliere.total_vente_journalier,
+        };
+      });
+      return callback(null, ventesJournalieres);
     });
   }
 
@@ -70,42 +100,11 @@ class TableBord {
     }
   }
 
-  // static getDailyRegisteredCustumersTotal(isToday, callback) {
-  //   if (isToday==1) {
-  //     const query = `
-  //           SELECT COUNT(*) AS total_journalier_clients_inscrits
-  //           FROM clients
-  //           WHERE DATE(date_ajout) = CURDATE()`;
-  //     connection.query(query, (error, results) => {
-  //       if (error) {
-  //         return callback(error, null);
-  //       }
-  //       if (results.length == 0) {
-  //         return callback(null, null);
-  //       }
-  //       return callback(null, results[0].total_journalier_clients_inscrits);
-  //     });
-  //   } else {
-  //     const query = `
-  //           SELECT COUNT(*) AS total_journalier_clients_inscrits
-  //           FROM clients
-  //           WHERE DATE(date_ajout) = DATE_SUB(CURDATE(), INTERVAL 1 DAY)`;
-  //     connection.query(query, (error, results) => {
-  //       if (error) {
-  //         return callback(error, null);
-  //       }
-  //       if (results.length == 0) {
-  //         return callback(null, null);
-  //       }
-  //       return callback(null, results[0].total_journalier_clients_inscrits);
-  //     });
-  //   }
-  // }
-
   static getDailySalesTotal(isToday, callback) {
     if (isToday == 1) {
       const query = `
-      SELECT COALESCE(SUM(montant),0) AS total_vente_journaliere
+      SELECT COALESCE(SUM(quantite_achetee),0) as total_quantite_journaliere,
+      COALESCE(SUM(montant),0) AS total_vente_journaliere
       FROM achat_client
       WHERE DATE(date_achat) = CURDATE()`;
       connection.query(query, (error, results) => {
@@ -115,13 +114,16 @@ class TableBord {
         if (results.length == 0) {
           return callback(null, null);
         }
+
         return callback(null, {
+          total_quantite: results[0].total_quantite_journaliere,
           total_vente: results[0].total_vente_journaliere,
         });
       });
     } else {
       const query = `
-      SELECT COALESCE(SUM(montant),0) AS total_vente_journaliere
+      SELECT COALESCE(SUM(quantite_achetee),0) as total_quantite_journaliere,
+      COALESCE(SUM(montant),0) AS total_vente_journaliere
       FROM achat_client
       WHERE DATE(date_achat) = DATE_SUB(CURDATE(), INTERVAL 1 DAY)
       `;
@@ -133,6 +135,7 @@ class TableBord {
           return callback(null, null);
         }
         return callback(null, {
+          total_quantite: results[0].total_quantite_journaliere,
           total_vente: results[0].total_vente_journaliere,
         });
       });

@@ -1,5 +1,5 @@
 const SoldeCourant = require("../../models/solde_courant/solde_courant.model");
-
+const ActivitesBanque = require("../../models/activites_banque/activites_banque.model");
 class SoldeCourantController {
   // Créer un nouveau solde courant
   static create = (req, res) => {
@@ -16,7 +16,6 @@ class SoldeCourantController {
         (soldeCourant) => soldeCourant.banque == soldeCourantData.banque
       );
 
-      console.log("exist", exist);
       if (exist.length > 0) {
         return res.status(406).json({
           status: 406,
@@ -79,19 +78,167 @@ class SoldeCourantController {
           .status(404)
           .json({ status: 404, error: "Solde courant non trouvé" });
       }
-      existingSoldeCourant = { ...existingSoldeCourant, ...updatedData };
 
-      // existingSoldeCourant
+      // si c'est le nom de la banque ou le solde veut etre modifie
+      if (
+        existingSoldeCourant.banque != updatedData.banque ||
+        existingSoldeCourant.solde_actuel != updatedData.solde_actuel
+      ) {
+        if (existingSoldeCourant.banque != updatedData.banque)
+          SoldeCourant.getAll((getAllError, soldesCourants) => {
+            if (getAllError) {
+              return res.status(500).json({
+                status: 500,
+                error: "Erreur lors de la mise à jour du solde courant",
+              });
+            }
+            // on verifie si la banque remplacante n'existe pas encore
+            const exist = soldesCourants.filter(
+              (soldeCourant) => soldeCourant.banque == updatedData.banque
+            );
 
-      existingSoldeCourant.update((updateError) => {
-        if (updateError) {
-          return res.status(500).json({
-            status: 500,
-            error: "Erreur lors de la mise à jour du solde courant",
+            if (exist.length > 0) {
+              return res.status(406).json({
+                status: 406,
+                error: "La banque existe déjà",
+              });
+            } else {
+              // on verifie si des transactions n'ont pas ete deja faite au niveau de la banque
+              if (
+                existingSoldeCourant.solde_actuel != updatedData.solde_actuel
+              ) {
+                ActivitesBanque.getAllByBanqueID(
+                  updatedData.id_banque,
+                  (getAllBanqueError, activitesBanque) => {
+                    if (getAllBanqueError) {
+                      return res.status(500).json({
+                        status: 500,
+                        error: "Erreur lors de la mise à jour du solde courant",
+                      });
+                    }
+                    if (activitesBanque.length == 0) {
+                      existingSoldeCourant = {
+                        ...existingSoldeCourant,
+                        ...updatedData,
+                      };
+                      existingSoldeCourant = new SoldeCourant(
+                        existingSoldeCourant.id,
+                        existingSoldeCourant.banque,
+                        existingSoldeCourant.numero_compte,
+                        existingSoldeCourant.solde_actuel,
+                        existingSoldeCourant.date_ajout
+                      );
+                      existingSoldeCourant.update((updateError) => {
+                        if (updateError) {
+                          return res.status(500).json({
+                            status: 500,
+                            error:
+                              "Erreur lors de la mise à jour du solde courant",
+                          });
+                        }
+                        return res
+                          .status(200)
+                          .json({ status: 200, existingSoldeCourant });
+                      });
+                    } else {
+                      return res.status(406).json({
+                        status: 406,
+                        error:
+                          "Des transactions ont été déjà faites au niveau de la banque",
+                      });
+                    }
+                  }
+                );
+              } else {
+                existingSoldeCourant = {
+                  ...existingSoldeCourant,
+                  ...updatedData,
+                };
+                existingSoldeCourant = new SoldeCourant(
+                  existingSoldeCourant.id,
+                  existingSoldeCourant.banque,
+                  existingSoldeCourant.numero_compte,
+                  existingSoldeCourant.solde_actuel,
+                  existingSoldeCourant.date_ajout
+                );
+                existingSoldeCourant.update((updateError) => {
+                  if (updateError) {
+                    return res.status(500).json({
+                      status: 500,
+                      error: "Erreur lors de la mise à jour du solde courant",
+                    });
+                  }
+                  return res
+                    .status(200)
+                    .json({ status: 200, existingSoldeCourant });
+                });
+              }
+            }
           });
+        else if (
+          existingSoldeCourant.solde_actuel != updatedData.solde_actuel
+        ) {
+          ActivitesBanque.getAllByBanqueID(
+            updatedData.id_banque,
+            (getAllBanqueError, activitesBanque) => {
+              if (getAllBanqueError) {
+                return res.status(500).json({
+                  status: 500,
+                  error: "Erreur lors de la mise à jour du solde courant",
+                });
+              }
+              if (activitesBanque.length == 0) {
+                existingSoldeCourant = {
+                  ...existingSoldeCourant,
+                  ...updatedData,
+                };
+                existingSoldeCourant = new SoldeCourant(
+                  existingSoldeCourant.id,
+                  existingSoldeCourant.banque,
+                  existingSoldeCourant.numero_compte,
+                  existingSoldeCourant.solde_actuel,
+                  existingSoldeCourant.date_ajout
+                );
+                existingSoldeCourant.update((updateError) => {
+                  if (updateError) {
+                    return res.status(500).json({
+                      status: 500,
+                      error: "Erreur lors de la mise à jour du solde courant",
+                    });
+                  }
+                  return res
+                    .status(200)
+                    .json({ status: 200, existingSoldeCourant });
+                });
+              } else {
+                return res.status(406).json({
+                  status: 406,
+                  error:
+                    "Des transactions ont été déjà faites au niveau de la banque",
+                });
+              }
+            }
+          );
         }
-        return res.status(200).json({ status: 200, existingSoldeCourant });
-      });
+      } else {
+        existingSoldeCourant = { ...existingSoldeCourant, ...updatedData };
+        existingSoldeCourant = new SoldeCourant(
+          existingSoldeCourant.id,
+          existingSoldeCourant.banque,
+          existingSoldeCourant.numero_compte,
+          existingSoldeCourant.solde_actuel,
+          existingSoldeCourant.date_ajout
+        );
+        existingSoldeCourant.update((updateError) => {
+          if (updateError) {
+            return res.status(500).json({
+              status: 500,
+              error: "Erreur lors de la mise à jour du solde courant",
+            });
+          }
+          return res.status(200).json({ status: 200, existingSoldeCourant });
+        });
+      }
     });
   };
 

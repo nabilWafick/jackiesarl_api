@@ -152,44 +152,67 @@ class ActivitesBanqueController {
           error: "Erreur lors de la récupération de l'activité banque",
         });
       }
+
       if (!existingActiviteBanque) {
         return res
           .status(404)
           .json({ status: 404, error: "Activité banque non trouvée" });
       }
-      existingActiviteBanque = { ...existingActiviteBanque, ...updatedData };
 
-      existingActiviteBanque = new ActivitesBanque(
-        existingActiviteBanque.id,
-        existingActiviteBanque.id_banque,
-        existingActiviteBanque.description,
-        existingActiviteBanque.debit,
-        existingActiviteBanque.credit,
-        existingActiviteBanque.solde_actuel,
-        existingActiviteBanque.date_activite
-      );
-
-      existingActiviteBanque.update((updateError) => {
-        if (updateError) {
-          console.log("SQL Error");
-          return res.status(500).json({
-            status: 500,
-            error: "Erreur lors de la mise à jour de l'activité banque",
+      if (existingActiviteBanque.description != updatedData.description) {
+        if (
+          existingActiviteBanque.debit != updatedData.debit ||
+          existingActiviteBanque.credit != existingActiviteBanque.credit
+        ) {
+          return res.status(406).json({
+            status: 406,
+            error: "Cette opération ne peut être réalisée",
           });
+        } else {
+          // ================ Final =====================
+
+          existingActiviteBanque = {
+            ...existingActiviteBanque,
+            ...updatedData,
+          };
+
+          existingActiviteBanque = new ActivitesBanque(
+            existingActiviteBanque.id,
+            existingActiviteBanque.id_banque,
+            existingActiviteBanque.description,
+            existingActiviteBanque.debit,
+            existingActiviteBanque.credit,
+            existingActiviteBanque.solde_actuel,
+            existingActiviteBanque.date_activite
+          );
+
+          existingActiviteBanque.update((updateError) => {
+            if (updateError) {
+              console.log("SQL Error");
+              return res.status(500).json({
+                status: 500,
+                error: "Erreur lors de la mise à jour de l'activité banque",
+              });
+            }
+            return res
+              .status(200)
+              .json({ status: 200, existingActiviteBanque });
+          });
+          // =================== Final ========================
         }
-        return res.status(200).json({ status: 200, existingActiviteBanque });
-      });
+      }
     });
   };
 
   // Supprimer une activité banque par ID
   static delete = (req, res) => {
     const id = req.params.id;
+    console.log("in bank activity delete function");
     ActivitesBanque.getById(id, (getError, existingActiviteBanque) => {
       if (getError) {
         return res.status(500).json({
           status: 500,
-          error: "Erreur lors de la récupération de l'activité banque",
+          error: "Erreur lors de la suppression de l'activité banque",
         });
       }
       if (!existingActiviteBanque) {
@@ -197,15 +220,77 @@ class ActivitesBanqueController {
           .status(404)
           .json({ status: 404, error: "Activité banque non trouvée" });
       }
-      existingActiviteBanque.delete((deleteError, id) => {
-        if (!id) {
-          return res.status(500).json({
-            status: 500,
-            error: "Erreur lors de la suppression de l'activité banque",
-          });
+      console.log("before getting last of Banque");
+      ActivitesBanque.getLastOfBanque(
+        existingActiviteBanque.id_banque,
+        (lastError, lastActivite) => {
+          if (lastError) {
+            return res.status(500).json({
+              status: 500,
+              error: "Erreur lors de la suppression de l'activité banque",
+            });
+          }
+          console.log("last of Banque getted", id);
+          if (lastActivite.id != existingActiviteBanque.id) {
+            return res.status(406).json({
+              status: 406,
+              error: "Cette opération ne peut être supprimée",
+            });
+          }
+          SoldeCourant.getById(
+            existingActiviteBanque.id_banque,
+            (soldeCourantError, soldeCourant) => {
+              if (soldeCourantError) {
+                return res.status(500).json({
+                  status: 500,
+                  error: "Erreur lors de la suppression de l'activité banque",
+                });
+              }
+              if (!soldeCourant) {
+                return res.status(404).json({
+                  status: 404,
+                  error: "La banque n'existe pas",
+                });
+              }
+              console.log("la banque existe", soldeCourant);
+              // on verifie si l'operation a supprime est un credit
+              if (existingActiviteBanque.credit != 0) {
+                console.log(
+                  "existingActiviteBanque.credit ",
+                  existingActiviteBanque.credit
+                );
+                soldeCourant.solde_actuel += existingActiviteBanque.credit;
+              } else {
+                console.log(
+                  "existingActiviteBanque.debit",
+                  existingActiviteBanque.debit
+                );
+                soldeCourant.solde_actuel -= existingActiviteBanque.debit;
+              }
+              console.log("new soldeCourant", soldeCourant);
+              console.log("new soldeCourant solde", soldeCourant.solde_actuel);
+              soldeCourant.update((updateError) => {
+                if (updateError) {
+                  return res.status(500).json({
+                    status: 500,
+                    error: "Erreur lors de la suppression de l'activité banque",
+                  });
+                }
+                existingActiviteBanque.delete((deleteError, id) => {
+                  if (!id) {
+                    return res.status(500).json({
+                      status: 500,
+                      error:
+                        "Erreur lors de la suppression de l'activité banque",
+                    });
+                  }
+                  return res.status(204).json({ status: 204, id });
+                });
+              });
+            }
+          );
         }
-        return res.status(204).json({ status: 204, id });
-      });
+      );
     });
   };
 }

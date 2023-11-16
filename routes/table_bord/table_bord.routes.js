@@ -7,6 +7,10 @@ router.get(
   TableBordController.getWeekDailyPayments
 );
 router.get(
+  "/table-bord/total-ventes-hebdomadaire/",
+  TableBordController.getWeekDailySales
+);
+router.get(
   "/table-bord/total-clients-inscrits-quotidien/:isToday",
   TableBordController.getDailyRegisteredCustumersTotal
 );

@@ -134,6 +134,7 @@ class Brouillard {
     const query = "DELETE FROM brouillard WHERE id = ?";
     connection.query(query, [this.id], (error, results) => {
       if (error) {
+        console.log("SQL error", error);
         return callback(error, null);
       }
       return callback(null, this.id);

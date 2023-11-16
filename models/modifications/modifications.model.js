@@ -4,12 +4,14 @@ class Modifications {
   constructor(
     id,
     modification,
+    details,
     date_modification,
     nom_employe,
     prenoms_employe
   ) {
     this.id = id;
     this.modification = modification;
+    this.details = details;
     this.nom_employe = nom_employe;
     this.prenoms_employe = prenoms_employe;
     this.date_modification = date_modification;
@@ -17,11 +19,16 @@ class Modifications {
 
   static create(modificationData, callback) {
     const query =
-      "INSERT INTO modifications (id, modification, id_employe, date_modification) VALUES (NULL, ?, ?, ?)";
+      "INSERT INTO modifications (id, modification, details ,id_employe, date_modification) VALUES (NULL, ?, ?, ?, ?)";
     const currentDate = new Date();
     connection.query(
       query,
-      [modificationData.modification, modificationData.id_employe, currentDate],
+      [
+        modificationData.modification,
+        modificationData.details,
+        modificationData.id_employe,
+        currentDate,
+      ],
       (error, results) => {
         if (error) {
           return callback(error, null);
@@ -49,6 +56,7 @@ class Modifications {
       const modification = new Modifications(
         modificationData.id,
         modificationData.modification,
+        modificationData.details,
         modificationData.date_modification,
         modificationData.nom,
         modificationData.prenoms
@@ -60,7 +68,7 @@ class Modifications {
   static getAll(startDate, endDate, callback) {
     if (startDate && endDate) {
       const query =
-        "SELECT modifications.id, modification, date_modification, nom, prenoms  FROM modifications, employes WHERE modifications.id = employes.id AND date_modification BETWEEN ? AND ? ORDER BY id DESC";
+        "SELECT modifications.id, modification, details, date_modification, nom, prenoms  FROM modifications, employes WHERE modifications.id_employe = employes.id AND date_modification BETWEEN ? AND ? ORDER BY id DESC";
       connection.query(
         query,
         [new Date(startDate), new Date(endDate)],
@@ -72,6 +80,7 @@ class Modifications {
             return new Modifications(
               modificationData.id,
               modificationData.modification,
+              modificationData.details,
               modificationData.date_modification,
               modificationData.nom,
               modificationData.prenoms
@@ -82,15 +91,16 @@ class Modifications {
       );
     } else {
       const query =
-        "SELECT modifications.id, modification, date_modification, nom, prenoms  FROM modifications, employes WHERE modifications.id = employes.id ORDER BY id DESC";
+        "SELECT modifications.id, modification, details, date_modification, nom, prenoms  FROM modifications, employes WHERE modifications.id_employe = employes.id ORDER BY id DESC";
       connection.query(query, (error, results) => {
         if (error) {
           return callback(error, null);
         }
         const modificationsList = results.map((modificationData) => {
-          console.log(modificationData);
+          // console.log(modificationData);
           return new Modifications(
             modificationData.id,
+            modificationData.details,
             modificationData.modification,
             modificationData.date_modification,
             modificationData.nom,
@@ -104,7 +114,7 @@ class Modifications {
 
   update(callback) {
     const query =
-      "UPDATE modifications SET modification = ?, id_employe = ?, date_modification = ? WHERE id = ?";
+      "UPDATE modifications SET modification = ?, details = ?, id_employe = ?, date_modification = ? WHERE id = ?";
     const { id, ...updatedData } = this;
     connection.query(
       query,

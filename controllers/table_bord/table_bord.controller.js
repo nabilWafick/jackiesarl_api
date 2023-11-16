@@ -12,6 +12,19 @@ class TableBordController {
       return res.status(200).json(weekDailyPayments);
     });
   }
+
+  static getWeekDailySales(req, res) {
+    TableBord.getWeekDailySales((error, weekDailyPayments) => {
+      if (error) {
+        return res.status(500).json({
+          status: 500,
+          error: "Erreur lors de la récupération des paiements de la semaine ",
+        });
+      }
+      return res.status(200).json(weekDailyPayments);
+    });
+  }
+
   static getDailyRegisteredCustumersTotal(req, res) {
     const isToday = req.params.isToday;
 

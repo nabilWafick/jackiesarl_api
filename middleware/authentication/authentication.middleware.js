@@ -10,7 +10,7 @@ class AuthenticationMiddleware {
     const token = authHeader && authHeader.split(" ")[2];
 
     if (!accessToken || !token) {
-      console.log("Not Authenticated");
+      //  console.log("Not Authenticated");
       return res.status(401).json({ status: 401, error: "Non Authentifié" });
     }
 

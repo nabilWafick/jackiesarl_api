@@ -90,6 +90,31 @@ class ActivitesBanque {
     });
   }
 
+  static getLastOfBanque(id_banque, callback) {
+    const query =
+      "SELECT * FROM activites_banque WHERE id_banque = ? ORDER BY id DESC LIMIT 1";
+    connection.query(query, [id_banque], (error, results) => {
+      if (error) {
+        console.log("SQL error", error);
+        return callback(error, null);
+      }
+      if (results.length == 0) {
+        return callback(null, null); // Activité banque non trouvée
+      }
+      const activitesBanqueData = results[0];
+      const activitesBanque = new ActivitesBanque(
+        activitesBanqueData.id,
+        activitesBanqueData.id_banque,
+        activitesBanqueData.description,
+        activitesBanqueData.debit,
+        activitesBanqueData.credit,
+        activitesBanqueData.solde_actuel,
+        new Date(activitesBanqueData.date_activite)
+      );
+      return callback(null, activitesBanque);
+    });
+  }
+
   static getAllByBanqueID(id_banque, callback) {
     const query =
       "SELECT * FROM activites_banque WHERE id_banque = ? ORDER BY id DESC";
