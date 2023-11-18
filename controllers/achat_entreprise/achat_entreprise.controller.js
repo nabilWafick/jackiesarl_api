@@ -3,6 +3,7 @@ const path = require("path");
 const fs = require("fs");
 const AchatClient = require("../../models/achat_client/achat_client.model");
 const StockBonCommande = require("../../models/stock_bon_commande/stock_bon_commande.model");
+const Modifications = require("../../models/modifications/modifications.model");
 
 deleteFile = (fileLink) => {
   const filePath = fileLink.split("http://127.0.0.1:7000/");
@@ -104,6 +105,8 @@ class AchatEntrepriseController {
   static update = (req, res) => {
     const bonCommande = req.params.bon_commande;
     const updatedData = req.body;
+    let previousData = {};
+    let newData = {};
 
     AchatEntreprise.getByBonCommande(
       bonCommande,
@@ -120,6 +123,8 @@ class AchatEntrepriseController {
             .json({ status: 404, error: "Achat entreprise non trouvé" });
         }
 
+        previousData = existingAchatEntreprise;
+
         StockBonCommande.getByBonCommande(
           updatedData.bon_commande,
           (stockError, stock) => {
@@ -129,7 +134,7 @@ class AchatEntrepriseController {
                 error: "Erreur lors de la mise à jour de l'achat entreprise",
               });
             }
-            console.log("stock from SQL: ", stock);
+            // console.log("stock from SQL: ", stock);
             // si ce n'est pas encore utilise ou mise en vente
             if (!stock || !stock.id) {
               console.log("stock bon de commande !exist");
@@ -163,6 +168,8 @@ class AchatEntrepriseController {
                 }
               }
 
+              newData = existingAchatEntreprise;
+
               existingAchatEntreprise = new AchatEntreprise(
                 existingAchatEntreprise.bon_commande,
                 existingAchatEntreprise.categorie,
@@ -184,6 +191,34 @@ class AchatEntrepriseController {
                       "Erreur lors de la mise à jour de l'achat entreprise",
                   });
                 }
+
+                Modifications.create(
+                  {
+                    modification: `Modification des données d'un achat de l'entreprise`,
+                    details: `
+                      Anciennes données::
+                      Bon de Commande: ${previousData.bon_commande},
+                      Catégorie: ${previousData.categorie},
+                      Quantité achetée: ${previousData.quantite_achetee},
+                      Montant: ${previousData.montant},
+                      Banque: ${previousData.banque},
+                      Chèque: ${previousData.cheque},
+                      Bordereau: ${previousData.bordereau}
+                      -
+                      Nouvelles données::
+                      Bon de Commande: ${newData.bon_commande},
+                      Catégorie: ${newData.categorie},
+                      Quantité achetée: ${newData.quantite_achetee},
+                      Montant: ${newData.montant},
+                      Banque: ${newData.banque},
+                      Chèque: ${newData.cheque},
+                      Bordereau: ${newData.bordereau}
+                      `,
+                    id_employe: req.employee.id,
+                  },
+                  (error, modification) => {}
+                );
+
                 return res
                   .status(200)
                   .json({ status: 200, existingAchatEntreprise });
@@ -260,6 +295,8 @@ class AchatEntrepriseController {
                         }
                       }
 
+                      newData = existingAchatEntreprise;
+
                       existingAchatEntreprise = new AchatEntreprise(
                         existingAchatEntreprise.bon_commande,
                         existingAchatEntreprise.categorie,
@@ -279,6 +316,34 @@ class AchatEntrepriseController {
                               "Erreur lors de la mise à jour de l'achat entreprise",
                           });
                         }
+
+                        Modifications.create(
+                          {
+                            modification: `Modification des données d'un achat de l'entreprise`,
+                            details: `
+                              Anciennes données::
+                              Bon de Commande: ${previousData.bon_commande},
+                              Catégorie: ${previousData.categorie},
+                              Quantité achetée: ${previousData.quantite_achetee},
+                              Montant: ${previousData.montant},
+                              Banque: ${previousData.banque},
+                              Chèque: ${previousData.cheque},
+                              Bordereau: ${previousData.bordereau}
+                              -
+                              Nouvelles données::
+                              Bon de Commande: ${newData.bon_commande},
+                              Catégorie: ${newData.categorie},
+                              Quantité achetée: ${newData.quantite_achetee},
+                              Montant: ${newData.montant},
+                              Banque: ${newData.banque},
+                              Chèque: ${newData.cheque},
+                              Bordereau: ${newData.bordereau}
+                              `,
+                            id_employe: req.employee.id,
+                          },
+                          (error, modification) => {}
+                        );
+
                         return res
                           .status(200)
                           .json({ status: 200, existingAchatEntreprise });
@@ -326,6 +391,8 @@ class AchatEntrepriseController {
                   }
                 }
 
+                newData = existingAchatEntreprise;
+
                 existingAchatEntreprise = new AchatEntreprise(
                   existingAchatEntreprise.bon_commande,
                   existingAchatEntreprise.categorie,
@@ -345,6 +412,34 @@ class AchatEntrepriseController {
                         "Erreur lors de la mise à jour de l'achat entreprise",
                     });
                   }
+
+                  Modifications.create(
+                    {
+                      modification: `Modification des données d'un achat de l'entreprise`,
+                      details: `
+                        Anciennes données::
+                        Bon de Commande: ${previousData.bon_commande},
+                        Catégorie: ${previousData.categorie},
+                        Quantité achetée: ${previousData.quantite_achetee},
+                        Montant: ${previousData.montant},
+                        Banque: ${previousData.banque},
+                        Chèque: ${previousData.cheque},
+                        Bordereau: ${previousData.bordereau}
+                        -
+                        Nouvelles données::
+                        Bon de Commande: ${newData.bon_commande},
+                        Catégorie: ${newData.categorie},
+                        Quantité achetée: ${newData.quantite_achetee},
+                        Montant: ${newData.montant},
+                        Banque: ${newData.banque},
+                        Chèque: ${newData.cheque},
+                        Bordereau: ${newData.bordereau}
+                        `,
+                      id_employe: req.employee.id,
+                    },
+                    (error, modification) => {}
+                  );
+
                   return res
                     .status(200)
                     .json({ status: 200, existingAchatEntreprise });
@@ -355,8 +450,6 @@ class AchatEntrepriseController {
             }
           }
         );
-
-        // ==================== Final ===================
       }
     );
   };

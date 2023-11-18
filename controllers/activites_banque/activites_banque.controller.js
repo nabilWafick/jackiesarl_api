@@ -1,5 +1,6 @@
 const ActivitesBanque = require("../../models/activites_banque/activites_banque.model");
 const SoldeCourant = require("../../models/solde_courant/solde_courant.model");
+const Modifications = require("../../models/modifications/modifications.model");
 
 class ActivitesBanqueController {
   // Créer une nouvelle activité banque
@@ -145,63 +146,110 @@ class ActivitesBanqueController {
   static update = (req, res) => {
     const id = req.params.id;
     const updatedData = req.body;
-    ActivitesBanque.getById(id, (getError, existingActiviteBanque) => {
-      if (getError) {
-        return res.status(500).json({
-          status: 500,
-          error: "Erreur lors de la récupération de l'activité banque",
+    let previousData = {};
+    let newData = {};
+
+    SoldeCourant.getById(
+      updatedData.id_banque,
+      (soldeCourantError, soldeCourant) => {
+        if (soldeCourantError) {
+          return res.status(500).json({
+            status: 500,
+            error: "Erreur lors de la mise à jour de l'activité banque",
+          });
+        }
+        if (!soldeCourant) {
+          return res.status(404).json({
+            status: 404,
+            error: "La banque n'existe pas",
+          });
+        }
+
+        ActivitesBanque.getById(id, (getError, existingActiviteBanque) => {
+          if (getError) {
+            return res.status(500).json({
+              status: 500,
+              error: "Erreur lors de la récupération de l'activité banque",
+            });
+          }
+
+          if (!existingActiviteBanque) {
+            return res
+              .status(404)
+              .json({ status: 404, error: "Activité banque non trouvée" });
+          }
+
+          previousData = existingActiviteBanque;
+
+          if (existingActiviteBanque.description != updatedData.description) {
+            if (
+              existingActiviteBanque.debit != updatedData.debit ||
+              existingActiviteBanque.credit != existingActiviteBanque.credit
+            ) {
+              return res.status(406).json({
+                status: 406,
+                error: "Cette opération ne peut être réalisée",
+              });
+            } else {
+              // ================ Final =====================
+
+              existingActiviteBanque = {
+                ...existingActiviteBanque,
+                ...updatedData,
+              };
+
+              newData = existingActiviteBanque;
+
+              existingActiviteBanque = new ActivitesBanque(
+                existingActiviteBanque.id,
+                existingActiviteBanque.id_banque,
+                existingActiviteBanque.description,
+                existingActiviteBanque.debit,
+                existingActiviteBanque.credit,
+                existingActiviteBanque.solde_actuel,
+                existingActiviteBanque.date_activite
+              );
+
+              existingActiviteBanque.update((updateError) => {
+                if (updateError) {
+                  console.log("SQL Error");
+                  return res.status(500).json({
+                    status: 500,
+                    error: "Erreur lors de la mise à jour de l'activité banque",
+                  });
+                }
+
+                Modifications.create(
+                  {
+                    modification: `Modification des données de la banque ${soldeCourant.banque}`,
+                    details: `
+                    Anciennes données::
+                    Description: ${previousData.description},
+                    Débit: ${previousData.debit},
+                    Crédit: ${previousData.credit},
+                    Solde actuel: ${previousData.solde_actuel}
+                    -
+                    Nouvelles données::
+                    Description: ${newData.description},
+                    Débit: ${newData.debit},
+                    Crédit: ${newData.credit},
+                    Solde actuel: ${newData.solde_actuel}
+                    `,
+                    id_employe: req.employee.id,
+                  },
+                  (error, modification) => {}
+                );
+
+                return res
+                  .status(200)
+                  .json({ status: 200, existingActiviteBanque });
+              });
+              // =================== Final ========================
+            }
+          }
         });
       }
-
-      if (!existingActiviteBanque) {
-        return res
-          .status(404)
-          .json({ status: 404, error: "Activité banque non trouvée" });
-      }
-
-      if (existingActiviteBanque.description != updatedData.description) {
-        if (
-          existingActiviteBanque.debit != updatedData.debit ||
-          existingActiviteBanque.credit != existingActiviteBanque.credit
-        ) {
-          return res.status(406).json({
-            status: 406,
-            error: "Cette opération ne peut être réalisée",
-          });
-        } else {
-          // ================ Final =====================
-
-          existingActiviteBanque = {
-            ...existingActiviteBanque,
-            ...updatedData,
-          };
-
-          existingActiviteBanque = new ActivitesBanque(
-            existingActiviteBanque.id,
-            existingActiviteBanque.id_banque,
-            existingActiviteBanque.description,
-            existingActiviteBanque.debit,
-            existingActiviteBanque.credit,
-            existingActiviteBanque.solde_actuel,
-            existingActiviteBanque.date_activite
-          );
-
-          existingActiviteBanque.update((updateError) => {
-            if (updateError) {
-              console.log("SQL Error");
-              return res.status(500).json({
-                status: 500,
-                error: "Erreur lors de la mise à jour de l'activité banque",
-              });
-            }
-            return res
-              .status(200)
-              .json({ status: 200, existingActiviteBanque });
-          });
-          // =================== Final ========================
-        }
-      }
-    });
+    );
   };
 
   // Supprimer une activité banque par ID

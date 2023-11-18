@@ -1,6 +1,7 @@
 const AchatClient = require("../../models/achat_client/achat_client.model");
 const StockBonCommande = require("../../models/stock_bon_commande/stock_bon_commande.model");
 const Clients = require("../../models/clients/clients.model");
+const Modifications = require("../../models/modifications/modifications.model");
 const path = require("path");
 const fs = require("fs");
 
@@ -484,6 +485,8 @@ class AchatClientController {
   static update = (req, res) => {
     const id = req.params.id;
     let updatedData = req.body;
+    let previousData = {};
+    let newData = {};
     console.log("updatedData", updatedData);
     updatedData = {
       ...updatedData,
@@ -495,301 +498,378 @@ class AchatClientController {
 
     console.log("parsed updatedData", updatedData);
 
-    AchatClient.getById(id, (getError, existingAchatClient) => {
-      if (getError) {
+    Clients.getById(updatedData.id_client, (clientError, client) => {
+      if (clientError) {
         return res.status(500).json({
           status: 500,
-          error: "Erreur lors de la récupération de l'achat client",
+          error: "Erreur lors de la mise à jour de la remise de chèque client",
         });
       }
-      if (!existingAchatClient) {
+
+      if (!client) {
         return res
           .status(404)
-          .json({ status: 404, error: "Achat client non trouvé" });
+          .json({ status: 404, error: "Le client n'existe pas" });
       }
 
-      // on verifie le stock bon de commande est le meme que l'ancien
+      AchatClient.getById(id, (getError, existingAchatClient) => {
+        if (getError) {
+          return res.status(500).json({
+            status: 500,
+            error: "Erreur lors de la récupération de l'achat client",
+          });
+        }
+        if (!existingAchatClient) {
+          return res
+            .status(404)
+            .json({ status: 404, error: "Achat client non trouvé" });
+        }
 
-      if (updatedData.numero_bc == existingAchatClient.numero_bc) {
-        // last car on peut ajoute les stocks peu à peu, on prend le dernier ajouté
-        StockBonCommande.getLastBonCommande(
-          updatedData.numero_bc,
-          (getError, usedStockBonCommande) => {
-            if (getError) {
-              return res
-                .status(500)
-                .json({ status: 500, error: "Stock Bon Commande non trouvé" });
-            }
+        previousData = existingAchatClient;
+        // on verifie le stock bon de commande est le meme que l'ancien
 
-            if (!usedStockBonCommande) {
-              return res
-                .status(404)
-                .json({ status: 404, error: "Stock Bon Commande non trouvé" });
-            }
+        if (updatedData.numero_bc == existingAchatClient.numero_bc) {
+          // last car on peut ajoute les stocks peu à peu, on prend le dernier ajouté
+          StockBonCommande.getLastBonCommande(
+            updatedData.numero_bc,
+            (getError, usedStockBonCommande) => {
+              if (getError) {
+                return res.status(500).json({
+                  status: 500,
+                  error: "Stock Bon Commande non trouvé",
+                });
+              }
 
-            if (
-              usedStockBonCommande.stock_apres_vente +
-                existingAchatClient.quantite_achetee -
-                updatedData.quantite_achetee >=
-              0
-            ) {
-              usedStockBonCommande.stock_avant_vente +=
-                existingAchatClient.quantite_achetee -
-                updatedData.quantite_achetee;
-              usedStockBonCommande.vente +=
-                -existingAchatClient.quantite_achetee +
-                updatedData.quantite_achetee;
-              usedStockBonCommande.stock_apres_vente +=
-                existingAchatClient.quantite_achetee -
-                updatedData.quantite_achetee;
-              updatedData.categorie = usedStockBonCommande.categorie;
+              if (!usedStockBonCommande) {
+                return res.status(404).json({
+                  status: 404,
+                  error: "Stock Bon Commande non trouvé",
+                });
+              }
 
-              usedStockBonCommande = new StockBonCommande(
-                usedStockBonCommande.id,
-                usedStockBonCommande.numero_bc,
-                usedStockBonCommande.categorie,
-                usedStockBonCommande.quantite_achetee,
-                usedStockBonCommande.stock_initial,
-                usedStockBonCommande.stock_avant_vente,
-                usedStockBonCommande.vente,
-                usedStockBonCommande.stock_apres_vente,
-                usedStockBonCommande.date_rechargement
-              );
+              if (
+                usedStockBonCommande.stock_apres_vente +
+                  existingAchatClient.quantite_achetee -
+                  updatedData.quantite_achetee >=
+                0
+              ) {
+                usedStockBonCommande.stock_avant_vente +=
+                  existingAchatClient.quantite_achetee -
+                  updatedData.quantite_achetee;
+                usedStockBonCommande.vente +=
+                  -existingAchatClient.quantite_achetee +
+                  updatedData.quantite_achetee;
+                usedStockBonCommande.stock_apres_vente +=
+                  existingAchatClient.quantite_achetee -
+                  updatedData.quantite_achetee;
+                updatedData.categorie = usedStockBonCommande.categorie;
 
-              usedStockBonCommande.update((updateError) => {
-                if (updateError) {
-                  return res.status(500).json({
-                    status: 500,
-                    error:
-                      "Erreur lors de la mise à jour du stock bon de commande",
-                  });
-                }
-                // stock bon de commande mise à jour avec succes
-
-                // on met update l'achat client
-
-                existingAchatClient = {
-                  ...existingAchatClient,
-                  ...updatedData,
-                };
-                const file = req.file;
-                console.log("existingAchatClient", existingAchatClient);
-                console.log("file", file);
-                if (file) {
-                  const needed_path = file && file.path.split("/uploads")[1];
-                  //console.log("needeed path", needed_path);
-                  const fileLink =
-                    file && `http://127.0.0.1:7000${needed_path}`;
-                  // console.log("file link", fileLink);
-                  const lastSlip = existingAchatClient.bordereau;
-                  existingAchatClient = {
-                    ...existingAchatClient,
-                    bordereau: fileLink,
-                  };
-                  if (lastSlip != "") {
-                    deleteFile(lastSlip);
-                  }
-                }
-                existingAchatClient = new AchatClient(
-                  existingAchatClient.id,
-                  undefined,
-                  existingAchatClient.quantite_achetee,
-                  existingAchatClient.categorie,
-                  existingAchatClient.montant,
-                  existingAchatClient.numero_ctp,
-                  existingAchatClient.bordereau,
-                  existingAchatClient.numero_bc,
-                  existingAchatClient.id_client,
-                  existingAchatClient.date_achat
+                usedStockBonCommande = new StockBonCommande(
+                  usedStockBonCommande.id,
+                  usedStockBonCommande.numero_bc,
+                  usedStockBonCommande.categorie,
+                  usedStockBonCommande.quantite_achetee,
+                  usedStockBonCommande.stock_initial,
+                  usedStockBonCommande.stock_avant_vente,
+                  usedStockBonCommande.vente,
+                  usedStockBonCommande.stock_apres_vente,
+                  usedStockBonCommande.date_rechargement
                 );
-                existingAchatClient.update((updateError) => {
+
+                usedStockBonCommande.update((updateError) => {
                   if (updateError) {
                     return res.status(500).json({
                       status: 500,
-                      error: "Erreur lors de la mise à jour de l'achat client",
-                    });
-                  }
-                  return res.status(200).json({
-                    status: 200,
-                    achatClient: existingAchatClient,
-                  });
-                });
-
-                // ======================== Final ==========================
-              });
-            } else {
-              return res.status(406).json({
-                status: 406,
-                error: `La quantité achetée est supérieure à celle disponible. ${usedStockBonCommande.stock_apres_vente} t disponible`,
-              });
-            }
-          }
-        );
-      } else {
-        // si c'est un nouveau stock bon de commande
-        StockBonCommande.getLastBonCommande(
-          updatedData.numero_bc,
-          (getError, newStockBonCommande) => {
-            if (getError) {
-              return res.status(500).json({
-                status: 500,
-                error:
-                  "Erreur lors de la récupération du stock bon de commande",
-              });
-            }
-            if (!newStockBonCommande) {
-              return res.status(404).json({
-                status: 404,
-                error: "Le stock bon de commande n'existe pas",
-              });
-            }
-
-            if (
-              updatedData.quantite_achetee >
-              newStockBonCommande.stock_apres_vente
-            ) {
-              return res.status(406).json({
-                status: 406,
-                error: `La quantité demandée est supérieure à celle disponible. ${newStockBonCommande.stock_apres_vente} t en stock`,
-              });
-            } else {
-              // on restitue le prelevement de l'ancien stock bon de commande
-              StockBonCommande.getLastBonCommande(
-                existingAchatClient.numero_bc,
-                (error, oldStockBonCommande) => {
-                  if (error) {
-                    return res.status(500).json({
-                      status: 500,
                       error:
-                        "Erreur lors de la récupération du stock bon de commande",
+                        "Erreur lors de la mise à jour du stock bon de commande",
                     });
                   }
-                  if (!oldStockBonCommande) {
-                    return res.status(404).json({
-                      status: 404,
-                      error: "Le stock bon de commande n'existe pas",
-                    });
+                  // stock bon de commande mise à jour avec succes
+
+                  // on update l'achat client
+
+                  existingAchatClient = {
+                    ...existingAchatClient,
+                    ...updatedData,
+                  };
+
+                  newData = existingAchatClient;
+
+                  const file = req.file;
+                  console.log("existingAchatClient", existingAchatClient);
+                  console.log("file", file);
+                  if (file) {
+                    const needed_path = file && file.path.split("/uploads")[1];
+                    //console.log("needeed path", needed_path);
+                    const fileLink =
+                      file && `http://127.0.0.1:7000${needed_path}`;
+                    // console.log("file link", fileLink);
+                    const lastSlip = existingAchatClient.bordereau;
+                    existingAchatClient = {
+                      ...existingAchatClient,
+                      bordereau: fileLink,
+                    };
+                    if (lastSlip != "") {
+                      deleteFile(lastSlip);
+                    }
                   }
-
-                  oldStockBonCommande.stock_avant_vente +=
-                    existingAchatClient.quantite_achetee;
-                  oldStockBonCommande.vente -=
-                    existingAchatClient.quantite_achetee;
-                  oldStockBonCommande.stock_apres_vente +=
-                    existingAchatClient.quantite_achetee;
-
-                  oldStockBonCommande = new StockBonCommande(
-                    oldStockBonCommande.id,
-                    oldStockBonCommande.numero_bc,
-                    oldStockBonCommande.categorie,
-                    oldStockBonCommande.quantite_achetee,
-                    oldStockBonCommande.stock_initial,
-                    oldStockBonCommande.stock_avant_vente,
-                    oldStockBonCommande.vente,
-                    oldStockBonCommande.stock_apres_vente,
-                    oldStockBonCommande.date_rechargement
+                  existingAchatClient = new AchatClient(
+                    existingAchatClient.id,
+                    undefined,
+                    existingAchatClient.quantite_achetee,
+                    existingAchatClient.categorie,
+                    existingAchatClient.montant,
+                    existingAchatClient.numero_ctp,
+                    existingAchatClient.bordereau,
+                    existingAchatClient.numero_bc,
+                    existingAchatClient.id_client,
+                    existingAchatClient.date_achat
                   );
-
-                  oldStockBonCommande.update((oldError) => {
-                    if (oldError) {
+                  existingAchatClient.update((updateError) => {
+                    if (updateError) {
                       return res.status(500).json({
                         status: 500,
-                        error: `Erreur de la mise à jour de l'ancien stock bon de commande`,
+                        error:
+                          "Erreur lors de la mise à jour de l'achat client",
                       });
                     }
-                    // ancien stock bon de commande mise à jour
 
-                    // on preleve dans le nouveau stock bon de commande
-                    newStockBonCommande.stock_avant_vente =
-                      newStockBonCommande.stock_apres_vente;
-                    newStockBonCommande.vente += updatedData.quantite_achetee;
-                    newStockBonCommande.stock_apres_vente -=
-                      updatedData.quantite_achetee;
-                    updatedData.categorie = newStockBonCommande.categorie;
-
-                    newStockBonCommande = new StockBonCommande(
-                      newStockBonCommande.id,
-                      newStockBonCommande.numero_bc,
-                      newStockBonCommande.categorie,
-                      newStockBonCommande.quantite_achetee,
-                      newStockBonCommande.stock_initial,
-                      newStockBonCommande.stock_avant_vente,
-                      newStockBonCommande.vente,
-                      newStockBonCommande.stock_apres_vente,
-                      newStockBonCommande.date_rechargement
+                    Modifications.create(
+                      {
+                        modification: `Modification des données d'un achat du client ${client.prenoms} ${client.nom}`,
+                        details: `
+                          Anciennes données::
+                          Quantite achetée: ${previousData.quantite_achetee},
+                          Catégorie: ${previousData.categorie},
+                          Montant: ${previousData.montant},
+                          Numéro CTP: ${previousData.numero_ctp},
+                          Bordereau: ${previousData.bordereau},
+                          Bon de Commande: ${previousData.numero_bc}
+                          -
+                          Nouvelles données::
+                          Quantite achetée: ${newData.quantite_achetee},
+                          Catégorie: ${newData.categorie},
+                          Montant: ${newData.montant},
+                          Numéro CTP: ${newData.numero_ctp},
+                          Bordereau: ${newData.bordereau},
+                          Bon de Commande: ${newData.numero_bc}
+                          `,
+                        id_employe: req.employee.id,
+                      },
+                      (error, modification) => {}
                     );
 
-                    newStockBonCommande.update((newError) => {
-                      if (newError) {
+                    return res.status(200).json({
+                      status: 200,
+                      achatClient: existingAchatClient,
+                    });
+                  });
+
+                  // ======================== Final ==========================
+                });
+              } else {
+                return res.status(406).json({
+                  status: 406,
+                  error: `La quantité achetée est supérieure à celle disponible. ${usedStockBonCommande.stock_apres_vente} t disponible`,
+                });
+              }
+            }
+          );
+        } else {
+          // si c'est un nouveau stock bon de commande
+          StockBonCommande.getLastBonCommande(
+            updatedData.numero_bc,
+            (getError, newStockBonCommande) => {
+              if (getError) {
+                return res.status(500).json({
+                  status: 500,
+                  error:
+                    "Erreur lors de la récupération du stock bon de commande",
+                });
+              }
+              if (!newStockBonCommande) {
+                return res.status(404).json({
+                  status: 404,
+                  error: "Le stock bon de commande n'existe pas",
+                });
+              }
+
+              if (
+                updatedData.quantite_achetee >
+                newStockBonCommande.stock_apres_vente
+              ) {
+                return res.status(406).json({
+                  status: 406,
+                  error: `La quantité demandée est supérieure à celle disponible. ${newStockBonCommande.stock_apres_vente} t en stock`,
+                });
+              } else {
+                // on restitue le prelevement de l'ancien stock bon de commande
+                StockBonCommande.getLastBonCommande(
+                  existingAchatClient.numero_bc,
+                  (error, oldStockBonCommande) => {
+                    if (error) {
+                      return res.status(500).json({
+                        status: 500,
+                        error:
+                          "Erreur lors de la récupération du stock bon de commande",
+                      });
+                    }
+                    if (!oldStockBonCommande) {
+                      return res.status(404).json({
+                        status: 404,
+                        error: "Le stock bon de commande n'existe pas",
+                      });
+                    }
+
+                    oldStockBonCommande.stock_avant_vente +=
+                      existingAchatClient.quantite_achetee;
+                    oldStockBonCommande.vente -=
+                      existingAchatClient.quantite_achetee;
+                    oldStockBonCommande.stock_apres_vente +=
+                      existingAchatClient.quantite_achetee;
+
+                    oldStockBonCommande = new StockBonCommande(
+                      oldStockBonCommande.id,
+                      oldStockBonCommande.numero_bc,
+                      oldStockBonCommande.categorie,
+                      oldStockBonCommande.quantite_achetee,
+                      oldStockBonCommande.stock_initial,
+                      oldStockBonCommande.stock_avant_vente,
+                      oldStockBonCommande.vente,
+                      oldStockBonCommande.stock_apres_vente,
+                      oldStockBonCommande.date_rechargement
+                    );
+
+                    oldStockBonCommande.update((oldError) => {
+                      if (oldError) {
                         return res.status(500).json({
                           status: 500,
                           error: `Erreur de la mise à jour de l'ancien stock bon de commande`,
                         });
                       }
-                      // prelevement du nouveau stock realise avec succes
+                      // ancien stock bon de commande mise à jour
 
-                      // on met a jour l'achat du client
+                      // on preleve dans le nouveau stock bon de commande
+                      newStockBonCommande.stock_avant_vente =
+                        newStockBonCommande.stock_apres_vente;
+                      newStockBonCommande.vente += updatedData.quantite_achetee;
+                      newStockBonCommande.stock_apres_vente -=
+                        updatedData.quantite_achetee;
+                      updatedData.categorie = newStockBonCommande.categorie;
 
-                      // ======================== Final ==========================
-
-                      existingAchatClient = {
-                        ...existingAchatClient,
-                        ...updatedData,
-                      };
-                      const file = req.file;
-                      console.log("existingAchatClient", existingAchatClient);
-                      console.log("file", file);
-                      const needed_path =
-                        file && file.path.split("/uploads")[1];
-                      //console.log("needeed path", needed_path);
-                      const fileLink =
-                        file && `http://127.0.0.1:7000${needed_path}`;
-                      // console.log("file link", fileLink);
-                      if (file) {
-                        const lastSlip = existingAchatClient.bordereau;
-                        existingAchatClient = {
-                          ...existingAchatClient,
-                          bordereau: fileLink,
-                        };
-                        if (lastSlip != "") {
-                          deleteFile(lastSlip);
-                        }
-                      }
-                      existingAchatClient = new AchatClient(
-                        existingAchatClient.id,
-                        undefined,
-                        existingAchatClient.quantite_achetee,
-                        existingAchatClient.categorie,
-                        existingAchatClient.montant,
-                        existingAchatClient.numero_ctp,
-                        existingAchatClient.bordereau,
-                        existingAchatClient.numero_bc,
-                        existingAchatClient.id_client,
-                        existingAchatClient.date_achat
+                      newStockBonCommande = new StockBonCommande(
+                        newStockBonCommande.id,
+                        newStockBonCommande.numero_bc,
+                        newStockBonCommande.categorie,
+                        newStockBonCommande.quantite_achetee,
+                        newStockBonCommande.stock_initial,
+                        newStockBonCommande.stock_avant_vente,
+                        newStockBonCommande.vente,
+                        newStockBonCommande.stock_apres_vente,
+                        newStockBonCommande.date_rechargement
                       );
-                      existingAchatClient.update((updateError) => {
-                        if (updateError) {
+
+                      newStockBonCommande.update((newError) => {
+                        if (newError) {
                           return res.status(500).json({
                             status: 500,
-                            error:
-                              "Erreur lors de la mise à jour de l'achat client",
+                            error: `Erreur de la mise à jour de l'ancien stock bon de commande`,
                           });
                         }
-                        return res.status(200).json({
-                          status: 200,
-                          achatClient: existingAchatClient,
-                        });
-                      });
+                        // prelevement du nouveau stock realise avec succes
 
-                      // ======================== Final ==========================
+                        // on met a jour l'achat du client
+
+                        // ======================== Final ==========================
+
+                        existingAchatClient = {
+                          ...existingAchatClient,
+                          ...updatedData,
+                        };
+
+                        newData = existingAchatClient;
+
+                        const file = req.file;
+                        console.log("existingAchatClient", existingAchatClient);
+                        console.log("file", file);
+                        const needed_path =
+                          file && file.path.split("/uploads")[1];
+                        //console.log("needeed path", needed_path);
+                        const fileLink =
+                          file && `http://127.0.0.1:7000${needed_path}`;
+                        // console.log("file link", fileLink);
+                        if (file) {
+                          const lastSlip = existingAchatClient.bordereau;
+                          existingAchatClient = {
+                            ...existingAchatClient,
+                            bordereau: fileLink,
+                          };
+                          if (lastSlip != "") {
+                            deleteFile(lastSlip);
+                          }
+                        }
+                        existingAchatClient = new AchatClient(
+                          existingAchatClient.id,
+                          undefined,
+                          existingAchatClient.quantite_achetee,
+                          existingAchatClient.categorie,
+                          existingAchatClient.montant,
+                          existingAchatClient.numero_ctp,
+                          existingAchatClient.bordereau,
+                          existingAchatClient.numero_bc,
+                          existingAchatClient.id_client,
+                          existingAchatClient.date_achat
+                        );
+                        existingAchatClient.update((updateError) => {
+                          if (updateError) {
+                            return res.status(500).json({
+                              status: 500,
+                              error:
+                                "Erreur lors de la mise à jour de l'achat client",
+                            });
+                          }
+
+                          Modifications.create(
+                            {
+                              modification: `Modification des données d'un achat du client ${client.prenoms} ${client.nom}`,
+                              details: `
+                                Anciennes données::
+                                Quantite achetée: ${previousData.quantite_achetee},
+                                Catégorie: ${previousData.categorie},
+                                Montant: ${previousData.montant},
+                                Numéro CTP: ${previousData.numero_ctp},
+                                Bordereau: ${previousData.bordereau},
+                                Bon de Commande: ${previousData.numero_bc}
+                                -
+                                Nouvelles données::
+                                Quantite achetée: ${newData.quantite_achetee},
+                                Catégorie: ${newData.categorie},
+                                Montant: ${newData.montant},
+                                Numéro CTP: ${newData.numero_ctp},
+                                Bordereau: ${newData.bordereau},
+                                Bon de Commande: ${newData.numero_bc}
+                                `,
+                              id_employe: req.employee.id,
+                            },
+                            (error, modification) => {}
+                          );
+
+                          return res.status(200).json({
+                            status: 200,
+                            achatClient: existingAchatClient,
+                          });
+                        });
+
+                        // ======================== Final ==========================
+                      });
                     });
-                  });
-                }
-              );
+                  }
+                );
+              }
             }
-          }
-        );
-      }
+          );
+        }
+      });
     });
   };
 

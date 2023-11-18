@@ -12,8 +12,8 @@ var AuthenticationMiddleware = require("../../middleware/authentication/authenti
 
 
 router.post("/stock-camion", AuthenticationMiddleware.authenticate, AuthorisationMiddleware.authorize("ajouter-stock-camion"), StockCamionController.create);
-router.get("/stock-camion/:id", StockCamionController.getById);
-router.get("/stocks-camions-default/:startDate?/:endDate?", StockCamionController.getAll);
+router.get("/stock-camion/:id", AuthenticationMiddleware.authenticate, AuthorisationMiddleware.authorize("lire-stock-camion"), StockCamionController.getById);
+router.get("/stocks-camions-default/:startDate?/:endDate?", AuthenticationMiddleware.authenticate, AuthorisationMiddleware.authorize("lire-stock-camion"), StockCamionController.getAll);
 router.put("/stock-camion/:id", AuthenticationMiddleware.authenticate, AuthorisationMiddleware.authorize("modifier-stock-camion"), StockCamionController.update);
 router["delete"]("/stock-camion/:id", AuthenticationMiddleware.authenticate, AuthorisationMiddleware.authorize("supprimer-stock-camion"), StockCamionController["delete"]);
 module.exports = router;

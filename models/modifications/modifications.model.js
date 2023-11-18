@@ -57,7 +57,7 @@ class Modifications {
         modificationData.id,
         modificationData.modification,
         modificationData.details,
-        modificationData.date_modification,
+        new Date(modificationData.date_modification),
         modificationData.nom,
         modificationData.prenoms
       );
@@ -81,7 +81,7 @@ class Modifications {
               modificationData.id,
               modificationData.modification,
               modificationData.details,
-              modificationData.date_modification,
+              new Date(modificationData.date_modification),
               modificationData.nom,
               modificationData.prenoms
             );
@@ -100,9 +100,9 @@ class Modifications {
           // console.log(modificationData);
           return new Modifications(
             modificationData.id,
-            modificationData.details,
             modificationData.modification,
-            modificationData.date_modification,
+            modificationData.details,
+            new Date(modificationData.date_modification),
             modificationData.nom,
             modificationData.prenoms
           );

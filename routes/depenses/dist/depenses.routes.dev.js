@@ -30,14 +30,14 @@ var upload = multer({
 }); // Routes pour la table `depenses`
 
 router.post("/depenses", AuthenticationMiddleware.authenticate, AuthorisationMiddleware.authorize("ajouter-depense"), upload.single("piece"), DepensesController.create);
-router.get("/depense/:id", DepensesController.getById);
-router.get("/depenses-default/:startDate?/:endDate?", DepensesController.getAll);
-router.get("/depenses/new-to-old/:startDate?/:endDate?", DepensesController.getAllFromNewToOld);
-router.get("/depenses/old-to-new/:startDate?/:endDate?", DepensesController.getAllFromOldToNew);
-router.get("/depenses/most-important/:startDate?/:endDate?", DepensesController.getAllMostImportant);
-router.get("/depenses/less-important/:startDate?/:endDate?", DepensesController.getAllLessImportant);
-router.get("/depenses/unvalidated/:startDate?/:endDate?", DepensesController.getAllUnvalidated);
-router.get("/depenses/validated/:startDate?/:endDate?", DepensesController.getAllValidated);
+router.get("/depense/:id", AuthenticationMiddleware.authenticate, AuthorisationMiddleware.authorize("lire-depense"), DepensesController.getById);
+router.get("/depenses-default/:startDate?/:endDate?", AuthenticationMiddleware.authenticate, AuthorisationMiddleware.authorize("lire-depense"), DepensesController.getAll);
+router.get("/depenses/new-to-old/:startDate?/:endDate?", AuthenticationMiddleware.authenticate, AuthorisationMiddleware.authorize("lire-depense"), DepensesController.getAllFromNewToOld);
+router.get("/depenses/old-to-new/:startDate?/:endDate?", AuthenticationMiddleware.authenticate, AuthorisationMiddleware.authorize("lire-depense"), DepensesController.getAllFromOldToNew);
+router.get("/depenses/most-important/:startDate?/:endDate?", AuthenticationMiddleware.authenticate, AuthorisationMiddleware.authorize("lire-depense"), DepensesController.getAllMostImportant);
+router.get("/depenses/less-important/:startDate?/:endDate?", AuthenticationMiddleware.authenticate, AuthorisationMiddleware.authorize("lire-depense"), DepensesController.getAllLessImportant);
+router.get("/depenses/unvalidated/:startDate?/:endDate?", AuthenticationMiddleware.authenticate, AuthorisationMiddleware.authorize("lire-depense"), DepensesController.getAllUnvalidated);
+router.get("/depenses/validated/:startDate?/:endDate?", AuthenticationMiddleware.authenticate, AuthorisationMiddleware.authorize("lire-depense"), DepensesController.getAllValidated);
 router.put("/depenses/:id", AuthenticationMiddleware.authenticate, AuthorisationMiddleware.authorize("modifier-depense"), upload.single("piece"), DepensesController.update);
 router["delete"]("/depenses/:id", AuthenticationMiddleware.authenticate, AuthorisationMiddleware.authorize("supprimer-depense"), DepensesController["delete"]);
 module.exports = router;

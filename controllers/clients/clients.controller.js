@@ -151,8 +151,8 @@ class ClientsController {
   static update = (req, res) => {
     const id = req.params.id;
     const updatedData = req.body;
-    //  console.log("Sended data for upadating client");
-    //  console.log(updatedData);
+    let previousData = {};
+    let newData = {};
     Clients.getById(id, (getError, existingClient) => {
       if (getError) {
         return res
@@ -163,6 +163,8 @@ class ClientsController {
         //   console.log("User to update not found");
         return res.status(404).json({ error: "Client non trouvé" });
       }
+
+      previousData = existingClient;
 
       Clients.getAll(undefined, undefined, (getError, clients) => {
         if (getError) {
@@ -220,6 +222,8 @@ class ClientsController {
 
         existingClient = { ...existingClient, ...updatedData };
 
+        newData = existingClient;
+
         existingClient = new Clients(
           existingClient.id,
           existingClient.nom,
@@ -243,6 +247,17 @@ class ClientsController {
           Modifications.create(
             {
               modification: `Modification des données d'un client`,
+              details: `Anciennes données::
+              Nom: ${previousData.nom},
+              Prénoms: ${previousData.prenoms},
+              Numéro IFU: ${previousData.numero_ifu},
+              Numéro de téléphone: ${previousData.numero_telephone},
+              Email: ${previousData.email} 
+              - Nouvelles données:: Nom: ${newData.nom},
+              Prénoms: ${newData.prenoms},
+              Numéro IFU: ${newData.numero_ifu},
+              Numéro de téléphone: ${newData.numero_telephone},
+              Email: ${newData.email},`,
               id_employe: req.employee.id,
             },
             (error, modification) => {}

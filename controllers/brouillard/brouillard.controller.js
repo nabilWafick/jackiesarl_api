@@ -1,5 +1,6 @@
 const ActivitesDepot = require("../../models/activites_depot/activites_depot.model");
 const Brouillard = require("../../models/brouillard/brouillard.model");
+const Modifications = require("../../models/modifications/modifications.model");
 
 class BrouillardController {
   // Créer un nouveau brouillard
@@ -51,7 +52,9 @@ class BrouillardController {
     const is_current_stock_increasing = req.params.is_current_stock_increasing;
     console.log("is_current_stock_increasing", is_current_stock_increasing);
     const updatedData = req.body;
-    console.log("id depot", id);
+    let previousData = {};
+    let newData = {};
+
     Brouillard.getById(id, (getError, existingBrouillard) => {
       if (getError) {
         return res.status(500).json({
@@ -65,12 +68,16 @@ class BrouillardController {
           .json({ status: 404, error: "Brouillard non trouvé" });
       }
 
+      previousData = existingBrouillard;
+
       if (is_current_stock_increasing == 1) {
         existingBrouillard = {
           ...existingBrouillard,
           ...updatedData,
           stock_actuel: updatedData.stock_actuel,
         };
+
+        newData = existingBrouillard;
 
         existingBrouillard = new Brouillard(
           existingBrouillard.id,
@@ -88,6 +95,27 @@ class BrouillardController {
               error: "Erreur lors de la mise à jour du brouillard",
             });
           }
+
+          Modifications.create(
+            {
+              modification: `Modification des données d'un dépôt`,
+              details: `
+                Anciennes données::
+                Dépôt: ${previousData.depot},
+                Stock actuel: ${previousData.stock_actuel},
+                Nom gérant: ${previousData.nom_gerant},
+                Numéro gérant: ${previousData.numero_gerant}
+                -
+                Nouvelles données::
+                Dépôt: ${newData.depot},
+                Stock actuel: ${newData.stock_actuel},
+                Nom gérant: ${newData.nom_gerant},
+                Numéro gérant: ${newData.numero_gerant}
+                `,
+              id_employe: req.employee.id,
+            },
+            (error, modification) => {}
+          );
 
           return res.status(200).json({ status: 200, existingBrouillard });
           // on ne met pas a jour le stock apres vente de la derniere vente
@@ -161,6 +189,8 @@ class BrouillardController {
               if (!lastActivite) {
                 existingBrouillard = { ...existingBrouillard, ...updatedData };
 
+                newData = existingBrouillard;
+
                 existingBrouillard = new Brouillard(
                   existingBrouillard.id,
                   existingBrouillard.depot,
@@ -177,6 +207,28 @@ class BrouillardController {
                       error: "Erreur lors de la mise à jour du brouillard",
                     });
                   }
+
+                  Modifications.create(
+                    {
+                      modification: `Modification des données d'un dépôt`,
+                      details: `
+                        Anciennes données::
+                        Dépôt: ${previousData.depot},
+                        Stock actuel: ${previousData.stock_actuel},
+                        Nom gérant: ${previousData.nom_gerant},
+                        Numéro gérant: ${previousData.numero_gerant}
+                        -
+                        Nouvelles données::
+                        Dépôt: ${newData.depot},
+                        Stock actuel: ${newData.stock_actuel},
+                        Nom gérant: ${newData.nom_gerant},
+                        Numéro gérant: ${newData.numero_gerant}
+                        `,
+                      id_employe: req.employee.id,
+                    },
+                    (error, modification) => {}
+                  );
+
                   return res
                     .status(200)
                     .json({ status: 200, existingBrouillard });
@@ -191,6 +243,8 @@ class BrouillardController {
           );
         } else {
           existingBrouillard = { ...existingBrouillard, ...updatedData };
+
+          newData = existingBrouillard;
 
           existingBrouillard = new Brouillard(
             existingBrouillard.id,
@@ -208,6 +262,28 @@ class BrouillardController {
                 error: "Erreur lors de la mise à jour du brouillard",
               });
             }
+
+            Modifications.create(
+              {
+                modification: `Modification des données d'un dépôt`,
+                details: `
+                  Anciennes données::
+                  Dépôt: ${previousData.depot},
+                  Stock actuel: ${previousData.stock_actuel},
+                  Nom gérant: ${previousData.nom_gerant},
+                  Numéro gérant: ${previousData.numero_gerant}
+                  -
+                  Nouvelles données::
+                  Dépôt: ${newData.depot},
+                  Stock actuel: ${newData.stock_actuel},
+                  Nom gérant: ${newData.nom_gerant},
+                  Numéro gérant: ${newData.numero_gerant}
+                  `,
+                id_employe: req.employee.id,
+              },
+              (error, modification) => {}
+            );
+
             return res.status(200).json({ status: 200, existingBrouillard });
           });
         }

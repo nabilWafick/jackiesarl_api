@@ -5,6 +5,8 @@ const cors = require("cors");
 const app = express();
 const routes = require("./routes/routes");
 const path = require("path");
+const undefinedRoute = require("./routes/404/404.routes");
+
 const port = process.env.PORT;
 
 const publicsDirectory = path.join(__dirname, "public");
@@ -27,6 +29,9 @@ app.use(bodyParser.json());
 
 // Utiliser les routes
 app.use("/api", routes);
+
+// route vers la racine
+app.use("/", undefinedRoute);
 
 // Démarrer le serveur
 app.listen(port, () => {

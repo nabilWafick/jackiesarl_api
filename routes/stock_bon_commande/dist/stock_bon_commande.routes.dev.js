@@ -12,8 +12,8 @@ var AuthenticationMiddleware = require("../../middleware/authentication/authenti
 
 
 router.post("/stock-bon-commande", AuthenticationMiddleware.authenticate, AuthorisationMiddleware.authorize("ajouter-stock-bon-commande"), StockBonCommandeController.create);
-router.get("/stock-bon-commande/:id", StockBonCommandeController.getById);
-router.get("/stock-bon-commande/", StockBonCommandeController.getAll);
+router.get("/stock-bon-commande/:id", AuthenticationMiddleware.authenticate, AuthorisationMiddleware.authorize("lire-stock-bon-commande"), StockBonCommandeController.getById);
+router.get("/stock-bon-commande/", AuthenticationMiddleware.authenticate, AuthorisationMiddleware.authorize("lire-stock-bon-commande"), StockBonCommandeController.getAll);
 router.put("/stock-bon-commande/:id", AuthenticationMiddleware.authenticate, AuthorisationMiddleware.authorize("modifier-stock-bon-commande"), StockBonCommandeController.update);
 router["delete"]("/stock-bon-commande/:id", AuthenticationMiddleware.authenticate, AuthorisationMiddleware.authorize("supprimer-stock-bon-commande"), StockBonCommandeController["delete"]);
 module.exports = router;

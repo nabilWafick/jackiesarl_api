@@ -6,6 +6,10 @@ var router = express.Router();
 
 var ClientsTonnagesController = require("../../controllers/clients_tonnages/clients_tonnages.controller");
 
-router.get("/clients-tonnages/:id_client", ClientsTonnagesController.getByIdClient);
-router.get("/clients-tonnages", ClientsTonnagesController.getAll);
+var AuthorisationMiddleware = require("../../middleware/authorisation/authorisation.middleware");
+
+var AuthenticationMiddleware = require("../../middleware/authentication/authentication.middleware");
+
+router.get("/clients-tonnages/:id_client", AuthenticationMiddleware.authenticate, AuthorisationMiddleware.authorize("lire-client"), ClientsTonnagesController.getByIdClient);
+router.get("/clients-tonnages", AuthenticationMiddleware.authenticate, AuthorisationMiddleware.authorize("lire-client"), ClientsTonnagesController.getAll);
 module.exports = router;

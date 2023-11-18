@@ -1,6 +1,7 @@
 const Depenses = require("../../models/depenses/depenses.model");
 const path = require("path");
 const fs = require("fs");
+const Modifications = require("../../models/modifications/modifications.model");
 
 deleteFile = (fileLink) => {
   const filePath = fileLink.split("http://127.0.0.1:7000/");
@@ -155,6 +156,9 @@ class DepensesController {
   static update = (req, res) => {
     const id = req.params.id;
     const updatedData = req.body;
+    let previousData = {};
+    let newData = {};
+
     Depenses.getById(id, (getError, existingDepense) => {
       if (getError) {
         return res.status(500).json({
@@ -167,6 +171,9 @@ class DepensesController {
           .status(404)
           .json({ status: 404, error: "Dépense non trouvée" });
       }
+
+      previousData = existingDepense;
+
       existingDepense = {
         ...existingDepense,
         ...updatedData,
@@ -188,6 +195,9 @@ class DepensesController {
           deleteFile(lastSlip);
         }
       }
+
+      newData = existingDepense;
+
       existingDepense = new Depenses(
         existingDepense.id,
         existingDepense.description,
@@ -203,6 +213,32 @@ class DepensesController {
             error: "Erreur lors de la mise à jour de la dépense",
           });
         }
+
+        Modifications.create(
+          {
+            modification: `Modification des données d'une dépense`,
+            details: `
+              Anciennes données::
+              Description: ${previousData.description},
+              Montant: ${previousData.montant},
+              Pièce: ${previousData.piece},
+              État de validation: ${
+                previousData.est_validee ? "Validée" : "Non Validée"
+              }
+              -
+              Nouvelles données::
+              Description: ${newData.description},
+              Montant: ${newData.montant},
+              Pièce: ${newData.piece},
+              État de validation: ${
+                newData.est_validee ? "Validée" : "Non Validée"
+              }
+              `,
+            id_employe: req.employee.id,
+          },
+          (error, modification) => {}
+        );
+
         return res.status(200).json({ status: 200, existingDepense });
       });
     });

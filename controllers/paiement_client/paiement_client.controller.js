@@ -1,5 +1,7 @@
 const PaiementClient = require("../../models/paiement_client/paiement_client.model");
 const AchatEntreprise = require("../../models/achat_entreprise/achat_entreprise.model");
+const Clients = require("../../models/clients/clients.model");
+const Modifications = require("../../models/modifications/modifications.model");
 const path = require("path");
 const fs = require("fs");
 
@@ -482,90 +484,143 @@ class PaiementClientController {
   static update = (req, res) => {
     const id = req.params.id;
     const updatedData = req.body;
-    PaiementClient.getById(id, (getError, existingPaiementClient) => {
-      if (getError) {
+    let previousData = {};
+    let newData = {};
+
+    Clients.getById(updatedData.id_client, (clientError, client) => {
+      if (clientError) {
         return res.status(500).json({
           status: 500,
-          error: "Erreur lors de la récupération du paiement client",
+          error: "Erreur lors de la mise à jour de la remise de chèque client",
         });
       }
-      if (!existingPaiementClient) {
+      if (!client) {
         return res
           .status(404)
-          .json({ status: 404, error: "Paiement client non trouvé" });
+          .json({ status: 404, error: "Le client n'existe pas" });
       }
 
-      AchatEntreprise.getByBonCommande(
-        updatedData.numero_bc,
-        (error, achatEntreprise) => {
-          if (error) {
-            return res.status(500).json({
-              error: "Erreur lors de la récupération de l'achat entreprise",
-            });
-          }
-          if (!achatEntreprise) {
-            return res
-              .status(406)
-              .json({ status: 406, error: "Achat entreprise non trouvé" });
-          }
+      PaiementClient.getById(id, (getError, existingPaiementClient) => {
+        if (getError) {
+          return res.status(500).json({
+            status: 500,
+            error: "Erreur lors de la récupération du paiement client",
+          });
+        }
+        if (!existingPaiementClient) {
+          return res
+            .status(404)
+            .json({ status: 404, error: "Paiement client non trouvé" });
+        }
 
-          existingPaiementClient = {
-            ...existingPaiementClient,
-            ...updatedData,
-            est_valide: parseInt(updatedData.est_valide),
-            montant: parseFloat(updatedData.montant),
-            numero_bc: parseInt(updatedData.numero_bc),
-            id_client: parseInt(updatedData.id_client),
-            categorie: achatEntreprise.categorie,
-          };
-
-          const file = req.file;
-          console.log("existingPaiementClient", existingPaiementClient);
-          console.log("file", file);
-          if (file) {
-            const needed_path = file && file.path.split("/uploads")[1];
-            //console.log("needeed path", needed_path);
-            const fileLink = file && `http://127.0.0.1:7000${needed_path}`;
-            // console.log("file link", fileLink);
-            const lastSlip = existingPaiementClient.bordereau;
-            existingPaiementClient = {
-              ...existingPaiementClient,
-              bordereau: fileLink,
-            };
-            if (lastSlip != "") {
-              deleteFile(lastSlip);
-            }
-          }
-
-          existingPaiementClient = new PaiementClient(
-            existingPaiementClient.id,
-            undefined,
-            existingPaiementClient.montant,
-            existingPaiementClient.banque,
-            existingPaiementClient.reference,
-            existingPaiementClient.categorie,
-            existingPaiementClient.numero_bc,
-            existingPaiementClient.bordereau,
-            existingPaiementClient.est_valide,
-            existingPaiementClient.id_client,
-            existingPaiementClient.date_paiement
-          );
-
-          existingPaiementClient.update((updateError) => {
-            if (updateError) {
+        AchatEntreprise.getByBonCommande(
+          updatedData.numero_bc,
+          (error, achatEntreprise) => {
+            if (error) {
               return res.status(500).json({
-                status: 500,
-                error: "Erreur lors de la mise à jour du paiement client",
+                error: "Erreur lors de la récupération de l'achat entreprise",
               });
             }
-            return res
-              .status(200)
-              .json({ status: 200, paiementClients: existingPaiementClient });
-          });
+            if (!achatEntreprise) {
+              return res
+                .status(406)
+                .json({ status: 406, error: "Achat entreprise non trouvé" });
+            }
 
-          // return res.status(200).json(achatEntreprise);
-        }
-      );
+            previousData = existingPaiementClient;
+
+            existingPaiementClient = {
+              ...existingPaiementClient,
+              ...updatedData,
+              est_valide: parseInt(updatedData.est_valide),
+              montant: parseFloat(updatedData.montant),
+              numero_bc: parseInt(updatedData.numero_bc),
+              id_client: parseInt(updatedData.id_client),
+              categorie: achatEntreprise.categorie,
+            };
+
+            const file = req.file;
+            console.log("existingPaiementClient", existingPaiementClient);
+            console.log("file", file);
+            if (file) {
+              const needed_path = file && file.path.split("/uploads")[1];
+              //console.log("needeed path", needed_path);
+              const fileLink = file && `http://127.0.0.1:7000${needed_path}`;
+              // console.log("file link", fileLink);
+              const lastSlip = existingPaiementClient.bordereau;
+              existingPaiementClient = {
+                ...existingPaiementClient,
+                bordereau: fileLink,
+              };
+              if (lastSlip != "") {
+                deleteFile(lastSlip);
+              }
+            }
+
+            newData = existingPaiementClient;
+
+            existingPaiementClient = new PaiementClient(
+              existingPaiementClient.id,
+              undefined,
+              existingPaiementClient.montant,
+              existingPaiementClient.banque,
+              existingPaiementClient.reference,
+              existingPaiementClient.categorie,
+              existingPaiementClient.numero_bc,
+              existingPaiementClient.bordereau,
+              existingPaiementClient.est_valide,
+              existingPaiementClient.id_client,
+              existingPaiementClient.date_paiement
+            );
+
+            existingPaiementClient.update((updateError) => {
+              if (updateError) {
+                return res.status(500).json({
+                  status: 500,
+                  error: "Erreur lors de la mise à jour du paiement client",
+                });
+              }
+
+              Modifications.create(
+                {
+                  modification: `Modification des données d'un paiement du client ${client.prenoms} ${client.nom}`,
+                  details: `
+                    Anciennes données::
+                    Montant: ${previousData.montant},
+                    Banque: ${previousData.banque},
+                    Référence: ${previousData.reference},
+                    Catégorie: ${previousData.categorie},
+                    Bon de Commande: ${previousData.numero_bc},
+                    Bordereau: ${previousData.bordereau},
+                    État de validation: ${
+                      previousData.est_valide ? "Validée" : "Non Validé"
+                    }
+                    -
+                    Nouvelles données::
+                    Montant: ${newData.montant},
+                    Banque: ${newData.banque},
+                    Référence: ${newData.reference},
+                    Catégorie: ${newData.categorie},
+                    Bon de Commande: ${newData.numero_bc},
+                    Bordereau: ${newData.bordereau},
+                    État de validation: ${
+                      newData.est_valide ? "Validée" : "Non Validée"
+                    }
+                    `,
+                  id_employe: req.employee.id,
+                },
+                (error, modification) => {}
+              );
+
+              return res
+                .status(200)
+                .json({ status: 200, paiementClients: existingPaiementClient });
+            });
+
+            // return res.status(200).json(achatEntreprise);
+          }
+        );
+      });
     });
   };
 

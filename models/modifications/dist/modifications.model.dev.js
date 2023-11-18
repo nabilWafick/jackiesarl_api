@@ -85,7 +85,7 @@ function () {
         }
 
         var modificationData = results[0];
-        var modification = new Modifications(modificationData.id, modificationData.modification, modificationData.details, modificationData.date_modification, modificationData.nom, modificationData.prenoms);
+        var modification = new Modifications(modificationData.id, modificationData.modification, modificationData.details, new Date(modificationData.date_modification), modificationData.nom, modificationData.prenoms);
         return callback(null, modification);
       });
     }
@@ -100,7 +100,7 @@ function () {
           }
 
           var modificationsList = results.map(function (modificationData) {
-            return new Modifications(modificationData.id, modificationData.modification, modificationData.details, modificationData.date_modification, modificationData.nom, modificationData.prenoms);
+            return new Modifications(modificationData.id, modificationData.modification, modificationData.details, new Date(modificationData.date_modification), modificationData.nom, modificationData.prenoms);
           });
           return callback(null, modificationsList);
         });
@@ -113,7 +113,7 @@ function () {
 
           var modificationsList = results.map(function (modificationData) {
             // console.log(modificationData);
-            return new Modifications(modificationData.id, modificationData.details, modificationData.modification, modificationData.date_modification, modificationData.nom, modificationData.prenoms);
+            return new Modifications(modificationData.id, modificationData.modification, modificationData.details, new Date(modificationData.date_modification), modificationData.nom, modificationData.prenoms);
           });
           return callback(null, modificationsList);
         });

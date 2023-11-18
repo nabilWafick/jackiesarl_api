@@ -11,8 +11,18 @@ router.post(
   AuthorisationMiddleware.authorize("ajouter-stock-bon-commande"),
   StockBonCommandeController.create
 );
-router.get("/stock-bon-commande/:id", StockBonCommandeController.getById);
-router.get("/stock-bon-commande/", StockBonCommandeController.getAll);
+router.get(
+  "/stock-bon-commande/:id",
+  AuthenticationMiddleware.authenticate,
+  AuthorisationMiddleware.authorize("lire-stock-bon-commande"),
+  StockBonCommandeController.getById
+);
+router.get(
+  "/stock-bon-commande/",
+  AuthenticationMiddleware.authenticate,
+  AuthorisationMiddleware.authorize("lire-stock-bon-commande"),
+  StockBonCommandeController.getAll
+);
 router.put(
   "/stock-bon-commande/:id",
   AuthenticationMiddleware.authenticate,

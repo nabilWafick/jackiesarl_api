@@ -12,9 +12,9 @@ var AuthenticationMiddleware = require("../../middleware/authentication/authenti
 
 
 router.post("/activites-depot", AuthenticationMiddleware.authenticate, AuthorisationMiddleware.authorize("ajouter-activite-depot"), ActivitesDepotController.create);
-router.get("/activite-depot/:id", ActivitesDepotController.getById);
-router.get("/activites-depots/", ActivitesDepotController.getAll);
-router.get("/activites-depot/depot-default/:id_depot/:startDate?/:endDate?", ActivitesDepotController.getAllByDepotID);
+router.get("/activite-depot/:id", AuthenticationMiddleware.authenticate, AuthorisationMiddleware.authorize("lire-activite-depot"), ActivitesDepotController.getById);
+router.get("/activites-depots/", AuthenticationMiddleware.authenticate, AuthorisationMiddleware.authorize("lire-activite-depot"), ActivitesDepotController.getAll);
+router.get("/activites-depot/depot-default/:id_depot/:startDate?/:endDate?", AuthenticationMiddleware.authenticate, AuthorisationMiddleware.authorize("lire-activite-depot"), ActivitesDepotController.getAllByDepotID);
 router.put("/activites-depot/:id", AuthenticationMiddleware.authenticate, AuthorisationMiddleware.authorize("modifier-activite-depot"), ActivitesDepotController.update);
 router["delete"]("/activites-depot/:id", AuthenticationMiddleware.authenticate, AuthorisationMiddleware.authorize("supprimer-activite-depot"), ActivitesDepotController["delete"]);
 module.exports = router;

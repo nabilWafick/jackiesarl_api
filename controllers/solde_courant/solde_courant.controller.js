@@ -1,5 +1,7 @@
 const SoldeCourant = require("../../models/solde_courant/solde_courant.model");
 const ActivitesBanque = require("../../models/activites_banque/activites_banque.model");
+
+const Modifications = require("../../models/modifications/modifications.model");
 class SoldeCourantController {
   // Créer un nouveau solde courant
   static create = (req, res) => {
@@ -66,6 +68,9 @@ class SoldeCourantController {
   static update = (req, res) => {
     const id = req.params.id;
     const updatedData = req.body;
+    let previousData = {};
+    let newData = {};
+
     SoldeCourant.getById(id, (getError, existingSoldeCourant) => {
       if (getError) {
         return res.status(500).json({
@@ -78,6 +83,8 @@ class SoldeCourantController {
           .status(404)
           .json({ status: 404, error: "Solde courant non trouvé" });
       }
+
+      previousData = existingSoldeCourant;
 
       // si c'est le nom de la banque ou le solde veut etre modifie
       if (
@@ -121,6 +128,9 @@ class SoldeCourantController {
                         ...existingSoldeCourant,
                         ...updatedData,
                       };
+
+                      newData = existingSoldeCourant;
+
                       existingSoldeCourant = new SoldeCourant(
                         existingSoldeCourant.id,
                         existingSoldeCourant.banque,
@@ -136,6 +146,26 @@ class SoldeCourantController {
                               "Erreur lors de la mise à jour du solde courant",
                           });
                         }
+
+                        Modifications.create(
+                          {
+                            modification: `Modification des données d'une banque`,
+                            details: `
+                              Anciennes données::
+                              Banque: ${previousData.banque},
+                              Numéro de compte: ${previousData.numero_compte},
+                              Solde actuel: ${previousData.solde_actuel}
+                              -
+                              Nouvelles données::
+                              Banque: ${newData.banque},
+                              Numéro de compte: ${newData.numero_compte},
+                              Solde actuel: ${newData.solde_actuel}
+                              `,
+                            id_employe: req.employee.id,
+                          },
+                          (error, modification) => {}
+                        );
+
                         return res
                           .status(200)
                           .json({ status: 200, existingSoldeCourant });
@@ -154,6 +184,9 @@ class SoldeCourantController {
                   ...existingSoldeCourant,
                   ...updatedData,
                 };
+
+                newData = existingSoldeCourant;
+
                 existingSoldeCourant = new SoldeCourant(
                   existingSoldeCourant.id,
                   existingSoldeCourant.banque,
@@ -168,6 +201,26 @@ class SoldeCourantController {
                       error: "Erreur lors de la mise à jour du solde courant",
                     });
                   }
+
+                  Modifications.create(
+                    {
+                      modification: `Modification des données d'une banque`,
+                      details: `
+                        Anciennes données::
+                        Banque: ${previousData.banque},
+                        Numéro de compte: ${previousData.numero_compte},
+                        Solde actuel: ${previousData.solde_actuel}
+                        -
+                        Nouvelles données::
+                        Banque: ${newData.banque},
+                        Numéro de compte: ${newData.numero_compte},
+                        Solde actuel: ${newData.solde_actuel}
+                        `,
+                      id_employe: req.employee.id,
+                    },
+                    (error, modification) => {}
+                  );
+
                   return res
                     .status(200)
                     .json({ status: 200, existingSoldeCourant });
@@ -192,6 +245,9 @@ class SoldeCourantController {
                   ...existingSoldeCourant,
                   ...updatedData,
                 };
+
+                newData = existingSoldeCourant;
+
                 existingSoldeCourant = new SoldeCourant(
                   existingSoldeCourant.id,
                   existingSoldeCourant.banque,
@@ -206,6 +262,26 @@ class SoldeCourantController {
                       error: "Erreur lors de la mise à jour du solde courant",
                     });
                   }
+
+                  Modifications.create(
+                    {
+                      modification: `Modification des données d'une banque`,
+                      details: `
+                        Anciennes données::
+                        Banque: ${previousData.banque},
+                        Numéro de compte: ${previousData.numero_compte},
+                        Solde actuel: ${previousData.solde_actuel}
+                        -
+                        Nouvelles données::
+                        Banque: ${newData.banque},
+                        Numéro de compte: ${newData.numero_compte},
+                        Solde actuel: ${newData.solde_actuel}
+                        `,
+                      id_employe: req.employee.id,
+                    },
+                    (error, modification) => {}
+                  );
+
                   return res
                     .status(200)
                     .json({ status: 200, existingSoldeCourant });
@@ -222,6 +298,9 @@ class SoldeCourantController {
         }
       } else {
         existingSoldeCourant = { ...existingSoldeCourant, ...updatedData };
+
+        newData = existingSoldeCourant;
+
         existingSoldeCourant = new SoldeCourant(
           existingSoldeCourant.id,
           existingSoldeCourant.banque,
@@ -236,6 +315,26 @@ class SoldeCourantController {
               error: "Erreur lors de la mise à jour du solde courant",
             });
           }
+
+          Modifications.create(
+            {
+              modification: `Modification des données d'une banque`,
+              details: `
+                Anciennes données::
+                Banque: ${previousData.banque},
+                Numéro de compte: ${previousData.numero_compte},
+                Solde actuel: ${previousData.solde_actuel}
+                -
+                Nouvelles données::
+                Banque: ${newData.banque},
+                Numéro de compte: ${newData.numero_compte},
+                Solde actuel: ${newData.solde_actuel}
+                `,
+              id_employe: req.employee.id,
+            },
+            (error, modification) => {}
+          );
+
           return res.status(200).json({ status: 200, existingSoldeCourant });
         });
       }

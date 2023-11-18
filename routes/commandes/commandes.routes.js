@@ -11,10 +11,17 @@ router.post(
   AuthorisationMiddleware.authorize("ajouter-commande"),
   CommandesController.create
 );
-router.get("/commande/:id", CommandesController.getById);
+router.get(
+  "/commande/:id",
+  AuthenticationMiddleware.authenticate,
+  AuthorisationMiddleware.authorize("lire-commande"),
+  CommandesController.getById
+);
 
 router.get(
   "/commandes-default/:startDate?/:endDate?",
+  AuthenticationMiddleware.authenticate,
+  AuthorisationMiddleware.authorize("lire-commande"),
   CommandesController.getAll
 );
 
@@ -22,10 +29,14 @@ router.get(
 
 router.get(
   "/commandes/new-to-old/:startDate?/:endDate?",
+  AuthenticationMiddleware.authenticate,
+  AuthorisationMiddleware.authorize("lire-commande"),
   CommandesController.getAllFromNewToOld
 );
 router.get(
   "/commandes/old-to-new/:startDate?/:endDate?",
+  AuthenticationMiddleware.authenticate,
+  AuthorisationMiddleware.authorize("lire-commande"),
   CommandesController.getAllFromOldToNew
 );
 
@@ -33,10 +44,14 @@ router.get(
 
 router.get(
   "/commandes/most-important/:startDate?/:endDate?",
+  AuthenticationMiddleware.authenticate,
+  AuthorisationMiddleware.authorize("lire-commande"),
   CommandesController.getAllMoreImportant
 );
 router.get(
   "/commandes/less-important/:startDate?/:endDate?",
+  AuthenticationMiddleware.authenticate,
+  AuthorisationMiddleware.authorize("lire-commande"),
   CommandesController.getAllLessImportant
 );
 
@@ -44,10 +59,14 @@ router.get(
 
 router.get(
   "/commandes/cim-benin-most-important/:startDate?/:endDate?",
+  AuthenticationMiddleware.authenticate,
+  AuthorisationMiddleware.authorize("lire-commande"),
   CommandesController.getAllCIMBENINMoreImportant
 );
 router.get(
   "/commandes/cim-benin-less-important/:startDate?/:endDate?",
+  AuthenticationMiddleware.authenticate,
+  AuthorisationMiddleware.authorize("lire-commande"),
   CommandesController.getAllCIMBENINLessImportant
 );
 
@@ -55,10 +74,14 @@ router.get(
 
 router.get(
   "/commandes/nocibe-most-important/:startDate?/:endDate?",
+  AuthenticationMiddleware.authenticate,
+  AuthorisationMiddleware.authorize("lire-commande"),
   CommandesController.getAllNOCIBEMoreImportant
 );
 router.get(
   "/commandes/nocibe-less-important/:startDate?/:endDate?",
+  AuthenticationMiddleware.authenticate,
+  AuthorisationMiddleware.authorize("lire-commande"),
   CommandesController.getAllNOCIBELessImportant
 );
 
@@ -66,16 +89,22 @@ router.get(
 
 router.get(
   "/commandes/destination/:startDate?/:endDate?",
+  AuthenticationMiddleware.authenticate,
+  AuthorisationMiddleware.authorize("lire-commande"),
   CommandesController.getAllGroupByDestination
 );
 
 router.get(
   "/commandes/delivered/:startDate?/:endDate?",
+  AuthenticationMiddleware.authenticate,
+  AuthorisationMiddleware.authorize("lire-commande"),
   CommandesController.getAllDelivered
 );
 
 router.get(
   "/commandes/undelivered/:startDate?/:endDate?",
+  AuthenticationMiddleware.authenticate,
+  AuthorisationMiddleware.authorize("lire-commande"),
   CommandesController.getAllUnDelivered
 );
 

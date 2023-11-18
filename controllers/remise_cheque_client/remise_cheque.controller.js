@@ -1,4 +1,6 @@
 const RemiseChequeClient = require("../../models/remise_cheque_client/remise_cheque_client.model");
+const Modifications = require("../../models/modifications/modifications.model");
+const Clients = require("../../models/clients/clients.model");
 
 class RemiseChequeClientController {
   // Créer une nouvelle remise de chèque client
@@ -354,43 +356,94 @@ class RemiseChequeClientController {
   static update = (req, res) => {
     const id = req.params.id;
     const updatedData = req.body;
-    RemiseChequeClient.getById(id, (getError, existingRemiseChequeClient) => {
-      if (getError) {
+    let previousData = {};
+    let newData = {};
+
+    Clients.getById(updatedData.id_client, (clientError, client) => {
+      if (clientError) {
         return res.status(500).json({
           status: 500,
-          error: "Erreur lors de la récupération de la remise de chèque client",
+          error: "Erreur lors de la mise à jour de la remise de chèque client",
         });
       }
-      if (!existingRemiseChequeClient) {
+      if (!client) {
         return res
           .status(404)
-          .json({ status: 404, error: "Remise de chèque client non trouvée" });
+          .json({ status: 404, error: "Le client n'existe pas" });
       }
-      existingRemiseChequeClient = {
-        ...existingRemiseChequeClient,
-        ...updatedData,
-      };
-      existingRemiseChequeClient = new RemiseChequeClient(
-        existingRemiseChequeClient.id,
-        existingRemiseChequeClient.description,
-        existingRemiseChequeClient.banque,
-        existingRemiseChequeClient.montant,
-        existingRemiseChequeClient.reste,
-        existingRemiseChequeClient.est_validee,
-        existingRemiseChequeClient.id_client,
-        existingRemiseChequeClient.date_remise
-      );
-      existingRemiseChequeClient.update((updateError) => {
-        if (updateError) {
+
+      RemiseChequeClient.getById(id, (getError, existingRemiseChequeClient) => {
+        if (getError) {
           return res.status(500).json({
             status: 500,
             error:
-              "Erreur lors de la mise à jour de la remise de chèque client",
+              "Erreur lors de la récupération de la remise de chèque client",
           });
         }
-        return res
-          .status(200)
-          .json({ status: 200, existingRemiseChequeClient });
+        if (!existingRemiseChequeClient) {
+          return res.status(404).json({
+            status: 404,
+            error: "Remise de chèque client non trouvée",
+          });
+        }
+        previousData = existingRemiseChequeClient;
+        existingRemiseChequeClient = {
+          ...existingRemiseChequeClient,
+          ...updatedData,
+        };
+        newData = existingRemiseChequeClient;
+        existingRemiseChequeClient = new RemiseChequeClient(
+          existingRemiseChequeClient.id,
+          existingRemiseChequeClient.description,
+          existingRemiseChequeClient.banque,
+          existingRemiseChequeClient.montant,
+          existingRemiseChequeClient.reste,
+          existingRemiseChequeClient.est_validee,
+          existingRemiseChequeClient.id_client,
+          existingRemiseChequeClient.date_remise
+        );
+        existingRemiseChequeClient.update((updateError) => {
+          if (updateError) {
+            return res.status(500).json({
+              status: 500,
+              error:
+                "Erreur lors de la mise à jour de la remise de chèque client",
+            });
+          }
+
+          // =================== Add Modification ===================
+          Modifications.create(
+            {
+              modification: `Modification des données d'une remise de chèque du client ${client.prenoms} ${client.nom}`,
+              details: `
+                Anciennes données::
+                Description: ${previousData.description},
+                Banque: ${previousData.banque},
+                Montant: ${previousData.montant},
+                Reste: ${previousData.reste},
+                État de validation: ${
+                  previousData.est_validee ? "Validée" : "Non Validée"
+                }
+                -
+                Nouvelles données::
+                Description: ${newData.description},
+                Banque: ${newData.banque},
+                Montant: ${newData.montant},
+                Reste: ${previousData.reste},
+                État de validation: ${
+                  newData.est_validee ? "Validée" : "Non Validée"
+                }
+                `,
+              id_employe: req.employee.id,
+            },
+            (error, modification) => {}
+          );
+          // =================== Add Modification ===================
+
+          return res
+            .status(200)
+            .json({ status: 200, existingRemiseChequeClient });
+        });
       });
     });
   };
@@ -401,6 +454,7 @@ class RemiseChequeClientController {
     RemiseChequeClient.getById(id, (getError, existingRemiseChequeClient) => {
       if (getError) {
         return res.status(500).json({
+          status: 500,
           error: "Erreur lors de la récupération de la remise de chèque client",
         });
       }

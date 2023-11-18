@@ -6,7 +6,6 @@ const achatEntrepriseRoutes = require("./achat_entreprise/achat_entreprise.route
 const activitesBanqueRoutes = require("./activites_banque/activites_banque.routes");
 const activitesDepotRoutes = require("./activites_depot/activites_depot.routes");
 const authRoutes = require("./auth/auth.routes");
-const autorisationsRoutes = require("./autorisations/autorisations.routes");
 const brouillardRoutes = require("./brouillard/brouillard.routes");
 const clientsRoutes = require("./clients/clients.routes");
 const clientsTonnagesRoutes = require("./clients_tonnages/clients_tonnages.routes");
@@ -23,13 +22,13 @@ const stockBonCommandeRoutes = require("./stock_bon_commande/stock_bon_commande.
 const stockCamionRoutes = require("./stock_camion/stock_camion.routes");
 const tableBordRoutes = require("./table_bord/table_bord.routes");
 const openFileRoute = require("./open_file/open_file.routes");
+const undefinedRoute = require("./404/404.routes");
 
 router.use("/", achatClientRoutes);
 router.use("/", achatEntrepriseRoutes);
 router.use("/", activitesBanqueRoutes);
 router.use("/", activitesDepotRoutes);
 router.use("/", authRoutes);
-router.use("/", autorisationsRoutes);
 router.use("/", brouillardRoutes);
 router.use("/", clientsRoutes);
 router.use("/", clientsTonnagesRoutes);
@@ -46,5 +45,6 @@ router.use("/", stockBonCommandeRoutes);
 router.use("/", stockCamionRoutes);
 router.use("/", tableBordRoutes);
 router.use("/", openFileRoute);
+router.use("/", undefinedRoute);
 
 module.exports = router;

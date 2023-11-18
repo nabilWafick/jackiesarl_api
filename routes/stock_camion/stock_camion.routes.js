@@ -11,9 +11,16 @@ router.post(
   AuthorisationMiddleware.authorize("ajouter-stock-camion"),
   StockCamionController.create
 );
-router.get("/stock-camion/:id", StockCamionController.getById);
+router.get(
+  "/stock-camion/:id",
+  AuthenticationMiddleware.authenticate,
+  AuthorisationMiddleware.authorize("lire-stock-camion"),
+  StockCamionController.getById
+);
 router.get(
   "/stocks-camions-default/:startDate?/:endDate?",
+  AuthenticationMiddleware.authenticate,
+  AuthorisationMiddleware.authorize("lire-stock-camion"),
   StockCamionController.getAll
 );
 router.put(

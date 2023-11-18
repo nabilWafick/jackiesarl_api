@@ -11,10 +11,22 @@ router.post(
   AuthorisationMiddleware.authorize("ajouter-activite-depot"),
   ActivitesDepotController.create
 );
-router.get("/activite-depot/:id", ActivitesDepotController.getById);
-router.get("/activites-depots/", ActivitesDepotController.getAll);
+router.get(
+  "/activite-depot/:id",
+  AuthenticationMiddleware.authenticate,
+  AuthorisationMiddleware.authorize("lire-activite-depot"),
+  ActivitesDepotController.getById
+);
+router.get(
+  "/activites-depots/",
+  AuthenticationMiddleware.authenticate,
+  AuthorisationMiddleware.authorize("lire-activite-depot"),
+  ActivitesDepotController.getAll
+);
 router.get(
   "/activites-depot/depot-default/:id_depot/:startDate?/:endDate?",
+  AuthenticationMiddleware.authenticate,
+  AuthorisationMiddleware.authorize("lire-activite-depot"),
   ActivitesDepotController.getAllByDepotID
 );
 router.put(

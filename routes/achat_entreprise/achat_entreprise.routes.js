@@ -31,10 +31,14 @@ router.post(
 );
 router.get(
   "/achat-entreprise/:bon_commande",
+  AuthenticationMiddleware.authenticate,
+  AuthorisationMiddleware.authorize("lire-achat-entreprise"),
   AchatEntrepriseController.getByBonCommande
 );
 router.get(
   "/achats-entreprise-default/:startDate?/:endDate?",
+  AuthenticationMiddleware.authenticate,
+  AuthorisationMiddleware.authorize("lire-achat-entreprise"),
   AchatEntrepriseController.getAll
 );
 router.put(

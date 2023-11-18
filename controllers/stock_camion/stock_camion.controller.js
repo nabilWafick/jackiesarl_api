@@ -1,4 +1,5 @@
 const StockCamion = require("../../models/stock_camion/stock_camion.model");
+const Modifications = require("../../models/modifications/modifications.model");
 
 class StockCamionController {
   // Créer un nouveau stock camion
@@ -48,6 +49,9 @@ class StockCamionController {
   static update = (req, res) => {
     const id = req.params.id;
     const updatedData = req.body;
+    let previousData = {};
+    let newData = {};
+
     StockCamion.getById(id, (getError, existingStockCamion) => {
       if (getError) {
         return res.status(500).json({
@@ -60,7 +64,12 @@ class StockCamionController {
           .status(404)
           .json({ status: 404, error: "Stock camion non trouvé" });
       }
+      previousData = existingStockCamion;
+
       existingStockCamion = { ...existingStockCamion, ...updatedData };
+
+      newData = existingStockCamion;
+
       existingStockCamion = new StockCamion(
         existingStockCamion.id,
         existingStockCamion.numero_camion,
@@ -77,6 +86,30 @@ class StockCamionController {
             error: "Erreur lors de la mise à jour du stock camion",
           });
         }
+
+        Modifications.create(
+          {
+            modification: `Modification des données d'un stock camion`,
+            details: `
+              Anciennes données::
+              Numéro camion: ${previousData.numero_camion},
+              Catégorie: ${previousData.categorie},
+              Numéro chauffeur: ${previousData.numero_chauffeur},
+              Bon Commande: ${previousData.numero_bc},
+              Quantité: ${previousData.quantite}
+              -
+              Nouvelles données::
+              Numéro camion: ${newData.numero_camion},
+              Catégorie: ${newData.categorie},
+              Numéro chauffeur: ${newData.numero_chauffeur},
+              Bon Commande: ${newData.numero_bc},
+              Quantité: ${newData.quantite}
+              `,
+            id_employe: req.employee.id,
+          },
+          (error, modification) => {}
+        );
+
         return res.status(200).json({ status: 200, existingStockCamion });
       });
     });

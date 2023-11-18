@@ -11,8 +11,18 @@ router.post(
   AuthorisationMiddleware.authorize("ajouter-solde-courant"),
   SoldeCourantController.create
 );
-router.get("/solde-courant/:id", SoldeCourantController.getById);
-router.get("/soldes-courants/", SoldeCourantController.getAll);
+router.get(
+  "/solde-courant/:id",
+  AuthenticationMiddleware.authenticate,
+  AuthorisationMiddleware.authorize("lire-solde-courant"),
+  SoldeCourantController.getById
+);
+router.get(
+  "/soldes-courants/",
+  AuthenticationMiddleware.authenticate,
+  AuthorisationMiddleware.authorize("lire-solde-courant"),
+  SoldeCourantController.getAll
+);
 router.put(
   "/solde-courant/:id",
   AuthenticationMiddleware.authenticate,

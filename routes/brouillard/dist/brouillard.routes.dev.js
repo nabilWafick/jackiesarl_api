@@ -12,8 +12,8 @@ var AuthenticationMiddleware = require("../../middleware/authentication/authenti
 
 
 router.post("/brouillard", AuthenticationMiddleware.authenticate, AuthorisationMiddleware.authorize("ajouter-brouillard"), BrouillardController.create);
-router.get("/brouillard/:id", BrouillardController.getById);
-router.get("/brouillards-default/:startDate?/:endDate?", BrouillardController.getAll);
+router.get("/brouillard/:id", AuthenticationMiddleware.authenticate, AuthorisationMiddleware.authorize("lire-brouillard"), BrouillardController.getById);
+router.get("/brouillards-default/:startDate?/:endDate?", AuthenticationMiddleware.authenticate, AuthorisationMiddleware.authorize("lire-brouillard"), BrouillardController.getAll);
 router.put("/brouillard/:id/:is_current_stock_increasing", AuthenticationMiddleware.authenticate, AuthorisationMiddleware.authorize("modifier-brouillard"), BrouillardController.update);
 router["delete"]("/brouillard/:id", AuthenticationMiddleware.authenticate, AuthorisationMiddleware.authorize("supprimer-brouillard"), BrouillardController["delete"]);
 module.exports = router;

@@ -1,4 +1,6 @@
+const Clients = require("../../models/clients/clients.model");
 const Commandes = require("../../models/commandes/commandes.model");
+const Modifications = require("../../models/modifications/modifications.model");
 
 class CommandesController {
   // Créer une nouvelle commande
@@ -211,44 +213,121 @@ class CommandesController {
   static update = (req, res) => {
     const id = req.params.id;
     const updatedData = req.body;
+    let previousData = {};
+    let newData = {};
     console.log("updatedData ", updatedData);
-    Commandes.getById(id, (getError, existingCommande) => {
-      if (getError) {
-        console.log("Erreur SQL Get");
+
+    Clients.getById(updatedData.id_client, (clientError, client) => {
+      if (clientError) {
         return res.status(500).json({
           status: 500,
-          error: "Erreur lors de la récupération de la commande",
+          error: "Erreur lors de la mise à jour de la commande",
         });
       }
-      if (!existingCommande) {
+
+      if (!client) {
         return res
           .status(404)
-          .json({ status: 404, error: "Commande non trouvée" });
+          .json({ status: 404, error: "Le client n'a pas été trouvé" });
       }
-      existingCommande = { ...existingCommande, ...updatedData };
 
-      existingCommande = new Commandes(
-        existingCommande.id,
-        undefined,
-        existingCommande.categorie,
-        existingCommande.quantite_achetee,
-        existingCommande.destination,
-        existingCommande.date_commande,
-        existingCommande.date_livraison,
-        existingCommande.est_traitee,
-        existingCommande.id_client,
-        existingCommande.date_ajout
-      );
-
-      existingCommande.update((updateError) => {
-        if (updateError) {
-          console.log("Erreur SQL Update");
+      Commandes.getById(id, (getError, existingCommande) => {
+        if (getError) {
+          console.log("Erreur SQL Get");
           return res.status(500).json({
             status: 500,
-            error: "Erreur lors de la mise à jour de la commande",
+            error: "Erreur lors de la récupération de la commande",
           });
         }
-        return res.status(200).json({ status: 200, existingCommande });
+        if (!existingCommande) {
+          return res
+            .status(404)
+            .json({ status: 404, error: "Commande non trouvée" });
+        }
+
+        previousData = existingCommande;
+
+        existingCommande = { ...existingCommande, ...updatedData };
+
+        newData = existingCommande;
+
+        existingCommande = new Commandes(
+          existingCommande.id,
+          undefined,
+          existingCommande.categorie,
+          existingCommande.quantite_achetee,
+          existingCommande.destination,
+          existingCommande.date_commande,
+          existingCommande.date_livraison,
+          existingCommande.est_traitee,
+          existingCommande.id_client,
+          existingCommande.date_ajout
+        );
+
+        existingCommande.update((updateError) => {
+          if (updateError) {
+            console.log("Erreur SQL Update");
+            return res.status(500).json({
+              status: 500,
+              error: "Erreur lors de la mise à jour de la commande",
+            });
+          }
+
+          Modifications.create(
+            {
+              modification: `Modification des données d'une commande du client ${client.prenoms} ${client.nom}`,
+              details: `
+                Anciennes données::
+                Catégorie: ${previousData.categorie},
+                Quantité achetée: ${previousData.quantite_achetee},
+                Destination: ${previousData.destination},
+                Date de commande: ${new Date(
+                  previousData.date_commande
+                ).toLocaleDateString("fr-FR", {
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                })},
+                Date de livraison: ${new Date(
+                  previousData.date_livraison
+                ).toLocaleDateString("fr-FR", {
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                })},
+                État de traitement: ${
+                  previousData.est_traitee ? "Traitée" : "Non Traitée"
+                }
+                -
+                Nouvelles données::
+                Catégorie: ${newData.categorie},
+                Quantité achetée: ${newData.quantite_achetee},
+                Destination: ${newData.destination},
+                Date de commande: ${new Date(
+                  newData.date_commande
+                ).toLocaleDateString("fr-FR", {
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                })},
+                Date de livraison: ${new Date(
+                  newData.date_livraison
+                ).toLocaleDateString("fr-FR", {
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                })},
+                État de traitement: ${
+                  newData.est_traitee ? "Traitée" : "Non Traitée"
+                }
+                `,
+              id_employe: req.employee.id,
+            },
+            (error, modification) => {}
+          );
+
+          return res.status(200).json({ status: 200, existingCommande });
+        });
       });
     });
   };

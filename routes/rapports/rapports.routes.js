@@ -46,7 +46,8 @@ router.get(
 
 router.get(
   "/rapports/employee/:employee_id",
-  // AuthorisationMiddleware.authorize("lire-rapport"),
+  AuthenticationMiddleware.authenticate,
+  AuthorisationMiddleware.authorize("lire-rapport"),
   RapportsController.getAllOfEmployee
 );
 

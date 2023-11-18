@@ -28,33 +28,52 @@ router.post(
   upload.single("piece"),
   DepensesController.create
 );
-router.get("/depense/:id", DepensesController.getById);
+router.get(
+  "/depense/:id",
+  AuthenticationMiddleware.authenticate,
+  AuthorisationMiddleware.authorize("lire-depense"),
+  DepensesController.getById
+);
 router.get(
   "/depenses-default/:startDate?/:endDate?",
+  AuthenticationMiddleware.authenticate,
+  AuthorisationMiddleware.authorize("lire-depense"),
   DepensesController.getAll
 );
 router.get(
   "/depenses/new-to-old/:startDate?/:endDate?",
+  AuthenticationMiddleware.authenticate,
+  AuthorisationMiddleware.authorize("lire-depense"),
   DepensesController.getAllFromNewToOld
 );
 router.get(
   "/depenses/old-to-new/:startDate?/:endDate?",
+  AuthenticationMiddleware.authenticate,
+  AuthorisationMiddleware.authorize("lire-depense"),
   DepensesController.getAllFromOldToNew
 );
 router.get(
   "/depenses/most-important/:startDate?/:endDate?",
+  AuthenticationMiddleware.authenticate,
+  AuthorisationMiddleware.authorize("lire-depense"),
   DepensesController.getAllMostImportant
 );
 router.get(
   "/depenses/less-important/:startDate?/:endDate?",
+  AuthenticationMiddleware.authenticate,
+  AuthorisationMiddleware.authorize("lire-depense"),
   DepensesController.getAllLessImportant
 );
 router.get(
   "/depenses/unvalidated/:startDate?/:endDate?",
+  AuthenticationMiddleware.authenticate,
+  AuthorisationMiddleware.authorize("lire-depense"),
   DepensesController.getAllUnvalidated
 );
 router.get(
   "/depenses/validated/:startDate?/:endDate?",
+  AuthenticationMiddleware.authenticate,
+  AuthorisationMiddleware.authorize("lire-depense"),
   DepensesController.getAllValidated
 );
 router.put(

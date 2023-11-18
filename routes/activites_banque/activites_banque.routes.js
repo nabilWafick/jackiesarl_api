@@ -11,18 +11,33 @@ router.post(
   AuthorisationMiddleware.authorize("ajouter-activite-banque"),
   ActivitesBanqueController.create
 );
-router.get("/activites-banque/:id", ActivitesBanqueController.getById);
-router.get("/activites-banque/", ActivitesBanqueController.getAll);
+
+router.get(
+  "/activites-banque/:id",
+  AuthenticationMiddleware.authenticate,
+  AuthorisationMiddleware.authorize("lire-activite-banque"),
+  ActivitesBanqueController.getById
+);
+
+router.get(
+  "/activites-banque/",
+  AuthenticationMiddleware.authenticate,
+  ActivitesBanqueController.getAll
+);
+
 router.get(
   "/activites-banque/banque/:id_banque",
+  AuthorisationMiddleware.authorize("lire-activite-banque"),
   ActivitesBanqueController.getAllByBanqueID
 );
+
 router.put(
   "/activites-banque/:id",
   AuthenticationMiddleware.authenticate,
   AuthorisationMiddleware.authorize("modifier-activite-banque"),
   ActivitesBanqueController.update
 );
+
 router.delete(
   "/activites-banque/:id",
   AuthenticationMiddleware.authenticate,

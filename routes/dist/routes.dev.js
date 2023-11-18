@@ -14,8 +14,6 @@ var activitesDepotRoutes = require("./activites_depot/activites_depot.routes");
 
 var authRoutes = require("./auth/auth.routes");
 
-var autorisationsRoutes = require("./autorisations/autorisations.routes");
-
 var brouillardRoutes = require("./brouillard/brouillard.routes");
 
 var clientsRoutes = require("./clients/clients.routes");
@@ -48,12 +46,13 @@ var tableBordRoutes = require("./table_bord/table_bord.routes");
 
 var openFileRoute = require("./open_file/open_file.routes");
 
+var undefinedRoute = require("./404/404.routes");
+
 router.use("/", achatClientRoutes);
 router.use("/", achatEntrepriseRoutes);
 router.use("/", activitesBanqueRoutes);
 router.use("/", activitesDepotRoutes);
 router.use("/", authRoutes);
-router.use("/", autorisationsRoutes);
 router.use("/", brouillardRoutes);
 router.use("/", clientsRoutes);
 router.use("/", clientsTonnagesRoutes);
@@ -70,4 +69,5 @@ router.use("/", stockBonCommandeRoutes);
 router.use("/", stockCamionRoutes);
 router.use("/", tableBordRoutes);
 router.use("/", openFileRoute);
+router.use("/", undefinedRoute);
 module.exports = router;

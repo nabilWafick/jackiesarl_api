@@ -1,5 +1,6 @@
 const ActivitesDepot = require("../../models/activites_depot/activites_depot.model");
 const Brouillard = require("../../models/brouillard/brouillard.model");
+const Modifications = require("../../models/modifications/modifications.model");
 
 class ActivitesDepotController {
   // Créer une nouvelle activité dépôt
@@ -99,158 +100,284 @@ class ActivitesDepotController {
   static update = (req, res) => {
     const id = req.params.id;
     const updatedData = req.body;
-    ActivitesDepot.getById(id, (getError, existingActiviteDepot) => {
-      if (getError) {
+    let previousData = {};
+    let newData = {};
+
+    Brouillard.getById(updatedData.id_depot, (error, brouillard) => {
+      if (error) {
         return res.status(500).json({
           status: 500,
-          error: "Erreur lors de la récupération de l'activité dépôt",
+          error: "Erreur lors de la mise à jour de l'activité du dépôt",
         });
       }
-      if (!existingActiviteDepot) {
-        return res
-          .status(404)
-          .json({ status: 404, error: "Activité dépôt non trouvée" });
+      if (!brouillard) {
+        return res.status(404).json({ status: 404, error: "Dépôt non trouvé" });
       }
 
-      //   on verifie si c'est la vente qui veut etre modifie
+      ActivitesDepot.getById(id, (getError, existingActiviteDepot) => {
+        if (getError) {
+          return res.status(500).json({
+            status: 500,
+            error: "Erreur lors de la récupération de l'activité dépôt",
+          });
+        }
+        if (!existingActiviteDepot) {
+          return res
+            .status(404)
+            .json({ status: 404, error: "Activité dépôt non trouvée" });
+        }
 
-      if (updatedData.vente != existingActiviteDepot.vente) {
-        ActivitesDepot.getLastActiviteDepot(
-          existingActiviteDepot.id_depot,
-          (lastError, lastActivite) => {
-            if (lastError) {
-              return res.status(500).json({
-                status: 500,
-                error: "Erreur lors de la mise à jour de l'activité du dépôt",
-              });
-            }
+        previousData = existingActiviteDepot;
 
-            if (lastActivite.id != existingActiviteDepot.id) {
-              return res.status(400).json({
-                status: 400,
-                error: "Cette opération ne peut être réalisée",
-              });
-            } else {
-              const lastSale =
-                existingActiviteDepot.quantite_avant_vente -
-                existingActiviteDepot.quantite_apres_vente;
+        //   on verifie si c'est la vente qui veut etre modifie
 
-              // si le stock sera suffisant pour une la nouvelle vente
+        if (updatedData.vente != existingActiviteDepot.vente) {
+          ActivitesDepot.getLastActiviteDepot(
+            existingActiviteDepot.id_depot,
+            (lastError, lastActivite) => {
+              if (lastError) {
+                return res.status(500).json({
+                  status: 500,
+                  error: "Erreur lors de la mise à jour de l'activité du dépôt",
+                });
+              }
 
-              if (
-                existingActiviteDepot.quantite_avant_vente -
-                  updatedData.vente >=
-                0
-              ) {
-                // on fait une nouvelle vente, apres avoir supprime l'ancienne vente
-                existingActiviteDepot.vente = updatedData.vente;
-                existingActiviteDepot.quantite_apres_vente =
+              if (lastActivite.id != existingActiviteDepot.id) {
+                return res.status(400).json({
+                  status: 400,
+                  error: "Cette opération ne peut être réalisée",
+                });
+              } else {
+                const lastSale =
                   existingActiviteDepot.quantite_avant_vente -
-                  updatedData.vente;
+                  existingActiviteDepot.quantite_apres_vente;
 
-                // zone brouillard
-                Brouillard.getById(
-                  updatedData.id_depot,
-                  (error, brouillard) => {
-                    if (error) {
+                // si le stock sera suffisant pour une la nouvelle vente
+
+                if (
+                  existingActiviteDepot.quantite_avant_vente -
+                    updatedData.vente >=
+                  0
+                ) {
+                  // on fait une nouvelle vente, apres avoir supprime l'ancienne vente
+                  existingActiviteDepot.vente = updatedData.vente;
+                  existingActiviteDepot.quantite_apres_vente =
+                    existingActiviteDepot.quantite_avant_vente -
+                    updatedData.vente;
+
+                  // zone brouillard
+
+                  // on restore l'ancien stock et on effectue une nouvelle vente
+
+                  brouillard.stock_actuel += lastSale;
+                  brouillard.stock_actuel -= updatedData.vente;
+
+                  brouillard.update((updateError) => {
+                    if (updateError) {
                       return res.status(500).json({
                         status: 500,
-                        error:
-                          "Erreur lors de la mise à jour de l'activité du dépôt",
+                        error: "Erreur lors de la mise à jour du brouillard",
                       });
                     }
-                    if (!brouillard) {
-                      return res
-                        .status(404)
-                        .json({ status: 404, error: "Dépôt non trouvé" });
-                    }
+                    // =================== Final =====================
+                    existingActiviteDepot = {
+                      ...existingActiviteDepot,
+                      ...updatedData,
+                      quantite_avant_vente:
+                        existingActiviteDepot.quantite_avant_vente,
+                      quantite_apres_vente:
+                        existingActiviteDepot.quantite_apres_vente,
+                      vente: existingActiviteDepot.vente,
+                    };
 
-                    // on restore l'ancien stock et on effectue une nouvelle vente
+                    newData = existingActiviteDepot;
 
-                    brouillard.stock_actuel += lastSale;
-                    brouillard.stock_actuel -= updatedData.vente;
-
-                    brouillard.update((updateError) => {
+                    // console.log("existingActiviteDepot", existingActiviteDepot);
+                    existingActiviteDepot = new ActivitesDepot(
+                      existingActiviteDepot.id,
+                      existingActiviteDepot.id_depot,
+                      existingActiviteDepot.quantite_avant_vente,
+                      existingActiviteDepot.vente,
+                      existingActiviteDepot.quantite_apres_vente,
+                      existingActiviteDepot.versement,
+                      existingActiviteDepot.depense,
+                      existingActiviteDepot.observation,
+                      existingActiviteDepot.date_remplissage
+                    );
+                    existingActiviteDepot.update((updateError) => {
                       if (updateError) {
                         return res.status(500).json({
                           status: 500,
-                          error: "Erreur lors de la mise à jour du brouillard",
+                          error:
+                            "Erreur lors de la mise à jour de l'activité dépôt",
                         });
                       }
-                      // =================== Final =====================
-                      existingActiviteDepot = {
-                        ...existingActiviteDepot,
-                        ...updatedData,
-                        quantite_avant_vente:
-                          existingActiviteDepot.quantite_avant_vente,
-                        quantite_apres_vente:
-                          existingActiviteDepot.quantite_apres_vente,
-                        vente: existingActiviteDepot.vente,
-                      };
-                      // console.log("existingActiviteDepot", existingActiviteDepot);
-                      existingActiviteDepot = new ActivitesDepot(
-                        existingActiviteDepot.id,
-                        existingActiviteDepot.id_depot,
-                        existingActiviteDepot.quantite_avant_vente,
-                        existingActiviteDepot.vente,
-                        existingActiviteDepot.quantite_apres_vente,
-                        existingActiviteDepot.versement,
-                        existingActiviteDepot.depense,
-                        existingActiviteDepot.observation,
-                        existingActiviteDepot.date_remplissage
+
+                      Modifications.create(
+                        {
+                          modification: `Modification des données de l'activité du dépôt de ${brouillard.depot}`,
+                          details: `
+                              Anciennes données::
+                              Quantité avant vente: ${previousData.quantite_avant_vente},
+                              Vente: ${previousData.vente},
+                              Quantité après vente: ${previousData.quantite_apres_vente},
+                              Versement: ${previousData.versement},
+                              Dépense: ${previousData.depense},
+                              Observation: ${previousData.observation}
+                              -
+                              Nouvelles données::
+                              Quantité avant vente: ${newData.quantite_avant_vente},
+                              Vente: ${newData.vente},
+                              Quantité après vente: ${newData.quantite_apres_vente},
+                              Versement: ${newData.versement},
+                              Dépense: ${newData.depense},
+                              Observation: ${newData.observation}
+                              `,
+                          id_employe: req.employee.id,
+                        },
+                        (error, modification) => {}
                       );
-                      existingActiviteDepot.update((updateError) => {
-                        if (updateError) {
+
+                      return res
+                        .status(200)
+                        .json({ status: 200, existingActiviteDepot });
+                    });
+                    // ============== Final =======================
+                  });
+
+                  /*
+                    Brouillard.getById(
+                      updatedData.id_depot,
+                      (error, brouillard) => {
+                        if (error) {
                           return res.status(500).json({
                             status: 500,
                             error:
-                              "Erreur lors de la mise à jour de l'activité dépôt",
+                              "Erreur lors de la mise à jour de l'activité du dépôt",
                           });
                         }
-                        return res
-                          .status(200)
-                          .json({ status: 200, existingActiviteDepot });
-                      });
-                      // ============== Final =======================
-                    });
-                  }
-                );
-                // zone brouillard
-              } else {
-                return res.status(406).json({
-                  status: 406,
-                  error: `La quantité demandée est supérieure au stock actuel. ${existingActiviteDepot.quantite_apres_vente} disponible`,
-                });
+                        if (!brouillard) {
+                          return res
+                            .status(404)
+                            .json({ status: 404, error: "Dépôt non trouvé" });
+                        }
+    
+                        // on restore l'ancien stock et on effectue une nouvelle vente
+    
+                        brouillard.stock_actuel += lastSale;
+                        brouillard.stock_actuel -= updatedData.vente;
+    
+                        brouillard.update((updateError) => {
+                          if (updateError) {
+                            return res.status(500).json({
+                              status: 500,
+                              error: "Erreur lors de la mise à jour du brouillard",
+                            });
+                          }
+                          // =================== Final =====================
+                          existingActiviteDepot = {
+                            ...existingActiviteDepot,
+                            ...updatedData,
+                            quantite_avant_vente:
+                              existingActiviteDepot.quantite_avant_vente,
+                            quantite_apres_vente:
+                              existingActiviteDepot.quantite_apres_vente,
+                            vente: existingActiviteDepot.vente,
+                          };
+                          // console.log("existingActiviteDepot", existingActiviteDepot);
+                          existingActiviteDepot = new ActivitesDepot(
+                            existingActiviteDepot.id,
+                            existingActiviteDepot.id_depot,
+                            existingActiviteDepot.quantite_avant_vente,
+                            existingActiviteDepot.vente,
+                            existingActiviteDepot.quantite_apres_vente,
+                            existingActiviteDepot.versement,
+                            existingActiviteDepot.depense,
+                            existingActiviteDepot.observation,
+                            existingActiviteDepot.date_remplissage
+                          );
+                          existingActiviteDepot.update((updateError) => {
+                            if (updateError) {
+                              return res.status(500).json({
+                                status: 500,
+                                error:
+                                  "Erreur lors de la mise à jour de l'activité dépôt",
+                              });
+                            }
+                            return res
+                              .status(200)
+                              .json({ status: 200, existingActiviteDepot });
+                          });
+                          // ============== Final =======================
+                        });
+                      }
+                    );*/
+                  // zone brouillard
+                } else {
+                  return res.status(406).json({
+                    status: 406,
+                    error: `La quantité demandée est supérieure au stock actuel. ${existingActiviteDepot.quantite_apres_vente} disponible`,
+                  });
+                }
               }
             }
-          }
-        );
-      } else {
-        // =================== Final =====================
-        existingActiviteDepot = { ...existingActiviteDepot, ...updatedData };
-        console.log("existingActiviteDepot", existingActiviteDepot);
-        existingActiviteDepot = new ActivitesDepot(
-          existingActiviteDepot.id,
-          existingActiviteDepot.id_depot,
-          existingActiviteDepot.quantite_avant_vente,
-          existingActiviteDepot.vente,
-          existingActiviteDepot.quantite_apres_vente,
-          existingActiviteDepot.versement,
-          existingActiviteDepot.depense,
-          existingActiviteDepot.observation,
-          existingActiviteDepot.date_remplissage
-        );
-        existingActiviteDepot.update((updateError) => {
-          if (updateError) {
-            return res.status(500).json({
-              status: 500,
-              error: "Erreur lors de la mise à jour de l'activité dépôt",
-            });
-          }
-          return res.status(200).json({ status: 200, existingActiviteDepot });
-        });
-        // ============== Final =======================
-      }
+          );
+        } else {
+          // =================== Final =====================
+          existingActiviteDepot = { ...existingActiviteDepot, ...updatedData };
+
+          newData = existingActiviteDepot;
+
+          //        console.log("existingActiviteDepot", existingActiviteDepot);
+          existingActiviteDepot = new ActivitesDepot(
+            existingActiviteDepot.id,
+            existingActiviteDepot.id_depot,
+            existingActiviteDepot.quantite_avant_vente,
+            existingActiviteDepot.vente,
+            existingActiviteDepot.quantite_apres_vente,
+            existingActiviteDepot.versement,
+            existingActiviteDepot.depense,
+            existingActiviteDepot.observation,
+            existingActiviteDepot.date_remplissage
+          );
+          existingActiviteDepot.update((updateError) => {
+            if (updateError) {
+              return res.status(500).json({
+                status: 500,
+                error: "Erreur lors de la mise à jour de l'activité dépôt",
+              });
+            }
+
+            Modifications.create(
+              {
+                modification: `Modification des données de l'activité du dépôt de ${brouillard.depot}`,
+                details: `
+                    Anciennes données::
+                    Quantité avant vente: ${previousData.quantite_avant_vente},
+                    Vente: ${previousData.vente},
+                    Quantité après vente: ${previousData.quantite_apres_vente},
+                    Versement: ${previousData.versement},
+                    Dépense: ${previousData.depense},
+                    Observation: ${previousData.observation}
+                    -
+                    Nouvelles données::
+                    Quantité avant vente: ${newData.quantite_avant_vente},
+                    Vente: ${newData.vente},
+                    Quantité après vente: ${newData.quantite_apres_vente},
+                    Versement: ${newData.versement},
+                    Dépense: ${newData.depense},
+                    Observation: ${newData.observation}
+                    `,
+                id_employe: req.employee.id,
+              },
+              (error, modification) => {}
+            );
+
+            return res.status(200).json({ status: 200, existingActiviteDepot });
+          });
+          // ============== Final =======================
+        }
+      });
     });
   };
 

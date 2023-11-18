@@ -12,24 +12,24 @@ var AuthenticationMiddleware = require("../../middleware/authentication/authenti
 
 
 router.post("/commandes", AuthenticationMiddleware.authenticate, AuthorisationMiddleware.authorize("ajouter-commande"), CommandesController.create);
-router.get("/commande/:id", CommandesController.getById);
-router.get("/commandes-default/:startDate?/:endDate?", CommandesController.getAll); // ================  Seniority
+router.get("/commande/:id", AuthenticationMiddleware.authenticate, AuthorisationMiddleware.authorize("lire-commande"), CommandesController.getById);
+router.get("/commandes-default/:startDate?/:endDate?", AuthenticationMiddleware.authenticate, AuthorisationMiddleware.authorize("lire-commande"), CommandesController.getAll); // ================  Seniority
 
-router.get("/commandes/new-to-old/:startDate?/:endDate?", CommandesController.getAllFromNewToOld);
-router.get("/commandes/old-to-new/:startDate?/:endDate?", CommandesController.getAllFromOldToNew); // ================= Importance
+router.get("/commandes/new-to-old/:startDate?/:endDate?", AuthenticationMiddleware.authenticate, AuthorisationMiddleware.authorize("lire-commande"), CommandesController.getAllFromNewToOld);
+router.get("/commandes/old-to-new/:startDate?/:endDate?", AuthenticationMiddleware.authenticate, AuthorisationMiddleware.authorize("lire-commande"), CommandesController.getAllFromOldToNew); // ================= Importance
 
-router.get("/commandes/most-important/:startDate?/:endDate?", CommandesController.getAllMoreImportant);
-router.get("/commandes/less-important/:startDate?/:endDate?", CommandesController.getAllLessImportant); // ================= CIM BENIN Importance
+router.get("/commandes/most-important/:startDate?/:endDate?", AuthenticationMiddleware.authenticate, AuthorisationMiddleware.authorize("lire-commande"), CommandesController.getAllMoreImportant);
+router.get("/commandes/less-important/:startDate?/:endDate?", AuthenticationMiddleware.authenticate, AuthorisationMiddleware.authorize("lire-commande"), CommandesController.getAllLessImportant); // ================= CIM BENIN Importance
 
-router.get("/commandes/cim-benin-most-important/:startDate?/:endDate?", CommandesController.getAllCIMBENINMoreImportant);
-router.get("/commandes/cim-benin-less-important/:startDate?/:endDate?", CommandesController.getAllCIMBENINLessImportant); // ================= NOCIBE Importance
+router.get("/commandes/cim-benin-most-important/:startDate?/:endDate?", AuthenticationMiddleware.authenticate, AuthorisationMiddleware.authorize("lire-commande"), CommandesController.getAllCIMBENINMoreImportant);
+router.get("/commandes/cim-benin-less-important/:startDate?/:endDate?", AuthenticationMiddleware.authenticate, AuthorisationMiddleware.authorize("lire-commande"), CommandesController.getAllCIMBENINLessImportant); // ================= NOCIBE Importance
 
-router.get("/commandes/nocibe-most-important/:startDate?/:endDate?", CommandesController.getAllNOCIBEMoreImportant);
-router.get("/commandes/nocibe-less-important/:startDate?/:endDate?", CommandesController.getAllNOCIBELessImportant); // ================== Destination
+router.get("/commandes/nocibe-most-important/:startDate?/:endDate?", AuthenticationMiddleware.authenticate, AuthorisationMiddleware.authorize("lire-commande"), CommandesController.getAllNOCIBEMoreImportant);
+router.get("/commandes/nocibe-less-important/:startDate?/:endDate?", AuthenticationMiddleware.authenticate, AuthorisationMiddleware.authorize("lire-commande"), CommandesController.getAllNOCIBELessImportant); // ================== Destination
 
-router.get("/commandes/destination/:startDate?/:endDate?", CommandesController.getAllGroupByDestination);
-router.get("/commandes/delivered/:startDate?/:endDate?", CommandesController.getAllDelivered);
-router.get("/commandes/undelivered/:startDate?/:endDate?", CommandesController.getAllUnDelivered);
+router.get("/commandes/destination/:startDate?/:endDate?", AuthenticationMiddleware.authenticate, AuthorisationMiddleware.authorize("lire-commande"), CommandesController.getAllGroupByDestination);
+router.get("/commandes/delivered/:startDate?/:endDate?", AuthenticationMiddleware.authenticate, AuthorisationMiddleware.authorize("lire-commande"), CommandesController.getAllDelivered);
+router.get("/commandes/undelivered/:startDate?/:endDate?", AuthenticationMiddleware.authenticate, AuthorisationMiddleware.authorize("lire-commande"), CommandesController.getAllUnDelivered);
 router.put("/commandes/:id", AuthenticationMiddleware.authenticate, AuthorisationMiddleware.authorize("modifier-commande"), CommandesController.update);
 router["delete"]("/commandes/:id", AuthenticationMiddleware.authenticate, AuthorisationMiddleware.authorize("supprimer-commande"), CommandesController["delete"]);
 module.exports = router;

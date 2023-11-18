@@ -14,6 +14,8 @@ var routes = require("./routes/routes");
 
 var path = require("path");
 
+var undefinedRoute = require("./routes/404/404.routes");
+
 var port = process.env.PORT;
 var publicsDirectory = path.join(__dirname, "public");
 app.use(express["static"](publicsDirectory));
@@ -28,7 +30,9 @@ app.use(cookieParser()); // Middleware pour analyser le corps des requêtes au f
 
 app.use(bodyParser.json()); // Utiliser les routes
 
-app.use("/api", routes); // Démarrer le serveur
+app.use("/api", routes); // route vers la racine
+
+app.use("/", undefinedRoute); // Démarrer le serveur
 
 app.listen(port, function () {
   console.log("Serveur en cours d'ex\xE9cution sur le port ".concat(port));

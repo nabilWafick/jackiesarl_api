@@ -31,8 +31,7 @@ var upload = multer({
 router.post("/rapports", AuthenticationMiddleware.authenticate, AuthorisationMiddleware.authorize("ajouter-rapport"), upload.single("rapport"), RapportsController.create);
 router.get("/rapport/:id", AuthenticationMiddleware.authenticate, AuthorisationMiddleware.authorize("lire-rapport"), RapportsController.getById);
 router.get("/rapports/", AuthenticationMiddleware.authenticate, AuthorisationMiddleware.authorize("admin"), RapportsController.getAll);
-router.get("/rapports/employee/:employee_id", // AuthorisationMiddleware.authorize("lire-rapport"),
-RapportsController.getAllOfEmployee);
+router.get("/rapports/employee/:employee_id", AuthenticationMiddleware.authenticate, AuthorisationMiddleware.authorize("lire-rapport"), RapportsController.getAllOfEmployee);
 router.put("/rapports/:id", AuthenticationMiddleware.authenticate, AuthorisationMiddleware.authorize("modifier-rapport"), upload.single("rapport"), RapportsController.update);
 router["delete"]("/rapports/:id", AuthenticationMiddleware.authenticate, AuthorisationMiddleware.authorize("supprimer-rapport"), RapportsController["delete"]);
 module.exports = router;

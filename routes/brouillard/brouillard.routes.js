@@ -11,9 +11,16 @@ router.post(
   AuthorisationMiddleware.authorize("ajouter-brouillard"),
   BrouillardController.create
 );
-router.get("/brouillard/:id", BrouillardController.getById);
+router.get(
+  "/brouillard/:id",
+  AuthenticationMiddleware.authenticate,
+  AuthorisationMiddleware.authorize("lire-brouillard"),
+  BrouillardController.getById
+);
 router.get(
   "/brouillards-default/:startDate?/:endDate?",
+  AuthenticationMiddleware.authenticate,
+  AuthorisationMiddleware.authorize("lire-brouillard"),
   BrouillardController.getAll
 );
 router.put(

@@ -30,12 +30,18 @@ router.post(
   upload.single("bordereau"),
   AchatClientController.create
 );
-router.get("/achat-client/:id", AchatClientController.getById);
+router.get(
+  "/achat-client/:id",
+  AuthenticationMiddleware.authenticate,
+  AuthorisationMiddleware.authorize("lire-achat-client"),
+  AchatClientController.getById
+);
 
 // =================== All clients default
-
 router.get(
   "/achats-clients-default/:startDate?/:endDate?",
+  AuthenticationMiddleware.authenticate,
+  AuthorisationMiddleware.authorize("lire-achat-client"),
   AchatClientController.getAll
 );
 
@@ -43,10 +49,14 @@ router.get(
 
 router.get(
   "/achats-clients/new-to-old/:startDate?/:endDate?",
+  AuthenticationMiddleware.authenticate,
+  AuthorisationMiddleware.authorize("lire-achat-client"),
   AchatClientController.getAllFromNewToOld
 );
 router.get(
   "/achats-clients/old-to-new/:startDate?/:endDate?",
+  AuthenticationMiddleware.authenticate,
+  AuthorisationMiddleware.authorize("lire-achat-client"),
   AchatClientController.getAllFromOldToNew
 );
 
@@ -54,10 +64,14 @@ router.get(
 
 router.get(
   "/achats-clients/most-important/:startDate?/:endDate?",
+  AuthenticationMiddleware.authenticate,
+  AuthorisationMiddleware.authorize("lire-achat-client"),
   AchatClientController.getAllMostImportant
 );
 router.get(
   "/achats-clients/less-important/:startDate?/:endDate?",
+  AuthenticationMiddleware.authenticate,
+  AuthorisationMiddleware.authorize("lire-achat-client"),
   AchatClientController.getAllLessImportant
 );
 
@@ -65,10 +79,14 @@ router.get(
 
 router.get(
   "/achats-clients/cim-benin-most-important/:startDate?/:endDate?",
+  AuthenticationMiddleware.authenticate,
+  AuthorisationMiddleware.authorize("lire-achat-client"),
   AchatClientController.getAllCIMBENINMostImportant
 );
 router.get(
   "/achats-clients/cim-benin-less-important/:startDate?/:endDate?",
+  AuthenticationMiddleware.authenticate,
+  AuthorisationMiddleware.authorize("lire-achat-client"),
   AchatClientController.getAllCIMBENINLessImportant
 );
 
@@ -76,10 +94,14 @@ router.get(
 
 router.get(
   "/achats-clients/nocibe-most-important/:startDate?/:endDate?",
+  AuthenticationMiddleware.authenticate,
+  AuthorisationMiddleware.authorize("lire-achat-client"),
   AchatClientController.getAllNOCIBEMostImportant
 );
 router.get(
   "/achats-clients/nocibe-less-important/:startDate?/:endDate?",
+  AuthenticationMiddleware.authenticate,
+  AuthorisationMiddleware.authorize("lire-achat-client"),
   AchatClientController.getAllNOCIBELessImportant
 );
 
@@ -87,6 +109,8 @@ router.get(
 
 router.get(
   "/achats-client/client-default/:id_client/:startDate?/:endDate?",
+  AuthenticationMiddleware.authenticate,
+  AuthorisationMiddleware.authorize("lire-achat-client"),
   AchatClientController.getAllOfClient
 );
 
@@ -94,10 +118,14 @@ router.get(
 
 router.get(
   "/achats-client/client/:id_client/old-to-new/:startDate?/:endDate?",
+  AuthenticationMiddleware.authenticate,
+  AuthorisationMiddleware.authorize("lire-achat-client"),
   AchatClientController.getAllOfClientFromOldToNew
 );
 router.get(
   "/achats-client/client/:id_client/new-to-important/:startDate?/:endDate?",
+  AuthenticationMiddleware.authenticate,
+  AuthorisationMiddleware.authorize("lire-achat-client"),
   AchatClientController.getAllOfClientFromNewToOld
 );
 
@@ -105,10 +133,14 @@ router.get(
 
 router.get(
   "/achats-client/client/:id_client/most-important/:startDate?/:endDate?",
+  AuthenticationMiddleware.authenticate,
+  AuthorisationMiddleware.authorize("lire-achat-client"),
   AchatClientController.getAllOfClientMostImportant
 );
 router.get(
   "/achats-client/client/:id_client/less-important/:startDate?/:endDate?",
+  AuthenticationMiddleware.authenticate,
+  AuthorisationMiddleware.authorize("lire-achat-client"),
   AchatClientController.getAllOfClientLessImportant
 );
 
@@ -116,10 +148,14 @@ router.get(
 
 router.get(
   "/achats-client/client/:id_client/cim-benin-most-important/:startDate?/:endDate?",
+  AuthenticationMiddleware.authenticate,
+  AuthorisationMiddleware.authorize("lire-achat-client"),
   AchatClientController.getAllOfClientCIMBENINMostImportant
 );
 router.get(
   "/achats-client/client/:id_client/cim-benin-less-important/:startDate?/:endDate?",
+  AuthenticationMiddleware.authenticate,
+  AuthorisationMiddleware.authorize("lire-achat-client"),
   AchatClientController.getAllOfClientCIMBENINLessImportant
 );
 
@@ -127,10 +163,14 @@ router.get(
 
 router.get(
   "/achats-client/client/:id_client/nocibe-most-important/:startDate?/:endDate?",
+  AuthenticationMiddleware.authenticate,
+  AuthorisationMiddleware.authorize("lire-achat-client"),
   AchatClientController.getAllOfClientNOCIBEMostImportant
 );
 router.get(
   "/achats-client/client/:id_client/nocibe-less-important/:startDate?/:endDate?",
+  AuthenticationMiddleware.authenticate,
+  AuthorisationMiddleware.authorize("lire-achat-client"),
   AchatClientController.getAllOfClientNOCIBELessImportant
 );
 
