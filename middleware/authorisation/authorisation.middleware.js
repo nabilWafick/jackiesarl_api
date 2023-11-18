@@ -2,7 +2,11 @@ class AuthorisationMiddleware {
   static authorize = (permission) => {
     // console.log("In Authorization Middleware");
     return (req, res, next) => {
+      //  console.log(Date.now());
+      //  console.log("employee", req.employee);
+      //  console.log("Employee permissions", req.employee.permissions);
       const employeePermissions = JSON.parse(req.employee.permissions);
+      //   console.log("employeePermissions", employeePermissions);
 
       if (employeePermissions[permission] || employeePermissions["admin"]) {
         //  console.log("Have permission", employeePermissions[permission]);

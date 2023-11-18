@@ -12,6 +12,9 @@ var AuthenticationMiddleware = require("../../middleware/authentication/authenti
 
 router.get("/table-bord/total-paiements-hebdomadaire/", AuthenticationMiddleware.authenticate, AuthorisationMiddleware.authorize("lire-tableau-bord"), TableBordController.getWeekDailyPayments);
 router.get("/table-bord/total-ventes-hebdomadaire/", AuthenticationMiddleware.authenticate, AuthorisationMiddleware.authorize("lire-tableau-bord"), TableBordController.getWeekDailySales);
+router.get("/table-bord/total-quantites-ventes-hebdomadaire/", // AuthenticationMiddleware.authenticate,
+// AuthorisationMiddleware.authorize("lire-tableau-bord"),
+TableBordController.getWeekDailySalesQuantity);
 router.get("/table-bord/total-clients-inscrits-quotidien/:isToday", AuthenticationMiddleware.authenticate, AuthorisationMiddleware.authorize("lire-tableau-bord"), TableBordController.getDailyRegisteredCustumersTotal);
 router.get("/table-bord/total-ventes-quotidiennes/:isToday", AuthenticationMiddleware.authenticate, AuthorisationMiddleware.authorize("lire-tableau-bord"), TableBordController.getDailySalesTotal);
 router.get("/table-bord/total-achats-entreprise-quotidiens/:isToday", AuthenticationMiddleware.authenticate, AuthorisationMiddleware.authorize("lire-tableau-bord"), TableBordController.getDailyCompanyPurchases);

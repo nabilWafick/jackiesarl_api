@@ -14,14 +14,26 @@ class TableBordController {
   }
 
   static getWeekDailySales(req, res) {
-    TableBord.getWeekDailySales((error, weekDailyPayments) => {
+    TableBord.getWeekDailySales((error, weekDailySales) => {
       if (error) {
         return res.status(500).json({
           status: 500,
           error: "Erreur lors de la récupération des paiements de la semaine ",
         });
       }
-      return res.status(200).json(weekDailyPayments);
+      return res.status(200).json(weekDailySales);
+    });
+  }
+
+  static getWeekDailySalesQuantity(req, res) {
+    TableBord.getWeekDailySalesQuantity((error, weekDailySales) => {
+      if (error) {
+        return res.status(500).json({
+          status: 500,
+          error: "Erreur lors de la récupération des paiements de la semaine ",
+        });
+      }
+      return res.status(200).json(weekDailySales);
     });
   }
 

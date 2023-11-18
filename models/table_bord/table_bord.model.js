@@ -64,6 +64,37 @@ GROUP by jours.days ORDER BY
     });
   }
 
+  static getWeekDailySalesQuantity(callback) {
+    const query = `SELECT DISTINCT CASE 
+    WHEN jours.days = 'Monday' THEN 'Lundi'
+    WHEN jours.days = 'Tuesday' THEN 'Mardi'
+    WHEN jours.days = 'Wednesday' THEN 'Mercredi'
+    WHEN jours.days = 'Thursday' THEN 'Jeudi'
+    WHEN jours.days = 'Friday' THEN 'Vendredi'
+    WHEN jours.days = 'Saturday' THEN 'Samedi'
+    WHEN jours.days = 'Sunday' THEN 'Dimanche'
+  END AS jour, COALESCE(SUM(achat_client.quantite_achetee),0) as total_quantite_achetee_journalier from jours
+LEFT JOIN achat_client
+ON jours.days = DAYNAME(achat_client.date_achat)
+AND WEEK(achat_client.date_achat) = WEEK(CURRENT_DATE)
+GROUP by jours.days ORDER BY
+  FIELD(jour, 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 
+  'Samedi','Dimanche')`;
+    connection.query(query, (error, results) => {
+      if (error) {
+        return callback(error, null);
+      }
+      const quantitesJournalieres = results.map((quantiteJournaliere) => {
+        return {
+          jour: quantiteJournaliere.jour,
+          total_quantite_vente:
+            quantiteJournaliere.total_quantite_achetee_journalier,
+        };
+      });
+      return callback(null, quantitesJournalieres);
+    });
+  }
+
   static getDailyRegisteredCustumersTotal(isToday, callback) {
     if (isToday == 1) {
       const query = `

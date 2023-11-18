@@ -32,7 +32,7 @@ function () {
   }, {
     key: "getWeekDailySales",
     value: function getWeekDailySales(req, res) {
-      TableBord.getWeekDailySales(function (error, weekDailyPayments) {
+      TableBord.getWeekDailySales(function (error, weekDailySales) {
         if (error) {
           return res.status(500).json({
             status: 500,
@@ -40,7 +40,21 @@ function () {
           });
         }
 
-        return res.status(200).json(weekDailyPayments);
+        return res.status(200).json(weekDailySales);
+      });
+    }
+  }, {
+    key: "getWeekDailySalesQuantity",
+    value: function getWeekDailySalesQuantity(req, res) {
+      TableBord.getWeekDailySalesQuantity(function (error, weekDailySales) {
+        if (error) {
+          return res.status(500).json({
+            status: 500,
+            error: "Erreur lors de la récupération des paiements de la semaine "
+          });
+        }
+
+        return res.status(200).json(weekDailySales);
       });
     }
   }, {

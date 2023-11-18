@@ -54,6 +54,24 @@ function () {
       });
     }
   }, {
+    key: "getWeekDailySalesQuantity",
+    value: function getWeekDailySalesQuantity(callback) {
+      var query = "SELECT DISTINCT CASE \n    WHEN jours.days = 'Monday' THEN 'Lundi'\n    WHEN jours.days = 'Tuesday' THEN 'Mardi'\n    WHEN jours.days = 'Wednesday' THEN 'Mercredi'\n    WHEN jours.days = 'Thursday' THEN 'Jeudi'\n    WHEN jours.days = 'Friday' THEN 'Vendredi'\n    WHEN jours.days = 'Saturday' THEN 'Samedi'\n    WHEN jours.days = 'Sunday' THEN 'Dimanche'\n  END AS jour, COALESCE(SUM(achat_client.quantite_achetee),0) as total_quantite_achetee_journalier from jours\nLEFT JOIN achat_client\nON jours.days = DAYNAME(achat_client.date_achat)\nAND WEEK(achat_client.date_achat) = WEEK(CURRENT_DATE)\nGROUP by jours.days ORDER BY\n  FIELD(jour, 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', \n  'Samedi','Dimanche')";
+      connection.query(query, function (error, results) {
+        if (error) {
+          return callback(error, null);
+        }
+
+        var quantitesJournalieres = results.map(function (quantiteJournaliere) {
+          return {
+            jour: quantiteJournaliere.jour,
+            total_quantite_vente: quantiteJournaliere.total_quantite_achetee_journalier
+          };
+        });
+        return callback(null, quantitesJournalieres);
+      });
+    }
+  }, {
     key: "getDailyRegisteredCustumersTotal",
     value: function getDailyRegisteredCustumersTotal(isToday, callback) {
       if (isToday == 1) {
