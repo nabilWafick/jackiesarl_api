@@ -3,11 +3,13 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 
 class AuthController {
-  static verifyAuthentication = async (req, res) => {
-    const authHeader = req.headers["authorization-tokens"];
+  // ============================= Verify authentication state
 
-    const accessToken = authHeader && authHeader.split(" ")[1];
-    const token = authHeader && authHeader.split(" ")[2];
+  static verifyAuthentication = async (req, res) => {
+    const authHeader = req.headers["authorization-token"];
+
+    const accessToken = req.cookies.accessToken;
+    const token = authHeader && authHeader.split(" ")[1];
 
     if (!accessToken || !token) {
       return res.status(401).json({ status: 401, error: "Non Authentifié" });
@@ -59,7 +61,7 @@ class AuthController {
                     .status(401)
                     .json({ status: 401, error: "Non authentifié" });
 
-                res.status(202).json({ status: 202, message: "Authentifié" });
+                res.status(202).json({ status: 202, employee: employee });
               });
             }
           );
@@ -149,6 +151,9 @@ class AuthController {
   static login = async (req, res) => {
     const { email, password } = req.body;
 
+    console.log("cookies", req.cookies);
+    console.log("req.body", req.body);
+
     Employes.getByEmail(email, async (employeError, employe) => {
       if (employeError) {
         return res.status(500).json({
@@ -179,14 +184,20 @@ class AuthController {
             expiresIn: "30m",
           }
         );
-        const authenticatedEmployee = {
+        res.cookie("accessToken", newAccessToken, {
+          httpOnly: true,
+          maxAge: 30 * 60 * 1000,
+          sameSite: "None",
+          secure: true,
+        });
+        /*const authenticatedEmployee = {
           ...employe,
           accessToken: newAccessToken,
-        };
+        };*/
+        //  res.send("Cookie defined with success");
         res.status(202).json({
           status: 202,
-          employe: { ...authenticatedEmployee, password: "Employe Password" },
-          accessToken: newAccessToken,
+          employe: { ...employe, password: "Employe Password" },
         });
       } else {
         return res
@@ -199,10 +210,11 @@ class AuthController {
   // ============================== Logout
 
   static logout = (req, res) => {
-    req.clearCookie("accessToken");
+    console.log("In logout");
+    res.clearCookie("accessToken");
     return res
-      .status("200")
-      .json({ status: 200, error: "Déonnecté avec succès" });
+      .status(200)
+      .json({ status: 200, message: "Déonnecté avec succès" });
   };
 }
 
