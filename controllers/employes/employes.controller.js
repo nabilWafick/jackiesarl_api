@@ -102,12 +102,15 @@ class EmployesController {
     // console.log("updatedData", updatedData);
     Employes.getById(id, (getError, existingEmploye) => {
       if (getError) {
-        return res
-          .status(500)
-          .json({ error: "Erreur lors de la récupération de l'employé" });
+        return res.status(500).json({
+          status: 500,
+          error: "Erreur lors de la récupération de l'employé",
+        });
       }
       if (!existingEmploye) {
-        return res.status(404).json({ error: "Employé non trouvé" });
+        return res
+          .status(404)
+          .json({ status: 500, error: "Employé non trouvé" });
       }
 
       //   console.log("existingEmploye", existingEmploye);
@@ -132,9 +135,10 @@ class EmployesController {
       );
       existingEmploye.update((updateError) => {
         if (updateError) {
-          return res
-            .status(500)
-            .json({ error: "Erreur lors de la mise à jour de l'employé" });
+          return res.status(500).json({
+            status: 500,
+            error: "Erreur lors de la mise à jour de l'employé",
+          });
         }
         return res.status(200).json({ status: 200, employee: existingEmploye });
       });
@@ -146,20 +150,24 @@ class EmployesController {
     const id = req.params.id;
     Employes.getById(id, (getError, existingEmploye) => {
       if (getError) {
-        return res
-          .status(500)
-          .json({ error: "Erreur lors de la récupération de l'employé" });
+        return res.status(500).json({
+          status: 500,
+          error: "Erreur lors de la récupération de l'employé",
+        });
       }
       if (!existingEmploye) {
-        return res.status(404).json({ error: "Employé non trouvé" });
+        return res
+          .status(404)
+          .json({ status: 500, error: "Employé non trouvé" });
       }
-      existingEmploye.delete((deleteError) => {
+      existingEmploye.delete((deleteError, id) => {
         if (deleteError) {
-          return res
-            .status(500)
-            .json({ error: "Erreur lors de la suppression de l'employé" });
+          return res.status(500).json({
+            status: 500,
+            error: "Erreur lors de la suppression de l'employé",
+          });
         }
-        return res.status(204).json();
+        return res.status(204).json({ status: 204, id });
       });
     });
   };

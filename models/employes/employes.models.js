@@ -109,6 +109,11 @@ class Employes {
       "lire-activite-banque": true,
       "modifier-activite-banque": false,
       "supprimer-activite-banque": false,
+
+      "ajouter-facture-mecef": false,
+      "lire-facture-mecef": true,
+      "modifier-facture-mecef": false,
+      "supprimer-facture-mecef": false,
     };
 
     const query =
@@ -252,13 +257,13 @@ class Employes {
     );
   }
 
-  static delete(id, callback) {
+  delete(callback) {
     const query = "DELETE FROM employes WHERE id = ?";
     connection.query(query, [id], (error, results) => {
       if (error) {
-        return callback(error);
+        return callback(error, null);
       }
-      return callback(null);
+      return callback(null, id);
     });
   }
 }

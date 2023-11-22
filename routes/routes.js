@@ -12,6 +12,7 @@ const clientsTonnagesRoutes = require("./clients_tonnages/clients_tonnages.route
 const commandesRoutes = require("./commandes/commandes.routes");
 const depensesRoutes = require("./depenses/depenses.routes");
 const employesRoutes = require("./employes/employes.routes");
+const facturesRoutes = require("./factures_mecef/factures_mecef.routes");
 const modificationsRoutes = require("./modifications/modifications.routes");
 const paiementClientRoutes = require("./paiement_client/paiement_client.routes");
 const rapportsRoutes = require("./rapports/rapports.routes");
@@ -35,6 +36,7 @@ router.use("/", clientsTonnagesRoutes);
 router.use("/", commandesRoutes);
 router.use("/", depensesRoutes);
 router.use("/", employesRoutes);
+router.use("/", facturesRoutes);
 router.use("/", modificationsRoutes);
 router.use("/", paiementClientRoutes);
 router.use("/", rapportsRoutes);
