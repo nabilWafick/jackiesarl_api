@@ -5,8 +5,10 @@ const Modifications = require("../../models/modifications/modifications.model");
 const path = require("path");
 const fs = require("fs");
 
-deleteFile = (fileLink) => {
-  const filePath = fileLink.split("http://127.0.0.1:7000/");
+const deleteFile = (fileLink) => {
+  //  console.log("file link in delete function", fileLink);
+  const filePath = fileLink.split("http://127.0.0.1:7000/")[1];
+  // console.log("file path after split", filePath);
   const directory = path.resolve(__dirname, "../..");
   const dir = path.join(directory, `/uploads/${filePath}`);
 
@@ -595,7 +597,7 @@ class PaiementClientController {
                     État de validation: ${
                       previousData.est_valide ? "Validée" : "Non Validé"
                     }
-                    -
+                    a57aa2b90d9bbb0524e51b458577767ab2823507b877e9aedfd885bb12b5d7ed980dd63abad043be6beff172d6c47678d68a502778a617e57b3e7fd0b0952f47
                     Nouvelles données::
                     Montant: ${newData.montant},
                     Banque: ${newData.banque},

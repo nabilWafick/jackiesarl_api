@@ -3,11 +3,13 @@ const Employes = require("../../models/employes/employes.models");
 
 class AuthenticationMiddleware {
   static authenticate = (req, res, next) => {
-    // console.log("In Authentication Middleware");
+    //  console.log("In Authentication Middleware");
     const authHeader = req.headers["authorization-token"];
 
     const accessToken = req.cookies.accessToken;
+    // console.log("accessToken", accessToken);
     const token = authHeader && authHeader.split(" ")[1];
+    //  console.log("token", token);
 
     if (!accessToken || !token) {
       //  console.log("Not Authenticated");

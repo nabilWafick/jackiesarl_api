@@ -253,7 +253,8 @@ class ClientsController {
               Numéro IFU: ${previousData.numero_ifu},
               Numéro de téléphone: ${previousData.numero_telephone},
               Email: ${previousData.email} 
-              - Nouvelles données:: Nom: ${newData.nom},
+              a57aa2b90d9bbb0524e51b458577767ab2823507b877e9aedfd885bb12b5d7ed980dd63abad043be6beff172d6c47678d68a502778a617e57b3e7fd0b0952f47
+              Nouvelles données:: Nom: ${newData.nom},
               Prénoms: ${newData.prenoms},
               Numéro IFU: ${newData.numero_ifu},
               Numéro de téléphone: ${newData.numero_telephone},

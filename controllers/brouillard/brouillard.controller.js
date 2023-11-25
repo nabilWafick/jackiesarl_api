@@ -105,7 +105,7 @@ class BrouillardController {
                 Stock actuel: ${previousData.stock_actuel},
                 Nom gérant: ${previousData.nom_gerant},
                 Numéro gérant: ${previousData.numero_gerant}
-                -
+                a57aa2b90d9bbb0524e51b458577767ab2823507b877e9aedfd885bb12b5d7ed980dd63abad043be6beff172d6c47678d68a502778a617e57b3e7fd0b0952f47
                 Nouvelles données::
                 Dépôt: ${newData.depot},
                 Stock actuel: ${newData.stock_actuel},
@@ -217,7 +217,7 @@ class BrouillardController {
                         Stock actuel: ${previousData.stock_actuel},
                         Nom gérant: ${previousData.nom_gerant},
                         Numéro gérant: ${previousData.numero_gerant}
-                        -
+                        a57aa2b90d9bbb0524e51b458577767ab2823507b877e9aedfd885bb12b5d7ed980dd63abad043be6beff172d6c47678d68a502778a617e57b3e7fd0b0952f47
                         Nouvelles données::
                         Dépôt: ${newData.depot},
                         Stock actuel: ${newData.stock_actuel},
@@ -272,7 +272,7 @@ class BrouillardController {
                   Stock actuel: ${previousData.stock_actuel},
                   Nom gérant: ${previousData.nom_gerant},
                   Numéro gérant: ${previousData.numero_gerant}
-                  -
+                  a57aa2b90d9bbb0524e51b458577767ab2823507b877e9aedfd885bb12b5d7ed980dd63abad043be6beff172d6c47678d68a502778a617e57b3e7fd0b0952f47
                   Nouvelles données::
                   Dépôt: ${newData.depot},
                   Stock actuel: ${newData.stock_actuel},

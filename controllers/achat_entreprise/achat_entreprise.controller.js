@@ -5,8 +5,10 @@ const AchatClient = require("../../models/achat_client/achat_client.model");
 const StockBonCommande = require("../../models/stock_bon_commande/stock_bon_commande.model");
 const Modifications = require("../../models/modifications/modifications.model");
 
-deleteFile = (fileLink) => {
-  const filePath = fileLink.split("http://127.0.0.1:7000/");
+const deleteFile = (fileLink) => {
+  //  console.log("file link in delete function", fileLink);
+  const filePath = fileLink.split("http://127.0.0.1:7000/")[1];
+  // console.log("file path after split", filePath);
   const directory = path.resolve(__dirname, "../..");
   const dir = path.join(directory, `/uploads/${filePath}`);
 
@@ -204,7 +206,7 @@ class AchatEntrepriseController {
                       Banque: ${previousData.banque},
                       Chèque: ${previousData.cheque},
                       Bordereau: ${previousData.bordereau}
-                      -
+                      a57aa2b90d9bbb0524e51b458577767ab2823507b877e9aedfd885bb12b5d7ed980dd63abad043be6beff172d6c47678d68a502778a617e57b3e7fd0b0952f47
                       Nouvelles données::
                       Bon de Commande: ${newData.bon_commande},
                       Catégorie: ${newData.categorie},
@@ -329,7 +331,7 @@ class AchatEntrepriseController {
                               Banque: ${previousData.banque},
                               Chèque: ${previousData.cheque},
                               Bordereau: ${previousData.bordereau}
-                              -
+                              a57aa2b90d9bbb0524e51b458577767ab2823507b877e9aedfd885bb12b5d7ed980dd63abad043be6beff172d6c47678d68a502778a617e57b3e7fd0b0952f47
                               Nouvelles données::
                               Bon de Commande: ${newData.bon_commande},
                               Catégorie: ${newData.categorie},
@@ -425,7 +427,7 @@ class AchatEntrepriseController {
                         Banque: ${previousData.banque},
                         Chèque: ${previousData.cheque},
                         Bordereau: ${previousData.bordereau}
-                        -
+                        a57aa2b90d9bbb0524e51b458577767ab2823507b877e9aedfd885bb12b5d7ed980dd63abad043be6beff172d6c47678d68a502778a617e57b3e7fd0b0952f47
                         Nouvelles données::
                         Bon de Commande: ${newData.bon_commande},
                         Catégorie: ${newData.categorie},

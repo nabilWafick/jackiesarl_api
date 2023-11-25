@@ -57,7 +57,24 @@ class AchatClient {
   }
 
   static getById(id, callback) {
-    const query = "SELECT * FROM achat_client WHERE id = ?";
+    const query = `SELECT
+    clients.id AS client_id,
+    clients.nom AS nom,
+    clients.prenoms AS prenoms,
+    clients.numero_ifu AS numero_ifu,
+    clients.numero_telephone AS numero_telephone,
+    clients.email AS email,
+    clients.date_ajout AS date_ajout,
+    achat_client.id AS achat_id,
+    achat_client.quantite_achetee,
+    achat_client.categorie AS categorie,
+    achat_client.montant AS montant,
+    achat_client.numero_ctp AS numero_ctp,
+    achat_client.bordereau AS bordereau,
+    achat_client.numero_bc AS numero_bc,
+    achat_client.date_achat AS date_achat
+    FROM clients, achat_client
+    WHERE  achat_client.id = ?`;
     connection.query(query, [id], (error, results) => {
       if (error) {
         return callback(error, null);
@@ -67,15 +84,23 @@ class AchatClient {
       }
       const achatClientData = results[0];
       const achatClient = new AchatClient(
-        achatClientData.id,
-        undefined,
+        achatClientData.achat_id,
+        new Clients(
+          achatClientData.client_id,
+          achatClientData.nom,
+          achatClientData.prenoms,
+          achatClientData.numero_ifu,
+          achatClientData.numero_telephone,
+          achatClientData.email,
+          achatClientData.date_ajout
+        ),
         achatClientData.quantite_achetee,
         achatClientData.categorie,
         achatClientData.montant,
         achatClientData.numero_ctp,
         achatClientData.bordereau,
         achatClientData.numero_bc,
-        achatClientData.id_client,
+        achatClientData.client_id,
         new Date(achatClientData.date_achat)
       );
       return callback(null, achatClient);
@@ -108,8 +133,67 @@ class AchatClient {
       return callback(null, achatClient);
     });
   }
+  // ================ All Clients Purchases Without Bill ================
 
-  // ================ All Client ================
+  static getAllWithoutBill(callback) {
+    const query = `SELECT
+      clients.id AS client_id,
+      clients.nom AS nom,
+      clients.prenoms AS prenoms,
+      clients.numero_ifu AS numero_ifu,
+      clients.numero_telephone AS numero_telephone,
+      clients.email AS email,
+      clients.date_ajout AS date_ajout,
+      achat_client.id AS achat_id,
+      achat_client.quantite_achetee,
+      achat_client.categorie AS categorie,
+      achat_client.montant AS montant,
+      achat_client.numero_ctp AS numero_ctp,
+      achat_client.bordereau AS bordereau,
+      achat_client.numero_bc AS numero_bc,
+      achat_client.date_achat AS date_achat
+  FROM
+      clients, achat_client 
+  WHERE
+       clients.id = achat_client.id_client  AND NOT EXISTS 
+  (
+   SELECT 1 
+   FROM factures_mecef
+   WHERE achat_client.id = factures_mecef.id_achat
+  )
+  
+  ORDER BY achat_client.id DESC;`;
+    connection.query(query, (error, results) => {
+      if (error) {
+        return callback(error, null);
+      }
+      const achatsClients = results.map((achatClientData) => {
+        return new AchatClient(
+          achatClientData.achat_id,
+          new Clients(
+            achatClientData.client_id,
+            achatClientData.nom,
+            achatClientData.prenoms,
+            achatClientData.numero_ifu,
+            achatClientData.numero_telephone,
+            achatClientData.email,
+            achatClientData.date_ajout
+          ),
+          achatClientData.quantite_achetee,
+          achatClientData.categorie,
+          achatClientData.montant,
+          achatClientData.numero_ctp,
+          achatClientData.bordereau,
+          achatClientData.numero_bc,
+          achatClientData.id_client,
+          new Date(achatClientData.date_achat)
+        );
+      });
+      return callback(null, achatsClients);
+    });
+  }
+
+  // ================ All Clients Purchases ================
 
   static getAll(startDate, endDate, callback) {
     if (startDate && endDate) {

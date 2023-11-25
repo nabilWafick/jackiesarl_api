@@ -151,8 +151,8 @@ class AuthController {
   static login = async (req, res) => {
     const { email, password } = req.body;
 
-    console.log("cookies", req.cookies);
-    console.log("req.body", req.body);
+    //   console.log("cookies", req.cookies);
+    //   console.log("req.body", req.body);
 
     Employes.getByEmail(email, async (employeError, employe) => {
       if (employeError) {
@@ -189,6 +189,7 @@ class AuthController {
           maxAge: 30 * 60 * 1000,
           sameSite: "None",
           secure: true,
+          partitioned: true,
         });
         /*const authenticatedEmployee = {
           ...employe,

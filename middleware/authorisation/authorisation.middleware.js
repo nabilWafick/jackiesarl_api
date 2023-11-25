@@ -1,6 +1,6 @@
 class AuthorisationMiddleware {
   static authorize = (permission) => {
-    // console.log("In Authorization Middleware");
+    //  console.log("In Authorization Middleware");
     return (req, res, next) => {
       //  console.log(Date.now());
       //  console.log("employee", req.employee);

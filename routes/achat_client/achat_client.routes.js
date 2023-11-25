@@ -45,6 +45,15 @@ router.get(
   AchatClientController.getAll
 );
 
+// ================== Without bill
+
+router.get(
+  "/achats-clients/without-bill",
+  AuthenticationMiddleware.authenticate,
+  AuthorisationMiddleware.authorize("lire-achat-client"),
+  AchatClientController.getAllWithoutBill
+);
+
 // ================  Seniority
 
 router.get(
