@@ -17,6 +17,7 @@ class ActivitesBanqueController {
             error: "Erreur lors de la récupération du solde courant",
           });
         }
+        console.log("La banque existe");
         if (!soldeCourant) {
           return res
             .status(404)

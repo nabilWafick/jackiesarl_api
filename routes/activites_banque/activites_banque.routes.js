@@ -22,11 +22,13 @@ router.get(
 router.get(
   "/activites-banque/",
   AuthenticationMiddleware.authenticate,
+  AuthorisationMiddleware.authorize("lire-activite-banque"),
   ActivitesBanqueController.getAll
 );
 
 router.get(
   "/activites-banque/banque/:id_banque",
+  AuthenticationMiddleware.authenticate,
   AuthorisationMiddleware.authorize("lire-activite-banque"),
   ActivitesBanqueController.getAllByBanqueID
 );
